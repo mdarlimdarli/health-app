@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-28T19:17:11.900Z",
+  "phase": 1,
+  "daysPerWeek": 2,
+  "sessionsPerPhase": 16,
+  "plans": [
+    {
+      "id": "A",
+      "name": "Plan A",
+      "type": "ganzkoerper",
+      "mobility": [
+        {
+          "exerciseId": "bws-rotation",
+          "seconds": 75,
+          "name": "Brustwirbelsäulen-Rotation"
+        },
+        {
+          "exerciseId": "katze-kuh",
+          "seconds": 75,
+          "name": "Katze-Kuh"
+        },
+        {
+          "exerciseId": "tuerrahmen-dehnung",
+          "seconds": 75,
+          "name": "Türrahmen-Dehnung"
+        },
+        {
+          "exerciseId": "schulterkreise",
+          "seconds": 75,
+          "name": "Schulterkreise"
+        }
+      ],
+      "exercises": [
+        {
+          "exerciseId": "beinpresse",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 2.5,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 2,5 kg."
+          },
+          "name": "Beinpresse"
+        },
+        {
+          "exerciseId": "hip-thrust-maschine",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 2.5,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 2,5 kg."
+          },
+          "name": "Hip Thrust Maschine"
+        },
+        {
+          "exerciseId": "rudern-kabel-sitzend",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 1.25,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 1,25 kg."
+          },
+          "name": "Rudern sitzend Kabelzug"
+        },
+        {
+          "exerciseId": "latzug-brust",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 1.25,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 1,25 kg."
+          },
+          "name": "Latzug zur Brust"
+        },
+        {
+          "exerciseId": "brustpresse-maschine",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 1.25,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 1,25 kg."
+          },
+          "name": "Brustpresse Maschine"
+        },
+        {
+          "exerciseId": "schulterdruecken-maschine",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 1.25,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 1,25 kg."
+          },
+          "name": "Schulterdrücken Maschine neutraler Griff"
+        },
+        {
+          "exerciseId": "plank",
+          "sets": 2,
+          "repRange": [
+            20,
+            40
+          ],
+          "restSeconds": 45,
+          "progressionRule": {
+            "type": "zeit",
+            "stepSeconds": 5,
+            "text": "Schaffst du in allen Sätzen 40 Sekunden, verlängere um 5 Sekunden."
+          },
+          "name": "Plank"
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Plan B",
+      "type": "ganzkoerper",
+      "mobility": [
+        {
+          "exerciseId": "tuerrahmen-dehnung",
+          "seconds": 75,
+          "name": "Türrahmen-Dehnung"
+        },
+        {
+          "exerciseId": "schulterkreise",
+          "seconds": 75,
+          "name": "Schulterkreise"
+        },
+        {
+          "exerciseId": "nackendehnung-seitlich",
+          "seconds": 75,
+          "name": "Nackendehnung seitlich"
+        },
+        {
+          "exerciseId": "faszienrolle-oberer-ruecken",
+          "seconds": 75,
+          "name": "Faszienrolle oberer Rücken"
+        }
+      ],
+      "exercises": [
+        {
+          "exerciseId": "ausfallschritte",
+          "sets": 2,
+          "repRange": [
+            8,
+            15
+          ],
+          "restSeconds": 60,
+          "progressionRule": {
+            "type": "wiederholungen",
+            "text": "Schaffst du in allen Sätzen 15 Wiederholungen, wähle eine schwerere Variante."
+          },
+          "name": "Ausfallschritte"
+        },
+        {
+          "exerciseId": "glute-bridge",
+          "sets": 2,
+          "repRange": [
+            8,
+            15
+          ],
+          "restSeconds": 60,
+          "progressionRule": {
+            "type": "wiederholungen",
+            "text": "Schaffst du in allen Sätzen 15 Wiederholungen, wähle eine schwerere Variante."
+          },
+          "name": "Glute Bridge"
+        },
+        {
+          "exerciseId": "rudern-maschine",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 1.25,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 1,25 kg."
+          },
+          "name": "Rudern Maschine"
+        },
+        {
+          "exerciseId": "klimmzug-unterstuetzt",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 1.25,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 1,25 kg."
+          },
+          "name": "Klimmzug unterstützt"
+        },
+        {
+          "exerciseId": "schulterdruecken-maschine",
+          "sets": 3,
+          "repRange": [
+            8,
+            12
+          ],
+          "restSeconds": 90,
+          "progressionRule": {
+            "type": "doppelprogression",
+            "stepKg": 1.25,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 1,25 kg."
+          },
+          "name": "Schulterdrücken Maschine neutraler Griff"
+        },
+        {
+          "exerciseId": "liegestuetz-erhoeht",
+          "sets": 2,
+          "repRange": [
+            8,
+            15
+          ],
+          "restSeconds": 60,
+          "progressionRule": {
+            "type": "wiederholungen",
+            "text": "Schaffst du in allen Sätzen 15 Wiederholungen, wähle eine schwerere Variante."
+          },
+          "name": "Liegestütz erhöht"
+        },
+        {
+          "exerciseId": "seitplank",
+          "sets": 2,
+          "repRange": [
+            20,
+            40
+          ],
+          "restSeconds": 45,
+          "progressionRule": {
+            "type": "zeit",
+            "stepSeconds": 5,
+            "text": "Schaffst du in allen Sätzen 40 Sekunden, verlängere um 5 Sekunden."
+          },
+          "name": "Seitplank"
+        }
+      ]
+    }
+  ],
+  "source": "data/profile.example.json"
+}

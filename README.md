@@ -50,6 +50,20 @@ Nach Änderungen an Shell-Dateien in `sw.js` die `VERSION` erhöhen, damit Gerä
 
 Tests für die Verschlüsselung: `http://localhost:8000/test.html` öffnen. Die Seite wird nicht deployt.
 
+Tests für Trainingsplaner und Übungsbibliothek:
+
+```bash
+node scripts/test-planner.mjs
+```
+
+Beispielpläne neu erzeugen (aus `data/profile.example.json` nach `data/plans.generated.json`):
+
+```bash
+node scripts/generate-plans.mjs
+```
+
+Mit `node scripts/generate-plans.mjs data/profile.json` siehst du die Pläne für dein eigenes Profil. Sie landen in `data/plans.local.json`, die Datei ist ignoriert.
+
 ## Deployment
 
 Jeder Push auf `main` deployt über GitHub Actions ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)) nach GitHub Pages.

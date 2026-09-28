@@ -4,7 +4,7 @@
   Bei jeder Änderung an Shell-Dateien VERSION erhöhen.
 */
 
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE = `shell-${VERSION}`;
 
 // Pfade relativ zum Scope, damit die App auch unter /health-app/ läuft
@@ -21,9 +21,12 @@ const SHELL = [
   './js/sync.js',
   './js/ui.js',
   './js/profile.js',
+  './js/planner.js',
   './js/vendor/idb.js',
   './js/modules/settings.js',
   './js/modules/profile-form.js',
+  './js/modules/training.js',
+  './data/exercises.json',
   './assets/fonts/inter-latin-wght-normal.woff2',
   './assets/icons/icon-180.png',
   './assets/icons/icon-512.png',
@@ -32,10 +35,18 @@ const SHELL = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((cache) => cache.addAll(SHELL))
+      .then((cache) => cache.addAll(SHELL).then(() => cacheExerciseImages(cache)))
       .then(() => self.skipWaiting())
   );
 });
+
+// Übungsgrafiken für den Offline-Betrieb: Liste kommt aus data/exercises.json
+async function cacheExerciseImages(cache) {
+  const response = await cache.match('./data/exercises.json');
+  if (!response) return;
+  const { exercises } = await response.json();
+  await cache.addAll(exercises.map((exercise) => `./assets/exercises/${exercise.svg}`));
+}
 
 self.addEventListener('activate', (event) => {
   // Alte Shell-Caches entfernen

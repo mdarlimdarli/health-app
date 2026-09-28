@@ -22,7 +22,7 @@ const ICONS = {
 // Routen: Titel, Farbwelt des Verlaufs, Platz in der Tab-Bar
 const ROUTES = {
   heute: { title: 'Heute', tone: 'sonne', tab: true },
-  training: { title: 'Training', tone: 'sonne', tab: true },
+  training: { title: 'Training', tone: 'sonne', tab: true, load: () => import('./modules/training.js') },
   medis: { title: 'Medis', tone: 'zitrone', tab: true },
   checkin: { title: 'Check-in', tone: 'himmel', tab: true },
   essen: { title: 'Essen', tone: 'salbei', tab: true },
@@ -102,8 +102,9 @@ async function navigate() {
   const id = currentRoute();
   const route = ROUTES[id];
   const view = document.getElementById('view');
-  // Hash angleichen, wenn umgeleitet wurde (ohne neuen hashchange)
-  if (location.hash !== `#/${id}`) history.replaceState(null, '', `#/${id}`);
+  // Hash angleichen, wenn umgeleitet wurde (ohne neuen hashchange). Unterpfade wie #/training/einheit bleiben.
+  const segment = location.hash.replace(/^#\/?/, '').split('/')[0];
+  if (segment !== id) history.replaceState(null, '', `#/${id}`);
   document.getElementById('app').classList.toggle('shell--onboarding', !hasProfile());
 
   document.getElementById('view-title').textContent = route.title;

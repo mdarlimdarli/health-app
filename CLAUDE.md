@@ -17,10 +17,11 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum)
+/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional)
 /js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten)
 /js/vendor/idb.js
-/data/exercises.json, plans.json, meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage)
+/data/exercises.json, plans.json (optionale Überschreibung), meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
+/scripts/generate-plans.mjs, test-planner.mjs (Node, nur Entwicklung)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
 
 ## Design-System (verbindlich)
@@ -58,3 +59,10 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - In den Einstellungen: "Profil bearbeiten" (gleiche Felder), "Profil als Datei exportieren" und "Profil aus Datei importieren" (JSON). Ein Import ergänzt Medikamente mit neuer ID, bestehende werden nie überschrieben.
 - Manifest-Name und short_name sind fest "Health". App-Titel und Begrüßung in der App werden aus profile.displayName gebildet ("<displayName> Health").
 - Keine Profildaten in Tests, README, PROFILE.md, Beispielen oder Commits. Beispiele immer neutral.
+
+## Training
+- Übungsbibliothek data/exercises.json ist allgemein. Persönliche Einschränkungen nur über profile.training.avoidTags, nie im Code und nie in der Bibliothek.
+- Pläne erzeugt js/planner.js zur Laufzeit aus profile.training, exercisePrefs (disliked, replacedBy) und der Phase (settings trainingPhase). data/plans.json überschreibt sie, falls vorhanden (öffentlich, keine persönlichen Vorgaben).
+- data/plans.generated.json wird nur aus profile.example.json erzeugt. Pläne aus dem eigenen Profil gehen nach data/plans.local.json (ignoriert).
+- Phasenwechsel nach 16 Einheiten nur vorschlagen, nie erzwingen.
+- Nach Änderungen an Planer oder Bibliothek: node scripts/test-planner.mjs.

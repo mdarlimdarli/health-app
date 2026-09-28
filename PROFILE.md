@@ -103,7 +103,7 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 
 ### Welche Felder wirken schon?
 
-Die App nutzt heute `displayName` und die Medikamente aus einer importierten Datei. Die übrigen Felder lesen die Module Training, Check-in, Essen und Erinnerungen, sobald sie gebaut sind. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
+Die App nutzt heute `displayName`, alle Felder unter `training` und die Medikamente aus einer importierten Datei. Die übrigen Felder lesen die Module Check-in, Essen und Erinnerungen, sobald sie gebaut sind. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
 
 ## So richtest du die App für eine andere Person ein
 
@@ -114,6 +114,6 @@ Die App nutzt heute `displayName` und die Medikamente aus einer importierten Dat
 5. **Auf dem iPhone installieren.** `https://<github-name>.github.io/health-app/` in Safari öffnen und wie in der [README](README.md) beschrieben zum Home-Bildschirm hinzufügen.
 6. **Profil anlegen.** Beim ersten Start die Einrichtung ausfüllen. Oder vorher `data/profile.example.json` kopieren, anpassen, auf das iPhone legen (zum Beispiel über iCloud Drive) und in der Einrichtung „Profil importieren“ wählen. Diese Datei nicht committen.
 7. **Sicherung verbinden.** In der App oben rechts die Einstellungen öffnen, GitHub-Owner und Token eintragen, ein Passwort setzen und einmal „Jetzt sichern“ tippen. Ab dann steckt das Profil in der Sicherung.
-8. **Trainingsplan anpassen.** Die Übungen stehen in `data/exercises.json`, die Pläne A und B in `data/plans.json`. Beide Dateien kommen mit dem Trainingsmodul. Persönliche Einschränkungen gehören nicht in die Pläne, sondern als Schonungen (`avoidTags`) ins Profil.
+8. **Trainingsplan anpassen.** Die App erzeugt die Pläne selbst aus `training` im Profil. Persönliche Einschränkungen gehören als Schonungen (`avoidTags`) ins Profil, nicht in die Übungsbibliothek `data/exercises.json`. In der App lässt sich jede Übung per „Alternative“ dauerhaft tauschen oder per „Mag ich nicht“ ausschließen. Wer den Plan komplett von Hand festlegen will, legt `data/plans.json` im Format von `data/plans.generated.json` an. Sie ist dann öffentlich, also ohne persönliche Hinweise.
 
 **Updates aus dem Original holen:** Auf GitHub im Fork **Sync fork** nutzen. Da kein Profil im Repo liegt, gibt es dabei keine Konflikte mit persönlichen Daten.

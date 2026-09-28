@@ -1,0 +1,1998 @@
+{
+  "version": 1,
+  "exercises": [
+    {
+      "id": "beinpresse",
+      "name": "Beinpresse",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Rückenlehne so einstellen, dass die Knie etwa 90 Grad gebeugt sind.",
+        "Füße hüftbreit mittig auf die Platte stellen.",
+        "Sicherungshebel erst lösen, wenn du stabil sitzt."
+      ],
+      "cues": [
+        "Drück über die ganze Fußsohle weg.",
+        "Unterer Rücken bleibt an der Lehne.",
+        "Knie zeigen in Richtung der Zehen.",
+        "Oben die Knie nicht ganz durchstrecken."
+      ],
+      "commonMistakes": [
+        "Das Becken rollt unten vom Polster ab.",
+        "Die Knie fallen nach innen."
+      ],
+      "alternatives": [
+        "goblet-squat",
+        "ausfallschritte",
+        "step-up",
+        "beinstrecker"
+      ],
+      "youtubeSearch": "Beinpresse richtige Ausführung Anfänger",
+      "svg": "beinpresse.svg"
+    },
+    {
+      "id": "beinstrecker",
+      "name": "Beinstrecker",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": false,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Drehachse der Maschine auf Höhe des Kniegelenks ausrichten.",
+        "Fußpolster knapp über dem Sprunggelenk."
+      ],
+      "cues": [
+        "Streck langsam bis fast ganz durch.",
+        "Oben kurz halten und den Oberschenkel anspannen.",
+        "Kontrolliert zurück, ohne Schwung."
+      ],
+      "commonMistakes": [
+        "Mit Schwung arbeiten und das Gewicht fallen lassen.",
+        "Das Gesäß hebt vom Sitz ab."
+      ],
+      "alternatives": [
+        "wadenheben",
+        "beinpresse",
+        "goblet-squat",
+        "ausfallschritte"
+      ],
+      "youtubeSearch": "Beinstrecker richtige Ausführung",
+      "svg": "beinstrecker.svg"
+    },
+    {
+      "id": "beinbeuger",
+      "name": "Beinbeuger",
+      "muscleGroup": "beine",
+      "pattern": "hueftdominant",
+      "plane": null,
+      "compound": false,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Knie auf Höhe der Drehachse.",
+        "Fersenpolster knapp über den Fersen."
+      ],
+      "cues": [
+        "Zieh die Fersen Richtung Gesäß.",
+        "Hüfte bleibt auf dem Polster.",
+        "Langsam zurück in die Streckung."
+      ],
+      "commonMistakes": [
+        "Die Hüfte hebt ab und der Rücken hilft mit.",
+        "Zu schnelles Absenken ohne Kontrolle."
+      ],
+      "alternatives": [
+        "hip-thrust-maschine",
+        "glute-bridge",
+        "rumaenisches-kreuzheben-kh",
+        "pull-through-kabel"
+      ],
+      "youtubeSearch": "Beinbeuger richtige Ausführung",
+      "svg": "beinbeuger.svg"
+    },
+    {
+      "id": "hip-thrust-maschine",
+      "name": "Hip Thrust Maschine",
+      "muscleGroup": "beine",
+      "pattern": "hueftdominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "gesaess"
+      ],
+      "setupHints": [
+        "Schulterblätter an die Lehne, Polster über dem Hüftknochen.",
+        "Füße so stellen, dass die Schienbeine oben senkrecht stehen."
+      ],
+      "cues": [
+        "Drück die Hüfte über die Fersen nach oben.",
+        "Oben Gesäß fest anspannen.",
+        "Kinn leicht zur Brust."
+      ],
+      "commonMistakes": [
+        "Ins Hohlkreuz drücken statt die Hüfte zu strecken.",
+        "Die Füße stehen zu weit vorne."
+      ],
+      "alternatives": [
+        "glute-bridge",
+        "rumaenisches-kreuzheben-kh",
+        "pull-through-kabel",
+        "beinbeuger"
+      ],
+      "youtubeSearch": "Hip Thrust Maschine richtige Ausführung",
+      "svg": "hip-thrust-maschine.svg"
+    },
+    {
+      "id": "glute-bridge",
+      "name": "Glute Bridge",
+      "muscleGroup": "beine",
+      "pattern": "hueftdominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "gesaess"
+      ],
+      "setupHints": [
+        "Rückenlage, Füße hüftbreit aufstellen.",
+        "Arme neben dem Körper ablegen."
+      ],
+      "cues": [
+        "Hüfte hoch, bis Knie, Hüfte und Schultern eine Linie bilden.",
+        "Oben zwei Sekunden halten.",
+        "Langsam Wirbel für Wirbel absenken."
+      ],
+      "commonMistakes": [
+        "Ins Hohlkreuz überstrecken.",
+        "Mit den Zehen statt den Fersen drücken."
+      ],
+      "alternatives": [
+        "hip-thrust-maschine",
+        "rumaenisches-kreuzheben-kh",
+        "pull-through-kabel",
+        "beinbeuger"
+      ],
+      "youtubeSearch": "Glute Bridge richtige Ausführung",
+      "svg": "glute-bridge.svg"
+    },
+    {
+      "id": "goblet-squat",
+      "name": "Goblet Squat",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Kurzhantel senkrecht vor der Brust halten.",
+        "Füße schulterbreit, Zehen leicht nach außen."
+      ],
+      "cues": [
+        "Setz dich zwischen die Fersen nach unten.",
+        "Brust bleibt aufrecht.",
+        "Knie folgen den Zehen.",
+        "Über die Mitte des Fußes hochdrücken."
+      ],
+      "commonMistakes": [
+        "Die Fersen heben ab.",
+        "Der Oberkörper kippt weit nach vorne."
+      ],
+      "alternatives": [
+        "beinpresse",
+        "ausfallschritte",
+        "step-up",
+        "beinstrecker"
+      ],
+      "youtubeSearch": "Goblet Squat richtige Ausführung",
+      "svg": "goblet-squat.svg"
+    },
+    {
+      "id": "langhantel-kniebeuge",
+      "name": "Langhantel-Kniebeuge",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "langhantel",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [
+        "bauchdruck"
+      ],
+      "focus": [
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Stange im Rack knapp unter Schulterhöhe einhängen.",
+        "Stange auf dem oberen Rücken ablegen, nicht auf dem Nacken.",
+        "Sicherheitsablagen auf Höhe der tiefsten Position."
+      ],
+      "cues": [
+        "Tief einatmen und den Rumpf fest machen.",
+        "Hüfte und Knie beugen gleichzeitig.",
+        "Knie nach außen schieben.",
+        "Kraftvoll aus der Mitte des Fußes hoch."
+      ],
+      "commonMistakes": [
+        "Der Rücken rundet sich unten.",
+        "Die Knie wandern nach innen."
+      ],
+      "alternatives": [
+        "bulgarian-split-squat",
+        "kreuzheben-langhantel"
+      ],
+      "youtubeSearch": "Langhantel-Kniebeuge richtige Ausführung",
+      "svg": "langhantel-kniebeuge.svg"
+    },
+    {
+      "id": "rumaenisches-kreuzheben-kh",
+      "name": "Rumänisches Kreuzheben Kurzhantel",
+      "muscleGroup": "beine",
+      "pattern": "hueftdominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "gesaess",
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Aufrecht stehen, Kurzhanteln vor den Oberschenkeln.",
+        "Knie leicht gebeugt, diese Beugung bleibt."
+      ],
+      "cues": [
+        "Schieb die Hüfte nach hinten.",
+        "Hanteln gleiten nah an den Beinen entlang.",
+        "Rücken bleibt lang und gerade.",
+        "Aus der Hüfte aufrichten, Gesäß anspannen."
+      ],
+      "commonMistakes": [
+        "Den Rücken runden, um tiefer zu kommen.",
+        "Die Knie immer weiter beugen, bis es eine Kniebeuge wird."
+      ],
+      "alternatives": [
+        "hip-thrust-maschine",
+        "glute-bridge",
+        "pull-through-kabel",
+        "beinbeuger"
+      ],
+      "youtubeSearch": "Rumänisches Kreuzheben Kurzhantel richtige Ausführung",
+      "svg": "rumaenisches-kreuzheben-kh.svg"
+    },
+    {
+      "id": "kreuzheben-langhantel",
+      "name": "Kreuzheben Langhantel",
+      "muscleGroup": "beine",
+      "pattern": "hueftdominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "langhantel",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [
+        "schweres-kreuzheben",
+        "bauchdruck"
+      ],
+      "focus": [
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Stange über der Fußmitte, Füße hüftbreit.",
+        "Griff knapp außerhalb der Knie."
+      ],
+      "cues": [
+        "Schulterblätter nach hinten unten ziehen.",
+        "Stange bleibt am Körper.",
+        "Beine drücken den Boden weg.",
+        "Oben aufrecht, ohne nach hinten zu lehnen."
+      ],
+      "commonMistakes": [
+        "Die Stange entfernt sich vom Körper.",
+        "Der Rücken rundet sich beim Anheben."
+      ],
+      "alternatives": [
+        "bulgarian-split-squat",
+        "langhantel-kniebeuge"
+      ],
+      "youtubeSearch": "Kreuzheben Langhantel richtige Ausführung",
+      "svg": "kreuzheben-langhantel.svg"
+    },
+    {
+      "id": "ausfallschritte",
+      "name": "Ausfallschritte",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "knochendichte",
+        "gesaess"
+      ],
+      "setupHints": [
+        "Aufrecht stehen, Hände an der Hüfte.",
+        "Genug Platz nach vorne lassen."
+      ],
+      "cues": [
+        "Mach einen großen Schritt nach vorne.",
+        "Hinteres Knie Richtung Boden senken.",
+        "Vorderes Knie bleibt über dem Fuß.",
+        "Über die vordere Ferse zurückdrücken."
+      ],
+      "commonMistakes": [
+        "Der Schritt ist zu kurz und das Knie schiebt weit über die Zehen.",
+        "Der Oberkörper kippt nach vorne."
+      ],
+      "alternatives": [
+        "beinpresse",
+        "goblet-squat",
+        "step-up",
+        "beinstrecker"
+      ],
+      "youtubeSearch": "Ausfallschritte richtige Ausführung",
+      "svg": "ausfallschritte.svg"
+    },
+    {
+      "id": "wadenheben",
+      "name": "Wadenheben",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": false,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Fußballen auf die Kante stellen.",
+        "Schultern unter die Polster."
+      ],
+      "cues": [
+        "Hoch auf die Zehenspitzen.",
+        "Oben eine Sekunde halten.",
+        "Unten die Ferse tief sinken lassen."
+      ],
+      "commonMistakes": [
+        "Wippen statt voller Bewegung.",
+        "Die Knie beugen mit."
+      ],
+      "alternatives": [
+        "beinstrecker",
+        "beinpresse",
+        "goblet-squat",
+        "ausfallschritte"
+      ],
+      "youtubeSearch": "Wadenheben richtige Ausführung",
+      "svg": "wadenheben.svg"
+    },
+    {
+      "id": "step-up",
+      "name": "Step-up",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "knochendichte",
+        "gesaess"
+      ],
+      "setupHints": [
+        "Stabile Box oder Bank auf Kniehöhe.",
+        "Ganzen Fuß auf die Box stellen."
+      ],
+      "cues": [
+        "Drück dich mit dem oberen Bein hoch.",
+        "Hinteres Bein hilft kaum mit.",
+        "Kontrolliert wieder absteigen."
+      ],
+      "commonMistakes": [
+        "Vom unteren Bein abspringen.",
+        "Das Knie knickt nach innen."
+      ],
+      "alternatives": [
+        "beinpresse",
+        "goblet-squat",
+        "ausfallschritte",
+        "beinstrecker"
+      ],
+      "youtubeSearch": "Step-up richtige Ausführung",
+      "svg": "step-up.svg"
+    },
+    {
+      "id": "pull-through-kabel",
+      "name": "Pull-Through Kabelzug",
+      "muscleGroup": "beine",
+      "pattern": "hueftdominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "gesaess"
+      ],
+      "setupHints": [
+        "Seilgriff am unteren Kabel, mit dem Rücken zum Turm stellen.",
+        "Seil zwischen den Beinen halten."
+      ],
+      "cues": [
+        "Hüfte nach hinten schieben.",
+        "Arme bleiben locker, die Hüfte arbeitet.",
+        "Aufrichten und Gesäß anspannen."
+      ],
+      "commonMistakes": [
+        "Mit den Armen ziehen.",
+        "Oben ins Hohlkreuz lehnen."
+      ],
+      "alternatives": [
+        "hip-thrust-maschine",
+        "glute-bridge",
+        "rumaenisches-kreuzheben-kh",
+        "beinbeuger"
+      ],
+      "youtubeSearch": "Pull-Through Kabelzug richtige Ausführung",
+      "svg": "pull-through-kabel.svg"
+    },
+    {
+      "id": "bulgarian-split-squat",
+      "name": "Bulgarian Split Squat",
+      "muscleGroup": "beine",
+      "pattern": "kniedominant",
+      "plane": null,
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "gesaess",
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Hinteren Fuß mit dem Spann auf eine Bank legen.",
+        "Vorderen Fuß etwa einen großen Schritt vor die Bank."
+      ],
+      "cues": [
+        "Senk dich gerade nach unten.",
+        "Gewicht auf dem vorderen Bein.",
+        "Oberkörper leicht nach vorne geneigt."
+      ],
+      "commonMistakes": [
+        "Der vordere Fuß steht zu nah an der Bank.",
+        "Das vordere Knie fällt nach innen."
+      ],
+      "alternatives": [
+        "langhantel-kniebeuge",
+        "kreuzheben-langhantel"
+      ],
+      "youtubeSearch": "Bulgarian Split Squat richtige Ausführung",
+      "svg": "bulgarian-split-squat.svg"
+    },
+    {
+      "id": "rudern-kabel-sitzend",
+      "name": "Rudern sitzend Kabelzug",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken",
+        "haltung"
+      ],
+      "setupHints": [
+        "Füße auf die Stützen, Knie leicht gebeugt.",
+        "Aufrecht sitzen, Griff mit gestreckten Armen."
+      ],
+      "cues": [
+        "Zieh die Ellbogen nah am Körper nach hinten.",
+        "Schulterblätter zusammenführen.",
+        "Brust bleibt offen, Schultern tief.",
+        "Langsam nach vorne lösen."
+      ],
+      "commonMistakes": [
+        "Mit dem Oberkörper weit nach hinten schwingen.",
+        "Die Schultern ziehen zu den Ohren."
+      ],
+      "alternatives": [
+        "rudern-maschine",
+        "einarmiges-rudern-kh",
+        "facepull",
+        "reverse-fly"
+      ],
+      "youtubeSearch": "Rudern sitzend Kabelzug richtige Ausführung",
+      "svg": "rudern-kabel-sitzend.svg"
+    },
+    {
+      "id": "latzug-brust",
+      "name": "Latzug zur Brust",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "vertikal",
+      "compound": true,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken"
+      ],
+      "setupHints": [
+        "Knie unter die Polster klemmen.",
+        "Stange etwas breiter als schulterbreit greifen."
+      ],
+      "cues": [
+        "Zieh die Stange zur oberen Brust.",
+        "Ellbogen zeigen nach unten.",
+        "Leicht zurücklehnen, Brust raus.",
+        "Oben die Arme fast strecken."
+      ],
+      "commonMistakes": [
+        "Mit Schwung aus dem Oberkörper ziehen.",
+        "Die Stange hinter den Kopf ziehen."
+      ],
+      "alternatives": [
+        "klimmzug-unterstuetzt",
+        "rudern-kabel-sitzend",
+        "rudern-maschine",
+        "einarmiges-rudern-kh"
+      ],
+      "youtubeSearch": "Latzug zur Brust richtige Ausführung",
+      "svg": "latzug-brust.svg"
+    },
+    {
+      "id": "latzug-nacken",
+      "name": "Latzug in den Nacken",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "vertikal",
+      "compound": true,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [
+        "last-hinter-kopf"
+      ],
+      "focus": [
+        "oberer-ruecken"
+      ],
+      "setupHints": [
+        "Knie unter die Polster klemmen.",
+        "Breiter Griff, Kopf leicht nach vorne."
+      ],
+      "cues": [
+        "Zieh die Stange kontrolliert hinter den Kopf.",
+        "Nur so tief, wie es ohne Schmerz geht.",
+        "Langsam zurück nach oben."
+      ],
+      "commonMistakes": [
+        "Den Kopf stark nach vorne drücken.",
+        "Zu schweres Gewicht mit Ruck."
+      ],
+      "alternatives": [
+        "latzug-brust",
+        "klimmzug-unterstuetzt",
+        "rudern-kabel-sitzend",
+        "rudern-maschine"
+      ],
+      "youtubeSearch": "Latzug in den Nacken richtige Ausführung",
+      "svg": "latzug-nacken.svg"
+    },
+    {
+      "id": "rudern-maschine",
+      "name": "Rudern Maschine",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken",
+        "haltung"
+      ],
+      "setupHints": [
+        "Brustpolster so einstellen, dass du die Griffe gerade noch erreichst.",
+        "Sitzhöhe: Griffe auf Brusthöhe."
+      ],
+      "cues": [
+        "Brust bleibt am Polster.",
+        "Ellbogen nach hinten führen.",
+        "Schulterblätter kurz zusammenhalten."
+      ],
+      "commonMistakes": [
+        "Die Brust löst sich vom Polster.",
+        "Nur mit den Armen ziehen."
+      ],
+      "alternatives": [
+        "rudern-kabel-sitzend",
+        "einarmiges-rudern-kh",
+        "facepull",
+        "reverse-fly"
+      ],
+      "youtubeSearch": "Rudern Maschine richtige Ausführung",
+      "svg": "rudern-maschine.svg"
+    },
+    {
+      "id": "facepull",
+      "name": "Facepull",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "horizontal",
+      "compound": false,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken",
+        "schultergürtel",
+        "haltung"
+      ],
+      "setupHints": [
+        "Seilgriff auf Stirnhöhe einhängen.",
+        "Mit Daumen nach hinten greifen."
+      ],
+      "cues": [
+        "Zieh das Seil Richtung Stirn.",
+        "Hände gehen neben die Ohren.",
+        "Ellbogen bleiben hoch.",
+        "Oben kurz halten."
+      ],
+      "commonMistakes": [
+        "Zu schweres Gewicht, der Oberkörper lehnt zurück.",
+        "Die Ellbogen sinken ab."
+      ],
+      "alternatives": [
+        "reverse-fly",
+        "rudern-kabel-sitzend",
+        "rudern-maschine",
+        "einarmiges-rudern-kh"
+      ],
+      "youtubeSearch": "Facepull richtige Ausführung",
+      "svg": "facepull.svg"
+    },
+    {
+      "id": "reverse-fly",
+      "name": "Reverse Fly",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "horizontal",
+      "compound": false,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken",
+        "schultergürtel",
+        "haltung"
+      ],
+      "setupHints": [
+        "Leichte Kurzhanteln wählen.",
+        "Oberkörper nach vorne neigen, Rücken gerade."
+      ],
+      "cues": [
+        "Arme in einem weiten Bogen seitlich anheben.",
+        "Ellbogen leicht gebeugt.",
+        "Schulterblätter zusammenführen."
+      ],
+      "commonMistakes": [
+        "Mit Schwung arbeiten.",
+        "Die Schultern ziehen nach oben."
+      ],
+      "alternatives": [
+        "facepull",
+        "rudern-kabel-sitzend",
+        "rudern-maschine",
+        "einarmiges-rudern-kh"
+      ],
+      "youtubeSearch": "Reverse Fly richtige Ausführung",
+      "svg": "reverse-fly.svg"
+    },
+    {
+      "id": "einarmiges-rudern-kh",
+      "name": "Einarmiges Rudern Kurzhantel",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken"
+      ],
+      "setupHints": [
+        "Hand und Knie auf einer Bank abstützen.",
+        "Rücken parallel zum Boden."
+      ],
+      "cues": [
+        "Zieh die Hantel zur Hüfte.",
+        "Ellbogen nah am Körper.",
+        "Oberkörper bleibt ruhig."
+      ],
+      "commonMistakes": [
+        "Den Oberkörper aufdrehen.",
+        "Die Hantel zur Schulter statt zur Hüfte ziehen."
+      ],
+      "alternatives": [
+        "rudern-kabel-sitzend",
+        "rudern-maschine",
+        "facepull",
+        "reverse-fly"
+      ],
+      "youtubeSearch": "Einarmiges Rudern Kurzhantel richtige Ausführung",
+      "svg": "einarmiges-rudern-kh.svg"
+    },
+    {
+      "id": "aussenrotation-kabel",
+      "name": "Außenrotation Kabelzug",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": null,
+      "compound": false,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "schultergürtel"
+      ],
+      "setupHints": [
+        "Kabel auf Ellbogenhöhe.",
+        "Seitlich zum Turm stellen, Handtuch zwischen Ellbogen und Körper."
+      ],
+      "cues": [
+        "Ellbogen bleibt am Körper.",
+        "Unterarm dreht nach außen.",
+        "Langsam zurück."
+      ],
+      "commonMistakes": [
+        "Der Ellbogen löst sich vom Körper.",
+        "Zu viel Gewicht."
+      ],
+      "alternatives": [
+        "facepull",
+        "reverse-fly",
+        "rudern-kabel-sitzend",
+        "latzug-brust"
+      ],
+      "youtubeSearch": "Außenrotation Kabelzug richtige Ausführung",
+      "svg": "aussenrotation-kabel.svg"
+    },
+    {
+      "id": "klimmzug-unterstuetzt",
+      "name": "Klimmzug unterstützt",
+      "muscleGroup": "ruecken",
+      "pattern": "ziehen",
+      "plane": "vertikal",
+      "compound": true,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken"
+      ],
+      "setupHints": [
+        "Mehr Gegengewicht bedeutet mehr Hilfe.",
+        "Knie auf das Polster, Griff schulterbreit."
+      ],
+      "cues": [
+        "Zieh die Brust zur Stange.",
+        "Schulterblätter zuerst nach unten.",
+        "Kontrolliert absenken."
+      ],
+      "commonMistakes": [
+        "Nur halbe Bewegung.",
+        "Mit dem Kinn nach vorne recken."
+      ],
+      "alternatives": [
+        "latzug-brust",
+        "rudern-kabel-sitzend",
+        "rudern-maschine",
+        "einarmiges-rudern-kh"
+      ],
+      "youtubeSearch": "Klimmzug unterstützt richtige Ausführung",
+      "svg": "klimmzug-unterstuetzt.svg"
+    },
+    {
+      "id": "brustpresse-maschine",
+      "name": "Brustpresse Maschine",
+      "muscleGroup": "brust",
+      "pattern": "druecken",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Sitzhöhe so, dass die Griffe auf Brusthöhe sind.",
+        "Rücken und Kopf an die Lehne."
+      ],
+      "cues": [
+        "Drück die Griffe gerade nach vorne.",
+        "Schultern bleiben hinten.",
+        "Langsam zurück bis zur Dehnung."
+      ],
+      "commonMistakes": [
+        "Die Schultern rollen nach vorne.",
+        "Die Arme ganz durchstrecken und einrasten."
+      ],
+      "alternatives": [
+        "kh-bankdruecken",
+        "liegestuetz-erhoeht",
+        "fliegende-kabel",
+        "butterfly-maschine"
+      ],
+      "youtubeSearch": "Brustpresse Maschine richtige Ausführung",
+      "svg": "brustpresse-maschine.svg"
+    },
+    {
+      "id": "kh-bankdruecken",
+      "name": "Kurzhantel-Bankdrücken",
+      "muscleGroup": "brust",
+      "pattern": "druecken",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Mit den Hanteln auf den Oberschenkeln hinsetzen und zurückrollen.",
+        "Füße fest am Boden."
+      ],
+      "cues": [
+        "Hanteln über der Brust nach oben drücken.",
+        "Ellbogen etwa 45 Grad vom Körper.",
+        "Langsam bis auf Brusthöhe senken."
+      ],
+      "commonMistakes": [
+        "Die Ellbogen stehen seitlich ab.",
+        "Der Po hebt von der Bank ab."
+      ],
+      "alternatives": [
+        "brustpresse-maschine",
+        "liegestuetz-erhoeht",
+        "fliegende-kabel",
+        "butterfly-maschine"
+      ],
+      "youtubeSearch": "Kurzhantel-Bankdrücken richtige Ausführung",
+      "svg": "kh-bankdruecken.svg"
+    },
+    {
+      "id": "lh-bankdruecken",
+      "name": "Langhantel-Bankdrücken",
+      "muscleGroup": "brust",
+      "pattern": "druecken",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "langhantel",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Augen unter der Stange, Füße fest am Boden.",
+        "Sicherheitsablagen oder Spotter nutzen."
+      ],
+      "cues": [
+        "Schulterblätter zusammen und nach unten.",
+        "Stange zur unteren Brust senken.",
+        "Gerade nach oben drücken."
+      ],
+      "commonMistakes": [
+        "Die Stange auf der Brust abprallen lassen.",
+        "Die Handgelenke knicken nach hinten."
+      ],
+      "alternatives": [
+        "kh-schraegbankdruecken"
+      ],
+      "youtubeSearch": "Langhantel-Bankdrücken richtige Ausführung",
+      "svg": "lh-bankdruecken.svg"
+    },
+    {
+      "id": "kh-schraegbankdruecken",
+      "name": "Schrägbankdrücken Kurzhantel",
+      "muscleGroup": "brust",
+      "pattern": "druecken",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Bank auf etwa 30 Grad stellen.",
+        "Hanteln auf den Oberschenkeln, dann zurücklegen."
+      ],
+      "cues": [
+        "Hanteln über die obere Brust drücken.",
+        "Schultern bleiben tief.",
+        "Kontrolliert absenken."
+      ],
+      "commonMistakes": [
+        "Die Bank ist zu steil.",
+        "Die Hanteln schlagen oben aneinander."
+      ],
+      "alternatives": [
+        "lh-bankdruecken"
+      ],
+      "youtubeSearch": "Schrägbankdrücken Kurzhantel richtige Ausführung",
+      "svg": "kh-schraegbankdruecken.svg"
+    },
+    {
+      "id": "liegestuetz-erhoeht",
+      "name": "Liegestütz erhöht",
+      "muscleGroup": "brust",
+      "pattern": "druecken",
+      "plane": "horizontal",
+      "compound": true,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Hände schulterbreit auf eine stabile Bank oder Kante.",
+        "Je höher die Kante, desto leichter."
+      ],
+      "cues": [
+        "Körper bildet eine gerade Linie.",
+        "Brust zur Kante senken.",
+        "Ellbogen schräg nach hinten."
+      ],
+      "commonMistakes": [
+        "Die Hüfte hängt durch.",
+        "Nur den Kopf zur Kante bewegen."
+      ],
+      "alternatives": [
+        "brustpresse-maschine",
+        "kh-bankdruecken",
+        "fliegende-kabel",
+        "butterfly-maschine"
+      ],
+      "youtubeSearch": "Liegestütz erhöht richtige Ausführung",
+      "svg": "liegestuetz-erhoeht.svg"
+    },
+    {
+      "id": "fliegende-kabel",
+      "name": "Fliegende Kabelzug",
+      "muscleGroup": "brust",
+      "pattern": "druecken",
+      "plane": "horizontal",
+      "compound": false,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Beide Kabel auf Schulterhöhe.",
+        "Ein Schritt nach vorne, leichte Schrittstellung."
+      ],
+      "cues": [
+        "Arme in einem Bogen vor der Brust zusammenführen.",
+        "Ellbogen leicht gebeugt.",
+        "Langsam öffnen bis zur Dehnung."
+      ],
+      "commonMistakes": [
+        "Zu schwer, es wird ein Drücken.",
+        "Die Schultern ziehen nach vorne."
+      ],
+      "alternatives": [
+        "butterfly-maschine",
+        "brustpresse-maschine",
+        "kh-bankdruecken",
+        "liegestuetz-erhoeht"
+      ],
+      "youtubeSearch": "Fliegende Kabelzug richtige Ausführung",
+      "svg": "fliegende-kabel.svg"
+    },
+    {
+      "id": "butterfly-maschine",
+      "name": "Butterfly Maschine",
+      "muscleGroup": "brust",
+      "pattern": "druecken",
+      "plane": "horizontal",
+      "compound": false,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Sitz so einstellen, dass die Griffe auf Brusthöhe sind.",
+        "Rücken an die Lehne."
+      ],
+      "cues": [
+        "Arme vor der Brust zusammenführen.",
+        "Brust bleibt offen.",
+        "Langsam zurück."
+      ],
+      "commonMistakes": [
+        "Die Arme zu weit nach hinten öffnen.",
+        "Mit Schwung arbeiten."
+      ],
+      "alternatives": [
+        "fliegende-kabel",
+        "brustpresse-maschine",
+        "kh-bankdruecken",
+        "liegestuetz-erhoeht"
+      ],
+      "youtubeSearch": "Butterfly Maschine richtige Ausführung",
+      "svg": "butterfly-maschine.svg"
+    },
+    {
+      "id": "schulterdruecken-maschine",
+      "name": "Schulterdrücken Maschine neutraler Griff",
+      "muscleGroup": "schultern",
+      "pattern": "druecken",
+      "plane": "vertikal",
+      "compound": true,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Sitzhöhe: Griffe starten auf Schulterhöhe.",
+        "Neutraler Griff, Handflächen zeigen zueinander."
+      ],
+      "cues": [
+        "Drück die Griffe gerade nach oben.",
+        "Rücken bleibt an der Lehne.",
+        "Kontrolliert zurück bis Schulterhöhe."
+      ],
+      "commonMistakes": [
+        "Ins Hohlkreuz drücken.",
+        "Die Arme oben einrasten."
+      ],
+      "alternatives": [
+        "seitheben"
+      ],
+      "youtubeSearch": "Schulterdrücken Maschine neutraler Griff richtige Ausführung",
+      "svg": "schulterdruecken-maschine.svg"
+    },
+    {
+      "id": "lh-schulterdruecken",
+      "name": "Schulterdrücken Langhantel",
+      "muscleGroup": "schultern",
+      "pattern": "druecken",
+      "plane": "vertikal",
+      "compound": true,
+      "equipment": "langhantel",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [
+        "nackendruecken"
+      ],
+      "focus": [],
+      "setupHints": [
+        "Stange auf Schulterhöhe aus dem Rack nehmen.",
+        "Griff knapp schulterbreit."
+      ],
+      "cues": [
+        "Rumpf und Gesäß fest.",
+        "Stange gerade nach oben drücken.",
+        "Kopf kurz zurücknehmen und dann unter die Stange."
+      ],
+      "commonMistakes": [
+        "Weit nach hinten lehnen.",
+        "Die Stange vor dem Körper nach vorne drücken."
+      ],
+      "alternatives": [
+        "kh-schulterdruecken"
+      ],
+      "youtubeSearch": "Schulterdrücken Langhantel richtige Ausführung",
+      "svg": "lh-schulterdruecken.svg"
+    },
+    {
+      "id": "kh-schulterdruecken",
+      "name": "Kurzhantel-Schulterdrücken sitzend",
+      "muscleGroup": "schultern",
+      "pattern": "druecken",
+      "plane": "vertikal",
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Bank fast senkrecht stellen.",
+        "Hanteln auf Schulterhöhe, Handflächen nach vorne oder zueinander."
+      ],
+      "cues": [
+        "Hanteln über den Kopf drücken.",
+        "Rücken bleibt an der Lehne.",
+        "Langsam bis Schulterhöhe senken."
+      ],
+      "commonMistakes": [
+        "Die Hanteln wandern weit nach vorne.",
+        "Ins Hohlkreuz drücken."
+      ],
+      "alternatives": [
+        "lh-schulterdruecken"
+      ],
+      "youtubeSearch": "Kurzhantel-Schulterdrücken sitzend richtige Ausführung",
+      "svg": "kh-schulterdruecken.svg"
+    },
+    {
+      "id": "seitheben",
+      "name": "Seitheben",
+      "muscleGroup": "schultern",
+      "pattern": "druecken",
+      "plane": null,
+      "compound": false,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "schultergürtel"
+      ],
+      "setupHints": [
+        "Leichte Kurzhanteln wählen.",
+        "Aufrecht stehen, Arme neben dem Körper."
+      ],
+      "cues": [
+        "Arme seitlich bis Schulterhöhe heben.",
+        "Ellbogen leicht gebeugt.",
+        "Schultern bleiben tief."
+      ],
+      "commonMistakes": [
+        "Mit Schwung aus dem Oberkörper.",
+        "Die Arme über Schulterhöhe reißen."
+      ],
+      "alternatives": [
+        "schulterdruecken-maschine"
+      ],
+      "youtubeSearch": "Seitheben richtige Ausführung",
+      "svg": "seitheben.svg"
+    },
+    {
+      "id": "bizeps-curl",
+      "name": "Bizeps Curl",
+      "muscleGroup": "arme",
+      "pattern": "ziehen",
+      "plane": null,
+      "compound": false,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Aufrecht stehen, Hanteln neben dem Körper.",
+        "Handflächen zeigen nach vorne."
+      ],
+      "cues": [
+        "Ellbogen bleiben am Körper.",
+        "Hanteln zur Schulter beugen.",
+        "Langsam wieder strecken."
+      ],
+      "commonMistakes": [
+        "Mit dem Oberkörper schwingen.",
+        "Die Ellbogen wandern nach vorne."
+      ],
+      "alternatives": [
+        "hammer-curl",
+        "trizeps-kabel",
+        "dips-unterstuetzt"
+      ],
+      "youtubeSearch": "Bizeps Curl richtige Ausführung",
+      "svg": "bizeps-curl.svg"
+    },
+    {
+      "id": "hammer-curl",
+      "name": "Hammer Curl",
+      "muscleGroup": "arme",
+      "pattern": "ziehen",
+      "plane": null,
+      "compound": false,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Hanteln neben dem Körper, Handflächen zueinander."
+      ],
+      "cues": [
+        "Hanteln senkrecht nach oben beugen.",
+        "Ellbogen bleiben ruhig.",
+        "Kontrolliert ablassen."
+      ],
+      "commonMistakes": [
+        "Die Handgelenke abknicken.",
+        "Zu schnell ablassen."
+      ],
+      "alternatives": [
+        "bizeps-curl",
+        "trizeps-kabel",
+        "dips-unterstuetzt"
+      ],
+      "youtubeSearch": "Hammer Curl richtige Ausführung",
+      "svg": "hammer-curl.svg"
+    },
+    {
+      "id": "trizeps-kabel",
+      "name": "Trizeps Drücken Kabelzug",
+      "muscleGroup": "arme",
+      "pattern": "druecken",
+      "plane": null,
+      "compound": false,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Seil oder Stange am oberen Kabel.",
+        "Ellbogen seitlich am Körper."
+      ],
+      "cues": [
+        "Unterarme nach unten strecken.",
+        "Ellbogen bleiben fixiert.",
+        "Unten kurz anspannen."
+      ],
+      "commonMistakes": [
+        "Die Ellbogen wandern nach vorne.",
+        "Mit dem Oberkörper drücken."
+      ],
+      "alternatives": [
+        "dips-unterstuetzt",
+        "bizeps-curl",
+        "hammer-curl"
+      ],
+      "youtubeSearch": "Trizeps Drücken Kabelzug richtige Ausführung",
+      "svg": "trizeps-kabel.svg"
+    },
+    {
+      "id": "dips-unterstuetzt",
+      "name": "Dips unterstützt",
+      "muscleGroup": "arme",
+      "pattern": "druecken",
+      "plane": null,
+      "compound": true,
+      "equipment": "maschine",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Gegengewicht wählen, mehr Gewicht bedeutet mehr Hilfe.",
+        "Knie auf das Polster."
+      ],
+      "cues": [
+        "Oberkörper leicht nach vorne.",
+        "Nur so tief, wie es für die Schultern angenehm ist.",
+        "Kraftvoll hochdrücken."
+      ],
+      "commonMistakes": [
+        "Zu tief sinken und die Schultern überlasten.",
+        "Die Schultern ziehen zu den Ohren."
+      ],
+      "alternatives": [
+        "trizeps-kabel",
+        "bizeps-curl",
+        "hammer-curl"
+      ],
+      "youtubeSearch": "Dips unterstützt richtige Ausführung",
+      "svg": "dips-unterstuetzt.svg"
+    },
+    {
+      "id": "plank",
+      "name": "Plank",
+      "muscleGroup": "core",
+      "pattern": "stabilisation",
+      "plane": null,
+      "compound": true,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "rumpf"
+      ],
+      "setupHints": [
+        "Unterarme unter den Schultern.",
+        "Beine gestreckt, Zehen aufgestellt."
+      ],
+      "cues": [
+        "Körper bildet eine Linie.",
+        "Gesäß und Bauch leicht anspannen.",
+        "Ruhig weiteratmen."
+      ],
+      "commonMistakes": [
+        "Die Hüfte hängt durch.",
+        "Das Gesäß ragt nach oben."
+      ],
+      "alternatives": [
+        "dead-bug",
+        "bird-dog",
+        "crunch",
+        "seitplank"
+      ],
+      "youtubeSearch": "Plank richtige Ausführung",
+      "svg": "plank.svg"
+    },
+    {
+      "id": "seitplank",
+      "name": "Seitplank",
+      "muscleGroup": "core",
+      "pattern": "rotation",
+      "plane": null,
+      "compound": true,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "rumpf"
+      ],
+      "setupHints": [
+        "Seitlich liegen, Unterarm unter der Schulter.",
+        "Einsteiger: Knie am Boden lassen."
+      ],
+      "cues": [
+        "Hüfte hochschieben.",
+        "Kopf, Hüfte und Füße in einer Linie.",
+        "Ruhig atmen."
+      ],
+      "commonMistakes": [
+        "Die Hüfte sinkt ab.",
+        "Der Oberkörper kippt nach vorne."
+      ],
+      "alternatives": [
+        "pallof-press",
+        "plank",
+        "dead-bug",
+        "farmers-carry"
+      ],
+      "youtubeSearch": "Seitplank richtige Ausführung",
+      "svg": "seitplank.svg"
+    },
+    {
+      "id": "pallof-press",
+      "name": "Pallof Press",
+      "muscleGroup": "core",
+      "pattern": "rotation",
+      "plane": null,
+      "compound": true,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "rumpf"
+      ],
+      "setupHints": [
+        "Kabel auf Brusthöhe, seitlich zum Turm stellen.",
+        "Griff mit beiden Händen vor der Brust."
+      ],
+      "cues": [
+        "Arme gerade nach vorne drücken.",
+        "Nicht zum Kabel drehen lassen.",
+        "Kurz halten, dann zurück."
+      ],
+      "commonMistakes": [
+        "Der Oberkörper dreht mit.",
+        "Zu nah am Turm stehen."
+      ],
+      "alternatives": [
+        "seitplank",
+        "plank",
+        "dead-bug",
+        "farmers-carry"
+      ],
+      "youtubeSearch": "Pallof Press richtige Ausführung",
+      "svg": "pallof-press.svg"
+    },
+    {
+      "id": "dead-bug",
+      "name": "Dead Bug",
+      "muscleGroup": "core",
+      "pattern": "stabilisation",
+      "plane": null,
+      "compound": true,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "rumpf",
+        "haltung"
+      ],
+      "setupHints": [
+        "Rückenlage, Arme zur Decke.",
+        "Knie und Hüfte 90 Grad gebeugt."
+      ],
+      "cues": [
+        "Unterer Rücken bleibt am Boden.",
+        "Gegengleich Arm und Bein langsam strecken.",
+        "Ausatmen beim Strecken."
+      ],
+      "commonMistakes": [
+        "Der untere Rücken hebt ab.",
+        "Zu schnell wechseln."
+      ],
+      "alternatives": [
+        "plank",
+        "bird-dog",
+        "crunch",
+        "seitplank"
+      ],
+      "youtubeSearch": "Dead Bug richtige Ausführung",
+      "svg": "dead-bug.svg"
+    },
+    {
+      "id": "farmers-carry",
+      "name": "Farmer's Carry",
+      "muscleGroup": "core",
+      "pattern": "tragen",
+      "plane": null,
+      "compound": true,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 2,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "rumpf",
+        "knochendichte",
+        "schultergürtel"
+      ],
+      "setupHints": [
+        "Zwei schwere Kurzhanteln oder Kettlebells.",
+        "Freie Strecke von etwa 20 Metern."
+      ],
+      "cues": [
+        "Aufrecht gehen, Schultern tief.",
+        "Kurze, ruhige Schritte.",
+        "Griff fest."
+      ],
+      "commonMistakes": [
+        "Die Schultern hängen nach vorne.",
+        "Hektische, lange Schritte."
+      ],
+      "alternatives": [
+        "plank",
+        "seitplank",
+        "pallof-press",
+        "dead-bug"
+      ],
+      "youtubeSearch": "Farmer's Carry richtige Ausführung",
+      "svg": "farmers-carry.svg"
+    },
+    {
+      "id": "suitcase-carry",
+      "name": "Suitcase Carry",
+      "muscleGroup": "core",
+      "pattern": "tragen",
+      "plane": null,
+      "compound": true,
+      "equipment": "kettlebell",
+      "level": 2,
+      "phase": 2,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "rumpf",
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Eine Kettlebell in einer Hand.",
+        "Nach jeder Strecke die Seite wechseln."
+      ],
+      "cues": [
+        "Nicht zur Gewichtsseite kippen.",
+        "Aufrecht und ruhig gehen.",
+        "Freie Hand locker."
+      ],
+      "commonMistakes": [
+        "Zur Seite lehnen.",
+        "Zu schweres Gewicht ohne saubere Haltung."
+      ],
+      "alternatives": [
+        "beinheben-haengend"
+      ],
+      "youtubeSearch": "Suitcase Carry richtige Ausführung",
+      "svg": "suitcase-carry.svg"
+    },
+    {
+      "id": "crunch",
+      "name": "Crunch",
+      "muscleGroup": "core",
+      "pattern": "stabilisation",
+      "plane": null,
+      "compound": true,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [
+        "crunches"
+      ],
+      "focus": [],
+      "setupHints": [
+        "Rückenlage, Füße aufgestellt.",
+        "Hände an die Schläfen."
+      ],
+      "cues": [
+        "Oberkörper einrollen, Schulterblätter lösen sich.",
+        "Nicht am Kopf ziehen.",
+        "Langsam zurück."
+      ],
+      "commonMistakes": [
+        "Mit den Händen am Nacken ziehen.",
+        "Mit Schwung hochreißen."
+      ],
+      "alternatives": [
+        "plank",
+        "dead-bug",
+        "bird-dog",
+        "seitplank"
+      ],
+      "youtubeSearch": "Crunch richtige Ausführung",
+      "svg": "crunch.svg"
+    },
+    {
+      "id": "beinheben-haengend",
+      "name": "Beinheben hängend",
+      "muscleGroup": "core",
+      "pattern": "stabilisation",
+      "plane": null,
+      "compound": true,
+      "equipment": "koerpergewicht",
+      "level": 2,
+      "phase": 2,
+      "unit": "reps",
+      "tags": [
+        "crunches",
+        "bauchdruck"
+      ],
+      "focus": [],
+      "setupHints": [
+        "An einer Stange hängen, Schultern aktiv.",
+        "Einsteiger: Knie angewinkelt heben."
+      ],
+      "cues": [
+        "Beine kontrolliert nach vorne heben.",
+        "Nicht schaukeln.",
+        "Langsam ablassen."
+      ],
+      "commonMistakes": [
+        "Mit Schwung arbeiten.",
+        "Passiv hängen, die Schultern sinken zu den Ohren."
+      ],
+      "alternatives": [
+        "suitcase-carry"
+      ],
+      "youtubeSearch": "Beinheben hängend richtige Ausführung",
+      "svg": "beinheben-haengend.svg"
+    },
+    {
+      "id": "bird-dog",
+      "name": "Bird Dog",
+      "muscleGroup": "core",
+      "pattern": "stabilisation",
+      "plane": null,
+      "compound": true,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "reps",
+      "tags": [],
+      "focus": [
+        "rumpf",
+        "haltung"
+      ],
+      "setupHints": [
+        "Vierfüßlerstand, Hände unter den Schultern.",
+        "Knie unter der Hüfte."
+      ],
+      "cues": [
+        "Gegengleich Arm und Bein strecken.",
+        "Becken bleibt waagerecht.",
+        "Kurz halten und wechseln."
+      ],
+      "commonMistakes": [
+        "Ins Hohlkreuz fallen.",
+        "Das Becken kippt zur Seite."
+      ],
+      "alternatives": [
+        "plank",
+        "dead-bug",
+        "crunch",
+        "seitplank"
+      ],
+      "youtubeSearch": "Bird Dog richtige Ausführung",
+      "svg": "bird-dog.svg"
+    },
+    {
+      "id": "bws-rotation",
+      "name": "Brustwirbelsäulen-Rotation",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken",
+        "haltung"
+      ],
+      "setupHints": [
+        "Vierfüßlerstand oder Seitlage mit angewinkelten Knien."
+      ],
+      "cues": [
+        "Arm öffnet sich Richtung Decke.",
+        "Blick folgt der Hand.",
+        "Langsam, mit dem Atem."
+      ],
+      "commonMistakes": [
+        "Aus der Hüfte statt aus dem Brustkorb drehen.",
+        "Zu schnell drehen."
+      ],
+      "alternatives": [
+        "katze-kuh",
+        "tuerrahmen-dehnung",
+        "schulterkreise",
+        "nackendehnung-seitlich"
+      ],
+      "youtubeSearch": "Brustwirbelsäulen-Rotation richtige Ausführung",
+      "svg": "bws-rotation.svg"
+    },
+    {
+      "id": "katze-kuh",
+      "name": "Katze-Kuh",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "haltung"
+      ],
+      "setupHints": [
+        "Vierfüßlerstand, Hände unter den Schultern."
+      ],
+      "cues": [
+        "Rücken rund machen und ausatmen.",
+        "Dann Brust nach vorne, einatmen.",
+        "Fließend wechseln."
+      ],
+      "commonMistakes": [
+        "Nur den Kopf bewegen.",
+        "Hektisch statt fließend."
+      ],
+      "alternatives": [
+        "bws-rotation",
+        "tuerrahmen-dehnung",
+        "schulterkreise",
+        "nackendehnung-seitlich"
+      ],
+      "youtubeSearch": "Katze-Kuh richtige Ausführung",
+      "svg": "katze-kuh.svg"
+    },
+    {
+      "id": "tuerrahmen-dehnung",
+      "name": "Türrahmen-Dehnung",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "schultergürtel",
+        "haltung"
+      ],
+      "setupHints": [
+        "Unterarm in Schulterhöhe an den Türrahmen legen."
+      ],
+      "cues": [
+        "Mit dem Körper sanft nach vorne lehnen.",
+        "Dehnung vorne an der Brust spüren.",
+        "Schulter bleibt tief."
+      ],
+      "commonMistakes": [
+        "Ins Hohlkreuz ausweichen.",
+        "Zu stark ziehen."
+      ],
+      "alternatives": [
+        "bws-rotation",
+        "katze-kuh",
+        "schulterkreise",
+        "nackendehnung-seitlich"
+      ],
+      "youtubeSearch": "Türrahmen-Dehnung richtige Ausführung",
+      "svg": "tuerrahmen-dehnung.svg"
+    },
+    {
+      "id": "schulterkreise",
+      "name": "Schulterkreise",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "schultergürtel"
+      ],
+      "setupHints": [
+        "Aufrecht stehen, Arme locker."
+      ],
+      "cues": [
+        "Große, langsame Kreise.",
+        "Erst nach hinten, dann nach vorne.",
+        "Nacken bleibt locker."
+      ],
+      "commonMistakes": [
+        "Zu kleine, hektische Kreise.",
+        "Die Schultern zu den Ohren ziehen."
+      ],
+      "alternatives": [
+        "bws-rotation",
+        "katze-kuh",
+        "tuerrahmen-dehnung",
+        "nackendehnung-seitlich"
+      ],
+      "youtubeSearch": "Schulterkreise richtige Ausführung",
+      "svg": "schulterkreise.svg"
+    },
+    {
+      "id": "nackendehnung-seitlich",
+      "name": "Nackendehnung seitlich",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Aufrecht sitzen oder stehen."
+      ],
+      "cues": [
+        "Ohr sanft zur Schulter neigen.",
+        "Gegenüberliegende Schulter nach unten schieben.",
+        "Ruhig atmen, nicht ziehen."
+      ],
+      "commonMistakes": [
+        "Mit der Hand am Kopf ziehen.",
+        "Die Schulter mit hochnehmen."
+      ],
+      "alternatives": [
+        "bws-rotation",
+        "katze-kuh",
+        "tuerrahmen-dehnung",
+        "schulterkreise"
+      ],
+      "youtubeSearch": "Nackendehnung seitlich richtige Ausführung",
+      "svg": "nackendehnung-seitlich.svg"
+    },
+    {
+      "id": "faszienrolle-oberer-ruecken",
+      "name": "Faszienrolle oberer Rücken",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [
+        "oberer-ruecken"
+      ],
+      "setupHints": [
+        "Rolle quer unter die Schulterblätter.",
+        "Hände stützen den Kopf."
+      ],
+      "cues": [
+        "Langsam zwischen Schulterblättern und Brustwirbelsäule rollen.",
+        "Gesäß bleibt am Boden oder leicht angehoben.",
+        "Nicht auf den unteren Rücken rollen."
+      ],
+      "commonMistakes": [
+        "Über den Nacken oder die Lendenwirbelsäule rollen.",
+        "Zu schnell rollen."
+      ],
+      "alternatives": [
+        "bws-rotation",
+        "katze-kuh",
+        "tuerrahmen-dehnung",
+        "schulterkreise"
+      ],
+      "youtubeSearch": "Faszienrolle oberer Rücken richtige Ausführung",
+      "svg": "faszienrolle-oberer-ruecken.svg"
+    },
+    {
+      "id": "hueftbeuger-dehnung",
+      "name": "Hüftbeuger-Dehnung",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Halbkniestand, hinteres Knie auf einer Matte."
+      ],
+      "cues": [
+        "Becken leicht aufrichten.",
+        "Hüfte sanft nach vorne schieben.",
+        "Oberkörper bleibt aufrecht."
+      ],
+      "commonMistakes": [
+        "Ins Hohlkreuz ausweichen.",
+        "Das vordere Knie schiebt weit über den Fuß."
+      ],
+      "alternatives": [
+        "bws-rotation",
+        "katze-kuh",
+        "tuerrahmen-dehnung",
+        "schulterkreise"
+      ],
+      "youtubeSearch": "Hüftbeuger-Dehnung richtige Ausführung",
+      "svg": "hueftbeuger-dehnung.svg"
+    },
+    {
+      "id": "hueft-mobilitaet-90-90",
+      "name": "90/90 Hüftmobilität",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [],
+      "focus": [],
+      "setupHints": [
+        "Im Sitzen beide Beine im 90 Grad Winkel ablegen."
+      ],
+      "cues": [
+        "Aufrecht sitzen.",
+        "Knie langsam zur anderen Seite wechseln.",
+        "Hände dürfen hinten stützen."
+      ],
+      "commonMistakes": [
+        "Den Rücken rund machen.",
+        "Mit Schwung wechseln."
+      ],
+      "alternatives": [
+        "bws-rotation",
+        "katze-kuh",
+        "tuerrahmen-dehnung",
+        "schulterkreise"
+      ],
+      "youtubeSearch": "90/90 Hüftmobilität richtige Ausführung",
+      "svg": "hueft-mobilitaet-90-90.svg"
+    }
+  ]
+}
