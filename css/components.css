@@ -1,0 +1,148 @@
+/* Komponenten: Shell, Kopfzeile, Tab-Bar, Karten, Verlaufsflecken */
+
+/* App-Shell */
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Kopfzeile mit Einstellungen oben rechts */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(var(--header-height) + var(--safe-top));
+  padding: var(--safe-top) calc(var(--page-margin) + var(--safe-right)) 0 calc(var(--page-margin) + var(--safe-left));
+  background: var(--color-bg);
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin-right: -10px;
+  border-radius: 50%;
+  transition: background-color var(--duration) var(--easing);
+}
+
+.icon-button:active,
+.icon-button[aria-current="page"] {
+  background: var(--color-line);
+}
+
+/* Hauptbereich, Platz für die Tab-Bar lassen */
+.view {
+  position: relative;
+  flex: 1;
+  padding: var(--space-1) calc(var(--page-margin) + var(--safe-right)) calc(var(--tabbar-height) + var(--safe-bottom) + var(--space-3)) calc(var(--page-margin) + var(--safe-left));
+  overflow-x: hidden;
+  isolation: isolate;
+  animation: view-in var(--duration) var(--easing);
+}
+
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Bottom-Tab-Bar */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
+  background: var(--color-bg);
+  border-top: var(--line-width) solid var(--color-line);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--tabbar-height);
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: color var(--duration) var(--easing);
+}
+
+.tab[aria-current="page"] {
+  color: var(--color-text);
+}
+
+.tab svg,
+.icon-button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Karte: keine Schatten, Trennung über Linie */
+.card {
+  position: relative;
+  padding: var(--space-3);
+  border: var(--line-width) solid var(--color-line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.card > * {
+  position: relative;
+}
+
+/*
+  Verlaufsfleck als Zustandsanzeige.
+  --intensity (0 bis 1) steuert Größe, Blur und Sättigung.
+  Farbe über Modifier-Klasse, z. B. .blob--sonne.
+*/
+.blob {
+  --intensity: 0.5;
+  --size: calc(120px + 160px * var(--intensity));
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: calc(0.35 + 0.65 * var(--intensity));
+  filter: blur(calc(var(--blur-min) + (var(--blur-max) - var(--blur-min)) * var(--intensity))) saturate(calc(0.6 + 0.6 * var(--intensity)));
+  transition: width var(--duration) var(--easing), height var(--duration) var(--easing), opacity var(--duration) var(--easing), filter var(--duration) var(--easing);
+}
+
+.blob--sonne { background: var(--gradient-sonne); }
+.blob--zitrone { background: var(--gradient-zitrone); }
+.blob--himmel { background: var(--gradient-himmel); }
+.blob--flieder { background: var(--gradient-flieder); }
+.blob--salbei { background: var(--gradient-salbei); }
+.blob--rose { background: var(--gradient-rose); }
+
+/* Platzhalter-Ansicht der leeren Module */
+.placeholder {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+}
+
+/* Abstand nach oben, damit der Blur nicht an der Kopfzeile abreißt */
+.placeholder .blob {
+  top: 160px;
+  right: -80px;
+  z-index: -1;
+}
