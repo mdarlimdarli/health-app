@@ -20,7 +20,7 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /js/app.js (Router, Shell), aura.js (Aura je Screen), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
 /js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
 /js/vendor/idb.js
-/data/exercises.json, plans.json (optionale Überschreibung), meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
+/data/exercises.json, plans.json (optionale Überschreibung), meals.example.json (neutraler Beispiel-Essensplan), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
 /scripts/generate-plans.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
 /push-worker/ (Vorlagen für die Push-Action im Repo health-data, wird nicht deployt)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
@@ -108,8 +108,10 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - Auswertung zeigt nur Zahlen und Verläufe, keine Interpretation.
 
 ## Ernährung und Auszug
-- Inhalte (foods, meals, weekPlan) kommen von außen in data/meals.json. Die Ampel wird zur Laufzeit aus profile.diet.intolerances berechnet und nie in der Datei gespeichert.
-- Gerichte mit einem Tag oder einer Zutat aus profile.diet.dislikes werden nie vorgeschlagen. Tags in meals.json und dislikes im Profil müssen dasselbe Vokabular nutzen (exakter Vergleich).
+- Der Essensplan ist persönlich und wird behandelt wie das Profil: data/meals.json wird nie committet (.gitignore) und nie deployt. Öffentlich ist nur data/meals.example.json (3 neutrale Gerichte, 10 Lebensmittel).
+- Der aktive Plan lebt in IndexedDB (settings, key "meals") und ist Teil der verschlüsselten Sicherung. Er kommt per "Essensplan aus Datei importieren" (Schema-Prüfung mit validateMealsFile, Versionsanzeige) und geht per "Essensplan exportieren" wieder hinaus. Ohne eigenen Plan zeigt der Tab Essen den Beispielplan mit Hinweis "Eigenen Plan importieren".
+- Die Ampel wird zur Laufzeit aus profile.diet.intolerances berechnet und nie in der Datei gespeichert.
+- Gerichte mit einem Tag oder einer Zutat aus profile.diet.dislikes werden nie vorgeschlagen. Tags im Essensplan und dislikes im Profil müssen dasselbe Vokabular nutzen (exakter Vergleich).
 - Vorschläge bevorzugen profile.diet.cuisines, dann die bessere Ampel. Eigene Tausche in settings mealSwaps, Feedback in mealFeedback.
 - Auszug für die Beratung ist unverschlüsseltes Markdown, ohne Namen der Person, Medikamente standardmäßig anonymisiert, keine Interpretation.
-- Nach Änderungen an den Regeln: node scripts/test-food.mjs.
+- Nach Änderungen an den Regeln: node scripts/test-food.mjs (läuft gegen data/meals.example.json, prüft eine lokale data/meals.json zusätzlich auf das Schema).

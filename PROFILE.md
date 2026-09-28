@@ -93,7 +93,7 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 |---|---|---|
 | `intolerances` | Liste | Unverträglichkeiten. Zur Wahl: `fructose`, `lactose`, `histamine`, `gluten`, `sorbit`. Gerichte mit passenden Tags werden nicht vorgeschlagen. |
 | `cuisines` | Liste | Bevorzugte Küchen, z. B. `italienisch`, `koreanisch`, `mediterran`. |
-| `dislikes` | Liste | Gemiedene Zutaten oder Gerichtsarten als Tags, z. B. `pilze`. In der App als Text mit Komma eingegeben. Ein Gericht fällt weg, wenn einer seiner `tags` oder eine Zutaten-ID in `data/meals.json` genau so heißt. |
+| `dislikes` | Liste | Gemiedene Zutaten oder Gerichtsarten als Tags, z. B. `pilze`. In der App als Text mit Komma eingegeben. Ein Gericht fällt weg, wenn einer seiner `tags` oder eine Zutaten-ID im Essensplan genau so heißt. |
 
 ### `reminders`
 

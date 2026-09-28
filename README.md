@@ -94,7 +94,7 @@ node scripts/test-meds.mjs
 node scripts/test-food.mjs
 ```
 
-Der Essensplan steht in `data/meals.json`. Das Schema: `foods` (id, name, category, fructose, lactose, histamine, gluten, note), `meals` (id, name, cuisine, slot, ingredients, tags, prepMinutes, histamineTest, recipe als kurzes Markdown, swaps) und `weekPlan` (weekday 1 bis 7 mit slots). Eine Ampel gehört nicht in die Datei, die App berechnet sie aus dem Profil. Nach dem Aktualisieren der Datei `version` erhöhen, dann zeigt die App unter Essen die neue Version.
+**Essensplan:** Der eigene Plan ist persönlich und liegt nie im Repo. Du importierst ihn in der App unter **Einstellungen > Essensplan aus Datei importieren**, danach lebt er auf dem Gerät und in der verschlüsselten Sicherung. Im Repo liegt nur der neutrale Beispielplan `data/meals.example.json`. Eine lokale Arbeitskopie `data/meals.json` ist in `.gitignore`. Das Schema: `foods` (id, name, category, fructose, lactose, histamine, gluten, note), `meals` (id, name, cuisine, slot, ingredients, tags, prepMinutes, histamineTest, recipe als kurzes Markdown, swaps) und `weekPlan` (weekday 1 bis 7 mit slots). Eine Ampel gehört nicht in die Datei, die App berechnet sie aus dem Profil. Beim Import prüft die App das Schema und zeigt die Version. Nach einer Überarbeitung `version` erhöhen und die Datei erneut importieren.
 
 Beispielpläne neu erzeugen (aus `data/profile.example.json` nach `data/plans.generated.json`):
 

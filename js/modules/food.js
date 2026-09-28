@@ -1,6 +1,6 @@
 /*
   Essen: Wochenplan (#/essen) und Ampelliste der Lebensmittel (#/essen/lebensmittel).
-  Inhalte kommen aus data/meals.json. Ampel, Ausschlüsse und bevorzugte Küchen
+  Der eigene Plan kommt per Import in IndexedDB, ohne ihn zeigt die App den Beispielplan. Ampel, Ausschlüsse und bevorzugte Küchen
   richten sich nach profile.diet, berechnet in js/food-rules.js.
 */
 
@@ -104,6 +104,24 @@ function openSheet(build) {
   });
 }
 
+/* Kopf: eigener Plan mit Version oder Hinweis auf den Beispielplan */
+
+function planHead(data) {
+  if (!data || data.source === 'beispiel') {
+    const card = el('div', 'card card--action stack-tight');
+    const link = el('a', 'button', 'Eigenen Plan importieren');
+    link.href = '#/einstellungen';
+    card.append(el('p', 'label', 'Beispielplan'), el('h2', null, data ? 'Das ist ein neutraler Beispielplan' : 'Noch kein Essensplan'), el('p', 'secondary', 'Importiere deinen eigenen Plan in den Einstellungen. Er bleibt auf dem Gerät und in deiner verschlüsselten Sicherung.'), link);
+    return card;
+  }
+  const head = el('div', 'food-head');
+  const version = el('p', 'hint', `Eigener Plan, Version ${data.version}${data.updatedAt ? ` vom ${data.updatedAt.split('-').reverse().join('.')}` : ''}`);
+  const link = el('a', 'button button--small', 'Plan ändern');
+  link.href = '#/einstellungen';
+  head.append(version, link);
+  return head;
+}
+
 /* Woche */
 
 async function renderWeek(root, date) {
@@ -111,27 +129,8 @@ async function renderWeek(root, date) {
   const today = todayISO();
   root.replaceChildren(subnav('woche'));
 
-  const head = el('div', 'food-head');
-  const version = el('p', 'hint');
-  const refresh = el('button', 'button button--small', 'Essensplan aktualisieren');
-  refresh.type = 'button';
-  version.textContent = data ? `Version ${data.version}${data.updatedAt ? ` vom ${data.updatedAt.split('-').reverse().join('.')}` : ''}` : 'Noch kein Essensplan geladen';
-  refresh.addEventListener('click', async () => {
-    refresh.disabled = true;
-    const before = data?.version;
-    const next = await loadMeals({ fresh: true });
-    refresh.disabled = false;
-    if (!next) return toast('Essensplan nicht erreichbar. Bist du online?', { error: true });
-    toast(next.version !== before ? `Neue Version ${next.version} geladen` : `Version ${next.version} ist aktuell`);
-    renderWeek(root, date);
-  });
-  head.append(version, refresh);
-  root.append(head);
-
-  if (!data?.meals.length) {
-    root.append(el('p', 'secondary', 'Noch kein Essensplan. Die Inhalte kommen später über data/meals.json.'));
-    return;
-  }
+  root.append(planHead(data));
+  if (!data?.meals.length) return;
 
   // Wochentags-Leiste der Woche des gewählten Tages
   const bar = weekBar({ date, today, tone: 'salbei', href: (day) => `#/essen/${day}`, label: 'Tag wählen' });
@@ -305,9 +304,10 @@ async function renderFoods(root) {
   const profileDiet = diet();
   root.replaceChildren(subnav('lebensmittel'));
   if (!data?.foods.length) {
-    root.append(el('p', 'secondary', 'Noch keine Lebensmittel. Die Inhalte kommen später über data/meals.json.'));
+    root.append(planHead(data));
     return;
   }
+  if (data.source === 'beispiel') root.append(el('p', 'hint', 'Beispielplan. Deinen eigenen Plan importierst du in den Einstellungen.'));
 
   // Grundregeln aus dem Essensplan, falls vorhanden
   if (data.notes?.length) {

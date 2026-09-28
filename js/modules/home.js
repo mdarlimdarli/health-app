@@ -137,7 +137,7 @@ async function renderTraining(container) {
   }
 }
 
-// Gerichte des Tages aus dem Essensplan, sofern data/meals.json Inhalte hat
+// Gerichte des Tages aus dem Essensplan (eigener Plan oder Beispielplan)
 async function renderMeal(container) {
   try {
     const { mealsForDate } = await import('../food-data.js');

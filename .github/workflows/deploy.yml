@@ -36,7 +36,8 @@ jobs:
           for item in index.html manifest.webmanifest sw.js css js data assets; do
             if [ -e "$item" ]; then cp -R "$item" _site/; fi
           done
-          rm -f _site/data/profile.json
+          # Persönliche Dateien werden nie deployt (Profil und Essensplan leben in IndexedDB)
+          rm -f _site/data/profile.json _site/data/meals.json _site/data/plans.local.json
 
       - name: Artefakt hochladen
         uses: actions/upload-pages-artifact@v3

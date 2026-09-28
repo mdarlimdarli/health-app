@@ -113,3 +113,45 @@ export function validateMeals(data) {
   }
   return errors;
 }
+
+/*
+  Vollständige Prüfung einer Essensplan-Datei vor dem Import:
+  Grundform, Pflichtfelder, erlaubte Werte, eindeutige IDs und alle Verweise.
+  Eine Ampel darf nicht in der Datei stehen, sie wird immer aus dem Profil berechnet.
+*/
+export function validateMealsFile(data) {
+  const errors = [];
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return ['Die Datei enthält kein Objekt.'];
+  if (!Array.isArray(data.foods) || !Array.isArray(data.meals)) return ['Die Datei braucht die Listen foods und meals.'];
+  if (data.version !== undefined && !Number.isFinite(Number(data.version))) errors.push('version muss eine Zahl sein.');
+  if (data.weekPlan !== undefined && !Array.isArray(data.weekPlan)) errors.push('weekPlan muss eine Liste sein.');
+
+  const seen = (list, label) => {
+    const ids = new Set();
+    for (const item of list) {
+      if (!item || typeof item.id !== 'string' || !item.id) { errors.push(`${label}: Eintrag ohne id.`); continue; }
+      if (ids.has(item.id)) errors.push(`${label}: id ${item.id} doppelt.`);
+      ids.add(item.id);
+      if (typeof item.name !== 'string' || !item.name) errors.push(`${label} ${item.id}: name fehlt.`);
+      if ('ampel' in item || 'rating' in item) errors.push(`${label} ${item.id}: Ampel gehört nicht in die Datei.`);
+    }
+  };
+  seen(data.foods, 'Lebensmittel');
+  seen(data.meals, 'Gericht');
+
+  for (const food of data.foods) {
+    for (const key of ['fructose', 'histamine']) {
+      if (food?.[key] !== undefined && !(food[key] in LEVELS)) errors.push(`Lebensmittel ${food.id}: ${key} muss niedrig, mittel oder hoch sein.`);
+    }
+    for (const key of ['lactose', 'gluten']) {
+      if (food?.[key] !== undefined && typeof food[key] !== 'boolean') errors.push(`Lebensmittel ${food.id}: ${key} muss true oder false sein.`);
+    }
+  }
+  for (const meal of data.meals) {
+    if (!Array.isArray(meal?.ingredients)) errors.push(`Gericht ${meal?.id}: ingredients muss eine Liste sein.`);
+  }
+  for (const day of data.weekPlan ?? []) {
+    if (!(Number(day?.weekday) >= 1 && Number(day?.weekday) <= 7)) errors.push(`Wochenplan: weekday ${day?.weekday} muss 1 bis 7 sein.`);
+  }
+  return [...errors, ...validateMeals(data)];
+}

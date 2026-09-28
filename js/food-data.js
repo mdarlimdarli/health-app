@@ -1,27 +1,67 @@
 /*
-  Datenzugriff Ernährung: data/meals.json laden (Inhalt, kommt von außen),
-  eigene Tausche (settings mealSwaps) und Feedback (Store mealFeedback).
+  Datenzugriff Ernährung. Der aktive Essensplan ist persönlich und lebt wie das Profil
+  nur in IndexedDB (settings, key "meals") und damit in der verschlüsselten Sicherung.
+  Ohne eigenen Plan zeigt die App den neutralen Beispielplan data/meals.example.json.
+  Eigene Tausche liegen in settings mealSwaps, Feedback im Store mealFeedback.
 */
 
 import * as db from './db.js';
 import { getProfile } from './profile.js';
-import { resolveMeal, MEAL_SLOTS } from './food-rules.js';
+import { resolveMeal, validateMealsFile, MEAL_SLOTS } from './food-rules.js';
+
+const EXAMPLE_URL = './data/meals.example.json';
 
 let cache = null;
 
-// fresh: Netz erzwingen (Button "Essensplan aktualisieren"), sonst Speicher oder Service-Worker-Cache
+function normalize(data, source) {
+  const notes = Array.isArray(data.notes) ? data.notes : data.note ? [data.note] : [];
+  return { source, version: data.version ?? 0, updatedAt: data.updatedAt ?? null, notes, foods: data.foods ?? [], meals: data.meals ?? [], weekPlan: data.weekPlan ?? [] };
+}
+
+// source: 'eigen' (importiert) oder 'beispiel' (neutraler Beispielplan)
 export async function loadMeals({ fresh = false } = {}) {
   if (cache && !fresh) return cache;
+  const stored = await db.getSetting('meals');
+  if (stored) {
+    cache = normalize(stored, 'eigen');
+    return cache;
+  }
   try {
-    const response = await fetch('./data/meals.json', { cache: fresh ? 'reload' : 'no-cache' });
-    if (!response.ok) return cache;
-    const data = await response.json();
-    const notes = Array.isArray(data.notes) ? data.notes : data.note ? [data.note] : [];
-    cache = { version: data.version ?? 0, updatedAt: data.updatedAt ?? null, notes, foods: data.foods ?? [], meals: data.meals ?? [], weekPlan: data.weekPlan ?? [] };
+    const response = await fetch(EXAMPLE_URL);
+    if (response.ok) cache = normalize(await response.json(), 'beispiel');
   } catch {
-    // offline ohne Cache: bisheriger Stand bleibt
+    // offline ohne Cache: kein Plan
   }
   return cache;
+}
+
+export async function storedMeals() {
+  return db.getSetting('meals');
+}
+
+// Prüft und speichert einen Plan aus einer Datei. Wirft mit allen gefundenen Fehlern.
+export function parseMealsFile(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error('Die Datei ist kein gültiges JSON.');
+  }
+  const errors = validateMealsFile(data);
+  if (errors.length) {
+    const error = new Error(`Der Essensplan ist nicht gültig: ${errors.slice(0, 3).join(' ')}${errors.length > 3 ? ` Und ${errors.length - 3} weitere Fehler.` : ''}`);
+    error.details = errors;
+    throw error;
+  }
+  return data;
+}
+
+export async function importMeals(data) {
+  const { version = 1, updatedAt = null, notes, note, foods, meals, weekPlan = [] } = data;
+  const stored = { version, updatedAt, notes: Array.isArray(notes) ? notes : note ? [note] : [], foods, meals, weekPlan, importedAt: new Date().toISOString() };
+  await db.setSetting('meals', stored);
+  cache = null;
+  return stored;
 }
 
 export function diet() {
