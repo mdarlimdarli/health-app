@@ -17,11 +17,11 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche)
-/js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen)
+/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
+/js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
-/scripts/generate-plans.mjs, test-planner.mjs, test-meds.mjs (Node, nur Entwicklung)
+/scripts/generate-plans.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
 /push-worker/ (Vorlagen für die Push-Action im Repo health-data, wird nicht deployt)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
 
@@ -80,3 +80,10 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - Slider nur aus profile.checkin.sliders (energy Sonne, digestion Salbei, pain Rose, sleep Himmel, mood Flieder). Schmerzseite nur bei painSideToggle.enabled, Zyklus nur bei cycleTracking, sonst komplett ausgeblendet.
 - Zyklusphasen für die Auswertung kommen aus profile.checkin.cyclePhases, nie fest im Code.
 - Auswertung zeigt nur Zahlen und Verläufe, keine Interpretation.
+
+## Ernährung und Auszug
+- Inhalte (foods, meals, weekPlan) kommen von außen in data/meals.json. Die Ampel wird zur Laufzeit aus profile.diet.intolerances berechnet und nie in der Datei gespeichert.
+- Gerichte mit einem Tag oder einer Zutat aus profile.diet.dislikes werden nie vorgeschlagen. Tags in meals.json und dislikes im Profil müssen dasselbe Vokabular nutzen (exakter Vergleich).
+- Vorschläge bevorzugen profile.diet.cuisines, dann die bessere Ampel. Eigene Tausche in settings mealSwaps, Feedback in mealFeedback.
+- Auszug für die Beratung ist unverschlüsseltes Markdown, ohne Namen der Person, Medikamente standardmäßig anonymisiert, keine Interpretation.
+- Nach Änderungen an den Regeln: node scripts/test-food.mjs.

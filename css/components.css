@@ -1617,3 +1617,226 @@ a.button {
 .training-card .button {
   margin-top: var(--space-1);
 }
+
+/* Essen */
+.food-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* Tagesleiste: Kreise, gewählter Tag gefüllt, heute mit Punkt */
+.week-bar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.week-day {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding-bottom: 8px;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.week-circle {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: var(--line-width) solid var(--color-line);
+  transition: background-color var(--duration) var(--easing);
+}
+
+.week-day--active .week-circle {
+  color: var(--color-bg);
+  background: var(--color-text);
+  border-color: var(--color-text);
+}
+
+.week-day--today::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--salbei-to);
+}
+
+.meal-card {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.meal-head {
+  display: grid;
+  gap: 2px;
+}
+
+.meal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.rating-dot {
+  flex: none;
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-line);
+}
+
+.rating-dot--gruen { background: var(--salbei-to); }
+.rating-dot--gelb { background: var(--zitrone-to); }
+.rating-dot--rot { background: var(--rose-to); }
+
+.test-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  border-radius: 14px;
+  background: var(--flieder-from);
+}
+
+.ingredient-list {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.ingredient-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.recipe-text {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.recipe-text ol,
+.recipe-text ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.swap-list {
+  display: grid;
+  gap: 4px;
+  margin: var(--space-2) 0;
+}
+
+.alt-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: 8px 0;
+  text-align: left;
+  border-bottom: var(--line-width) solid var(--color-line);
+}
+
+.thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+}
+
+.thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 52px;
+  border: var(--line-width) solid var(--color-line);
+  border-radius: var(--radius-control);
+  transition: background-color var(--duration) var(--easing);
+}
+
+.thumb svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.thumb-down {
+  transform: rotate(180deg);
+}
+
+.thumb[aria-pressed="true"] {
+  background: var(--salbei-from);
+  border-color: var(--salbei-from);
+}
+
+.food-list {
+  display: grid;
+  padding: 4px var(--space-2);
+}
+
+.food-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 60px;
+  padding: 8px 0;
+}
+
+.food-row + .food-row {
+  border-top: var(--line-width) solid var(--color-line);
+}
+
+.rating-text {
+  flex: none;
+  max-width: 88px;
+  text-align: right;
+}
+
+.meal-today {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.meal-today-row {
+  display: grid;
+  gap: 2px;
+}
+
+.meal-today .button {
+  margin-top: var(--space-1);
+}
+
+.report-preview {
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre-wrap;
+}

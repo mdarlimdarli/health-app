@@ -89,6 +89,12 @@ node scripts/test-planner.mjs
 node scripts/test-meds.mjs
 ```
 
+```bash
+node scripts/test-food.mjs
+```
+
+Der Essensplan steht in `data/meals.json`. Das Schema: `foods` (id, name, category, fructose, lactose, histamine, gluten, note), `meals` (id, name, cuisine, slot, ingredients, tags, prepMinutes, histamineTest, recipe als kurzes Markdown, swaps) und `weekPlan` (weekday 1 bis 7 mit slots). Eine Ampel gehört nicht in die Datei, die App berechnet sie aus dem Profil. Nach dem Aktualisieren der Datei `version` erhöhen, dann zeigt die App unter Essen die neue Version.
+
 Beispielpläne neu erzeugen (aus `data/profile.example.json` nach `data/plans.generated.json`):
 
 ```bash

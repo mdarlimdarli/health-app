@@ -1,10 +1,9 @@
 /*
   Startseite (Tab Heute): Begrüßung, Datum, Zyklustag (nur mit cycleTracking),
   Tagesfläche aus den Check-in-Werten, fällige Medikamente (wichtige zuerst, direkt abhakbar),
-  nächstes Training und das Gericht des Tages, sofern ein Essensplan existiert.
+  nächstes Training und die Gerichte des Tages, sofern ein Essensplan existiert.
 */
 
-import * as db from '../db.js';
 import { getProfile } from '../profile.js';
 import { openItems, setTaken } from '../meds-store.js';
 import { isMeasurement, slotLabel } from '../meds-schedule.js';
@@ -139,22 +138,20 @@ async function renderTraining(container) {
   }
 }
 
-/*
-  Gericht des Tages: nur, wenn ein Essensplan existiert (settings mealPlan: { Datum: mealId })
-  und das Gericht in data/meals.json steht. Bis das Essensmodul da ist, bleibt die Karte weg.
-*/
+// Gerichte des Tages aus dem Essensplan, sofern data/meals.json Inhalte hat
 async function renderMeal(container) {
-  const plan = await db.getSetting('mealPlan');
-  const mealId = plan?.[todayISO()];
-  if (!mealId) return;
   try {
-    const response = await fetch('./data/meals.json');
-    if (!response.ok) return;
-    const data = await response.json();
-    const meal = (data.meals ?? []).find((m) => m.id === mealId);
-    if (!meal) return;
-    const card = el('div', 'card');
-    card.append(el('p', 'label', 'Heute auf dem Plan'), el('h2', null, meal.name));
+    const { mealsForDate } = await import('../food-data.js');
+    const day = await mealsForDate(todayISO());
+    const planned = (day ?? []).filter((entry) => entry.meal);
+    if (!planned.length) return;
+    const card = el('div', 'card meal-today');
+    card.append(el('p', 'label', 'Heute auf dem Plan'));
+    for (const entry of planned) {
+      const row = el('div', 'meal-today-row');
+      row.append(el('span', 'secondary', entry.slot.label), el('span', 'med-name', entry.meal.name));
+      card.append(row);
+    }
     const link = el('a', 'button', 'Zum Essen');
     link.href = '#/essen';
     card.append(link);

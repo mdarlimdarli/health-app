@@ -93,7 +93,7 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 |---|---|---|
 | `intolerances` | Liste | Unverträglichkeiten. Zur Wahl: `fructose`, `lactose`, `histamine`, `gluten`, `sorbit`. Gerichte mit passenden Tags werden nicht vorgeschlagen. |
 | `cuisines` | Liste | Bevorzugte Küchen, z. B. `italienisch`, `koreanisch`, `mediterran`. |
-| `dislikes` | Liste | Gemiedene Zutaten oder Gerichtsarten als Tags, z. B. `pilze`. In der App als Text mit Komma eingegeben. |
+| `dislikes` | Liste | Gemiedene Zutaten oder Gerichtsarten als Tags, z. B. `pilze`. In der App als Text mit Komma eingegeben. Ein Gericht fällt weg, wenn einer seiner `tags` oder eine Zutaten-ID in `data/meals.json` genau so heißt. |
 
 ### `reminders`
 
@@ -105,7 +105,7 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 
 ### Welche Felder wirken schon?
 
-Die App nutzt heute `displayName`, `cycleTracking`, alle Felder unter `training`, `checkin` und `reminders` sowie die Medikamente aus einer importierten Datei. `diet` liest das Essensmodul, sobald es gebaut ist. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
+Die App nutzt alle Felder: `displayName`, `birthYear` (im Auszug für die Beratung), `cycleTracking`, `training`, `checkin`, `diet`, `reminders` und die Medikamente aus einer importierten Datei. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
 
 ## So richtest du die App für eine andere Person ein
 

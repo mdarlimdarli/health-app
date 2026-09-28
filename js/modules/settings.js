@@ -7,6 +7,7 @@ import * as db from '../db.js';
 import * as sync from '../sync.js';
 import { confirmDialog, toast, formatDateTime, todayISO } from '../ui.js';
 import { renderReminders } from './reminders.js';
+import { renderReportSection } from './report-section.js';
 import { appTitle, hasProfile, getProfile, loadProfile, parseProfileFile, importProfile, exportProfile } from '../profile.js';
 
 const TEMPLATE = `
@@ -27,6 +28,8 @@ const TEMPLATE = `
     </div>
 
     <div data-reminders></div>
+
+    <div data-report></div>
 
     <div class="card status-card">
       <div class="blob" data-status-blob></div>
@@ -319,5 +322,8 @@ export async function render(root) {
 
   await updateStatus();
   prepareExport();
-  if (hasProfile()) renderReminders($('[data-reminders]'));
+  if (hasProfile()) {
+    renderReminders($('[data-reminders]'));
+    renderReportSection($('[data-report]'));
+  }
 }
