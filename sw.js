@@ -4,7 +4,7 @@
   Bei jeder Änderung an Shell-Dateien VERSION erhöhen.
 */
 
-const VERSION = 'v6';
+const VERSION = 'v7';
 const CACHE = `shell-${VERSION}`;
 
 // Pfade relativ zum Scope, damit die App auch unter /health-app/ läuft
@@ -22,10 +22,16 @@ const SHELL = [
   './js/ui.js',
   './js/profile.js',
   './js/planner.js',
+  './js/meds-schedule.js',
+  './js/meds-store.js',
+  './js/push.js',
   './js/vendor/idb.js',
   './js/modules/settings.js',
   './js/modules/profile-form.js',
   './js/modules/training.js',
+  './js/modules/meds.js',
+  './js/modules/home.js',
+  './js/modules/reminders.js',
   './data/exercises.json',
   './assets/fonts/inter-latin-wght-normal.woff2',
   './assets/icons/icon-180.png',
@@ -100,3 +106,39 @@ async function networkFirst(request) {
     return cached || Response.error();
   }
 }
+
+/*
+  Push-Erinnerungen von der GitHub Action im Repo health-data.
+  Die Nachricht ist allgemein gehalten und nennt keine Medikamente.
+*/
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : '' };
+  }
+  event.waitUntil(self.registration.showNotification(data.title || 'Health', {
+    body: data.body || 'Zeit für deine Medis.',
+    icon: './assets/icons/icon-180.png',
+    badge: './assets/icons/icon-180.png',
+    tag: data.tag || 'erinnerung',
+    data: { url: new URL(data.url || './#/medis', self.registration.scope).href },
+  }));
+});
+
+// Tippen auf die Mitteilung öffnet die App bei den Medis
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || self.registration.scope;
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of windows) {
+      if ('focus' in client) {
+        if ('navigate' in client) await client.navigate(url).catch(() => {});
+        return client.focus();
+      }
+    }
+    return self.clients.openWindow(url);
+  })());
+});

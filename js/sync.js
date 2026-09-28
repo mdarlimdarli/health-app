@@ -350,3 +350,39 @@ export async function restore() {
   emitStatus();
   return true;
 }
+
+/*
+  Unverschlüsselte Hilfsdateien für Push-Erinnerungen (reminders.json, subscriptions.json).
+  Sie enthalten nur Uhrzeiten und Push-Adressen, keine Gesundheitsdaten,
+  denn die GitHub Action muss sie ohne Passwort lesen können.
+*/
+
+async function requireCredentials() {
+  const creds = await credentials();
+  if (!creds.owner || !creds.token) throw new SyncError('Trage zuerst GitHub-Owner und Token ein.', 'not-configured');
+  if (!navigator.onLine) throw new SyncError('Dafür musst du online sein.', 'offline');
+  return creds;
+}
+
+export async function readPlainJSON(path) {
+  const creds = await requireCredentials();
+  const text = await remoteText(creds, path);
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new SyncError(`${path} auf GitHub ist kein gültiges JSON.`);
+  }
+}
+
+export async function writePlainJSON(path, data, label) {
+  const creds = await requireCredentials();
+  const text = `${JSON.stringify(data, null, 2)}\n`;
+  try {
+    await putFile(creds, path, text, await remoteSha(creds, path), label);
+  } catch (error) {
+    // Zwischenzeitlich geändert (z. B. durch die Action): aktuellen Stand holen und erneut schreiben
+    if (error.code !== 'conflict') throw error;
+    await putFile(creds, path, text, await remoteSha(creds, path), label);
+  }
+}

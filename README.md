@@ -36,6 +36,35 @@ Neue Versionen lädt die App automatisch im Hintergrund, sobald sie online ist. 
 
 Im Repo liegen dann `data.json.enc` (verschlüsselt) und `manifest.json` (nur Zeitpunkt und Anzahl der Einträge, ohne Inhalte). Token, Passwort und Sync-Stand bleiben auf dem Gerät und werden nie mitgesichert oder exportiert.
 
+## Push-Erinnerungen einrichten
+
+Die App zeigt fällige Einträge immer auf der Startseite und als Zahl am Tab Medis. Push-Mitteilungen aufs Handy kommen ohne eigenen Server über eine GitHub Action im privaten Repo `health-data`.
+
+**So funktioniert es:** Beim Aktivieren legt die App im Repo `health-data` zwei Dateien ab. `reminders.json` enthält deine Uhrzeiten, `subscriptions.json` die Push-Adresse deines iPhones. Die Action läuft zu diesen Uhrzeiten, liest beide Dateien und verschickt eine allgemeine Mitteilung ohne Medikamentennamen.
+
+1. **VAPID-Schlüssel erzeugen** (einmalig, auf dem Mac):
+
+   ```bash
+   npx web-push generate-vapid-keys
+   ```
+
+2. **Secrets anlegen:** Im Repo `health-data` unter **Settings > Secrets and variables > Actions** drei Repository-Secrets anlegen:
+   - `VAPID_PUBLIC_KEY`: der öffentliche Schlüssel
+   - `VAPID_PRIVATE_KEY`: der private Schlüssel, er gehört nur hierher
+   - `VAPID_SUBJECT`: eine Kontaktadresse, z. B. `mailto:du@example.com`
+3. **Dateien kopieren:** Aus diesem Repo `push-worker/send-reminders.mjs` nach `health-data/push/send-reminders.mjs` und `push-worker/reminders.yml` nach `health-data/.github/workflows/reminders.yml`.
+4. **Zeitplan eintragen:** In der App unter **Einstellungen > Erinnerungen** die Uhrzeiten festlegen und unter „Zeitplan für die GitHub Action“ die cron-Zeilen kopieren. Diese ersetzen die Beispielzeilen in `reminders.yml`. GitHub kann Zeiten nur aus der Workflow-Datei lesen. Deshalb musst du sie nach jeder Änderung der Uhrzeiten neu einfügen.
+5. **Push aktivieren:** In der App den öffentlichen Schlüssel eintragen und „Push aktivieren“ tippen. iOS fragt dann nach der Erlaubnis für Mitteilungen.
+6. **Testen:** Im Repo `health-data` unter **Actions > Erinnerungen senden > Run workflow** starten. Eine Mitteilung kommt nur, wenn eine Uhrzeit in den letzten zwei Stunden lag und heute noch nicht verschickt wurde.
+
+**Einschränkungen auf dem iPhone:**
+- Web-Push gibt es erst ab iOS 16.4, und nur für die App vom Home-Bildschirm, nicht in Safari.
+- Mitteilungen können sich verspäten oder ausbleiben, etwa im Energiesparmodus oder bei Fokus.
+- GitHub startet geplante Actions oft einige Minuten später, bei hoher Last auch deutlich später.
+- **Für wichtige Einträge deshalb zusätzlich eine Erinnerung in der iOS-App Erinnerungen stellen.**
+
+Die Action braucht pro Lauf etwa eine Minute. Bei drei Uhrzeiten sind das rund 180 Minuten im Monat, das liegt gut im kostenlosen Kontingent für private Repos.
+
 ## Entwicklung
 
 Kein Build-Schritt nötig. Lokal starten, zum Beispiel mit:
@@ -50,10 +79,14 @@ Nach Änderungen an Shell-Dateien in `sw.js` die `VERSION` erhöhen, damit Gerä
 
 Tests für die Verschlüsselung: `http://localhost:8000/test.html` öffnen. Die Seite wird nicht deployt.
 
-Tests für Trainingsplaner und Übungsbibliothek:
+Tests für Trainingsplaner, Übungsbibliothek und Medikamenten-Zeitpläne:
 
 ```bash
 node scripts/test-planner.mjs
+```
+
+```bash
+node scripts/test-meds.mjs
 ```
 
 Beispielpläne neu erzeugen (aus `data/profile.example.json` nach `data/plans.generated.json`):

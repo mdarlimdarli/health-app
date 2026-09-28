@@ -82,7 +82,7 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 | `schedule.n` | Zahl | Nur bei `everyNDays`: Abstand in Tagen. |
 | `schedule.weekday` | Zahl | Nur bei `weekly`: 1 ist Montag, 7 ist Sonntag. |
 | `schedule.months` | Liste | Nur bei `seasonal`: Monate 1 bis 12, z. B. `[6, 7, 8]`. |
-| `schedule.slots` | Liste | Zeitpunkte am Tag: `morgen`, `abend`, `nach-fruehstueck`, `nach-mittag`, `nach-abend`. |
+| `schedule.slots` | Liste | Zeitpunkte am Tag: `morgen`, `nach-fruehstueck`, `mittag`, `nach-mittag`, `abend`, `nach-abend`. |
 | `schedule.startDate` | Datum | Optional, `YYYY-MM-DD`. Vorher gibt es keine Erinnerung. Fehlt es, gilt der Tag des Imports, bei `everyNDays` ist das auch der Bezugstag. |
 | `schedule.endDate` | Datum | Optional, `YYYY-MM-DD`. Danach endet der Plan. |
 
@@ -98,12 +98,13 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
-| `times` | Liste | Uhrzeiten für tägliche Erinnerungen, `HH:MM`. |
+| `times` | Liste | Uhrzeiten für Push-Erinnerungen, `HH:MM`. In der App unter Einstellungen > Erinnerungen änderbar. |
+| `slotTimes` | Objekt | Optional. Ab wann ein Slot als fällig gilt, z. B. `{ "morgen": "06:30" }`. Standard: Morgen 07:00, nach dem Frühstück 08:00, Mittag 12:00, nach dem Mittagessen 13:00, Abend 18:00, nach dem Abendessen 19:30. |
 | `timezone` | Text | Zeitzone für Erinnerungen, z. B. `Europe/Berlin`. |
 
 ### Welche Felder wirken schon?
 
-Die App nutzt heute `displayName`, alle Felder unter `training` und die Medikamente aus einer importierten Datei. Die übrigen Felder lesen die Module Check-in, Essen und Erinnerungen, sobald sie gebaut sind. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
+Die App nutzt heute `displayName`, alle Felder unter `training` und `reminders` sowie die Medikamente aus einer importierten Datei. Die übrigen Felder lesen die Module Check-in, Essen und Erinnerungen, sobald sie gebaut sind. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
 
 ## So richtest du die App für eine andere Person ein
 

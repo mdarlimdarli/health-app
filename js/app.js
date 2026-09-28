@@ -7,7 +7,10 @@
 */
 
 import { initSync } from './sync.js';
-import { loadProfile, getProfile, hasProfile, appTitle, onProfileChange } from './profile.js';
+import { loadProfile, hasProfile, appTitle, onProfileChange } from './profile.js';
+import { onChange } from './db.js';
+import { openItems } from './meds-store.js';
+import { setAppBadge } from './push.js';
 
 // Linien-Icons, 24er Raster, Strichstärke kommt aus CSS (1.5 px)
 const ICONS = {
@@ -21,9 +24,9 @@ const ICONS = {
 
 // Routen: Titel, Farbwelt des Verlaufs, Platz in der Tab-Bar
 const ROUTES = {
-  heute: { title: 'Heute', tone: 'sonne', tab: true },
+  heute: { title: 'Heute', tone: 'sonne', tab: true, load: () => import('./modules/home.js') },
   training: { title: 'Training', tone: 'sonne', tab: true, load: () => import('./modules/training.js') },
-  medis: { title: 'Medis', tone: 'zitrone', tab: true },
+  medis: { title: 'Medis', tone: 'zitrone', tab: true, load: () => import('./modules/meds.js') },
   checkin: { title: 'Check-in', tone: 'himmel', tab: true },
   essen: { title: 'Essen', tone: 'salbei', tab: true },
   einstellungen: { title: 'Einstellungen', tone: 'flieder', tab: false, load: () => import('./modules/settings.js') },
@@ -32,30 +35,16 @@ const ROUTES = {
 };
 
 const DEFAULT_ROUTE = 'heute';
-const TIME_ZONE = 'Europe/Berlin';
+const BADGE_INTERVAL_MS = 60000;
 
 function icon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
 }
 
-// Kalendertag in Berlin, unabhängig von der Zeitzone des Geräts
-function todayParts() {
-  const now = new Date();
-  const fmt = (options) => new Intl.DateTimeFormat('de-DE', { timeZone: TIME_ZONE, ...options }).format(now);
-  return { day: fmt({ day: 'numeric' }), weekday: fmt({ weekday: 'long' }), month: fmt({ month: 'long' }), hour: Number(fmt({ hour: 'numeric', hourCycle: 'h23' })) };
-}
-
-// Begrüßung nach Tageszeit, mit Namen aus dem Profil, falls vorhanden
-function greeting(hour) {
-  const phrase = hour >= 5 && hour < 11 ? 'Guten Morgen' : hour >= 11 && hour < 17 ? 'Hallo' : hour >= 17 && hour < 23 ? 'Guten Abend' : 'Gute Nacht';
-  const name = getProfile().displayName;
-  return name ? `${phrase}, ${name}` : phrase;
-}
-
 function renderShell(root) {
   const tabs = Object.entries(ROUTES)
     .filter(([, route]) => route.tab)
-    .map(([id, route]) => `<a class="tab" href="#/${id}" data-route="${id}">${icon(id)}<span>${route.title}</span></a>`)
+    .map(([id, route]) => `<a class="tab" href="#/${id}" data-route="${id}">${icon(id)}<span>${route.title}</span>${id === 'medis' ? '<span class="tab-badge" data-badge hidden></span>' : ''}</a>`)
     .join('');
 
   root.innerHTML = `
@@ -68,18 +57,7 @@ function renderShell(root) {
   `;
 }
 
-function renderPlaceholder(id, route) {
-  if (id === 'heute') {
-    const { day, weekday, month } = todayParts();
-    return `
-      <section class="placeholder">
-        <div class="blob blob--${route.tone}"></div>
-        <h2 data-greeting></h2>
-        <p class="label">${weekday}</p>
-        <p class="number">${day}</p>
-        <p class="secondary">${month}</p>
-      </section>`;
-  }
+function renderPlaceholder(route) {
   return `
     <section class="placeholder">
       <div class="blob blob--${route.tone}"></div>
@@ -131,12 +109,25 @@ async function navigate() {
     return;
   }
 
-  fresh.innerHTML = renderPlaceholder(id, route);
-  // Name aus dem Profil nur als Text einsetzen, nie als HTML
-  const greetingEl = fresh.querySelector('[data-greeting]');
-  if (greetingEl) greetingEl.textContent = greeting(todayParts().hour);
+  fresh.innerHTML = renderPlaceholder(route);
   // Intensität per CSSOM setzen (Inline-Styles sind per CSP gesperrt)
   fresh.querySelectorAll('.blob').forEach((blob) => blob.style.setProperty('--intensity', '0.6'));
+}
+
+// Zahl fälliger, offener Einträge am Tab Medis und am App-Symbol
+async function updateBadge() {
+  const badge = document.querySelector('[data-badge]');
+  if (!badge) return;
+  let count = 0;
+  try {
+    count = hasProfile() ? (await openItems()).length : 0;
+  } catch {
+    count = 0;
+  }
+  badge.hidden = count === 0;
+  badge.textContent = String(count);
+  badge.setAttribute('aria-label', `${count} fällig`);
+  setAppBadge(count);
 }
 
 function registerServiceWorker() {
@@ -164,6 +155,12 @@ async function start() {
   navigate();
   registerServiceWorker();
   initSync();
+
+  updateBadge();
+  onChange((store) => { if (store === 'medLog' || store === 'meds' || store === 'import') updateBadge(); });
+  onProfileChange(updateBadge);
+  setInterval(updateBadge, BADGE_INTERVAL_MS);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updateBadge(); });
 }
 
 start();

@@ -6,6 +6,7 @@
 import * as db from '../db.js';
 import * as sync from '../sync.js';
 import { confirmDialog, toast, formatDateTime, todayISO } from '../ui.js';
+import { renderReminders } from './reminders.js';
 import { appTitle, hasProfile, getProfile, loadProfile, parseProfileFile, importProfile, exportProfile } from '../profile.js';
 
 const TEMPLATE = `
@@ -24,6 +25,8 @@ const TEMPLATE = `
       <p class="hint">Die Profildatei ist nicht verschlüsselt. Sie enthält auch deine Medikamente.</p>
       <input type="file" accept="application/json,.json" data-profile-input hidden>
     </div>
+
+    <div data-reminders></div>
 
     <div class="card status-card">
       <div class="blob" data-status-blob></div>
@@ -316,4 +319,5 @@ export async function render(root) {
 
   await updateStatus();
   prepareExport();
+  if (hasProfile()) renderReminders($('[data-reminders]'));
 }

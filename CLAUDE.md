@@ -17,11 +17,12 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional)
-/js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten)
+/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js
+/js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
-/scripts/generate-plans.mjs, test-planner.mjs (Node, nur Entwicklung)
+/scripts/generate-plans.mjs, test-planner.mjs, test-meds.mjs (Node, nur Entwicklung)
+/push-worker/ (Vorlagen für die Push-Action im Repo health-data, wird nicht deployt)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
 
 ## Design-System (verbindlich)
@@ -66,3 +67,10 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - data/plans.generated.json wird nur aus profile.example.json erzeugt. Pläne aus dem eigenen Profil gehen nach data/plans.local.json (ignoriert).
 - Phasenwechsel nach 16 Einheiten nur vorschlagen, nie erzwingen.
 - Nach Änderungen an Planer oder Bibliothek: node scripts/test-planner.mjs.
+
+## Medis und Erinnerungen
+- Keine Medikamente im Code. Einträge liegen im Store meds, Einnahmen in medLog mit ID Datum|medId|Slot.
+- Schedule-Typen daily, everyNDays (ab startDate, sonst erstem Log), weekly (1 Montag bis 7 Sonntag), seasonal (months), jeweils mit optionalem startDate und endDate. type "measurement" speichert values (systolic, diastolic, pulse).
+- critical steht auf der Startseite immer oben, Streak nur für critical.
+- Push-Nachrichten sind allgemein und nennen nie Medikamente. reminders.json und subscriptions.json in health-data sind unverschlüsselt und enthalten nur Uhrzeiten und Push-Adressen.
+- Nach Änderungen an den Zeitplan-Regeln: node scripts/test-meds.mjs.
