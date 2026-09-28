@@ -8,6 +8,7 @@ import * as sync from '../sync.js';
 import { confirmDialog, toast, formatDateTime, todayISO } from '../ui.js';
 import { renderReminders } from './reminders.js';
 import { renderReportSection } from './report-section.js';
+import { renderMealsSection } from './meals-section.js';
 import { appTitle, hasProfile, getProfile, loadProfile, parseProfileFile, importProfile, exportProfile } from '../profile.js';
 
 const TEMPLATE = `
@@ -29,10 +30,11 @@ const TEMPLATE = `
 
     <div data-reminders></div>
 
+    <div data-meals></div>
+
     <div data-report></div>
 
     <div class="card status-card">
-      <div class="blob" data-status-blob></div>
       <p class="label">Sicherung</p>
       <p class="number" data-pending>0</p>
       <p data-pending-text></p>
@@ -80,7 +82,6 @@ const TEMPLATE = `
         <input class="input" name="repeat" type="password" autocomplete="new-password" minlength="8" required>
       </label>
       <div class="card warning-card">
-        <div class="blob blob--rose"></div>
         <p>Verlierst du das Passwort, kann niemand die Sicherung mehr lesen. Auch du nicht. Es wird nirgends gespeichert.</p>
       </div>
       <button class="button" type="submit" data-password-submit>Passwort setzen</button>
@@ -196,11 +197,6 @@ export async function render(root) {
     errorEl.hidden = !status.lastError;
     errorEl.textContent = status.lastError ?? '';
 
-    // Farbfläche zeigt den Zustand: Rose bei Fehler, Zitrone bei offenen Änderungen, sonst Himmel
-    const blob = $('[data-status-blob]');
-    const tone = status.lastError ? 'rose' : status.pending > 0 ? 'zitrone' : 'himmel';
-    blob.className = `blob blob--${tone}`;
-    blob.style.setProperty('--intensity', String(Math.min(1, 0.35 + status.pending * 0.1)));
 
     githubForm.owner.value ||= status.owner;
     githubForm.repo.value ||= status.repo;
@@ -350,6 +346,7 @@ export async function render(root) {
   prepareExport();
   if (hasProfile()) {
     renderReminders($('[data-reminders]'));
+    renderMealsSection($('[data-meals]'));
     renderReportSection($('[data-report]'));
   }
 }

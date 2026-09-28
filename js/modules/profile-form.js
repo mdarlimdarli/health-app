@@ -78,7 +78,6 @@ function checkedValues(form, name) {
 const TEMPLATE = `
   <form class="stack profile-form" novalidate>
     <div class="intro" data-onboarding hidden>
-      <div class="blob blob--sonne"></div>
       <p class="label">Willkommen</p>
       <h2>Richte deine App ein</h2>
       <p class="secondary">Deine Angaben bleiben auf diesem Gerät und in deiner verschlüsselten Sicherung. Medikamente legst du später im Tab Medis an.</p>
@@ -103,13 +102,13 @@ const TEMPLATE = `
     <section class="stack-tight">
       <h2>Training</h2>
       <div class="range-block card">
-        <div class="blob blob--sonne" data-blob="daysPerWeek"></div>
+        <div class="blob blob--mandarine" data-blob="daysPerWeek"></div>
         <span class="label">Tage pro Woche</span>
         <output class="number" data-output="daysPerWeek"></output>
         <input class="range" name="daysPerWeek" type="range" min="1" max="6" step="1" aria-label="Trainingstage pro Woche">
       </div>
       <div class="range-block card">
-        <div class="blob blob--sonne" data-blob="level"></div>
+        <div class="blob blob--mandarine" data-blob="level"></div>
         <span class="label">Level</span>
         <output class="number" data-output="level"></output>
         <p class="secondary" data-level-name></p>
@@ -186,7 +185,6 @@ export async function render(root, { route } = {}) {
     updateRange(name);
     form[name].addEventListener('input', () => updateRange(name));
   });
-  root.querySelectorAll('.intro .blob').forEach((blob) => blob.style.setProperty('--intensity', '0.4'));
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();

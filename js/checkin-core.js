@@ -6,15 +6,17 @@
 */
 
 import * as db from './db.js';
-import { el } from './ui.js';
 
-// Farbwelt, Beschriftung und feste Position der Verläufe je Slider
+/*
+  Farbwelt, Beschriftung und feste Position der Verläufe je Slider (Prozent der Aura-Fläche):
+  Energie oben links, Schlaf oben rechts, Verdauung unten links, Schmerz unten rechts.
+*/
 export const SLIDER_META = {
-  energy: { label: 'Energie', tone: 'sonne', low: 'leer', high: 'voll', x: 22, y: 30 },
-  sleep: { label: 'Schlaf', tone: 'himmel', low: 'schlecht', high: 'gut', x: 78, y: 28 },
-  digestion: { label: 'Verdauung', tone: 'salbei', low: 'schlecht', high: 'gut', x: 26, y: 76 },
-  pain: { label: 'Schmerz', tone: 'rose', low: 'kaum', high: 'stark', x: 76, y: 74 },
-  mood: { label: 'Stimmung', tone: 'flieder', low: 'tief', high: 'gut', x: 50, y: 52 },
+  energy: { label: 'Energie', tone: 'mandarine', low: 'leer', high: 'voll', x: 10, y: 10 },
+  sleep: { label: 'Schlaf', tone: 'periwinkle', low: 'schlecht', high: 'gut', x: 92, y: 8 },
+  digestion: { label: 'Verdauung', tone: 'salbei', low: 'schlecht', high: 'gut', x: 8, y: 52 },
+  pain: { label: 'Schmerz', tone: 'koralle', low: 'kaum', high: 'stark', x: 94, y: 50 },
+  mood: { label: 'Stimmung', tone: 'rose', low: 'tief', high: 'gut', x: 52, y: 28 },
 };
 
 export function activeSliders(profile) {
@@ -73,22 +75,15 @@ export function phaseFor(cycleDay, phases) {
   return phases.find((phase) => cycleDay >= phase.from && (phase.to == null || cycleDay <= phase.to)) ?? null;
 }
 
-/* Tagesfläche: je Slider ein Verlauf an fester Stelle, Größe und Sättigung nach Wert */
-
-export function renderAura(container, checkin, sliders) {
-  container.replaceChildren();
-  container.classList.add('day-aura');
-  const quiet = !hasValues(checkin, sliders);
-  container.classList.toggle('day-aura--quiet', quiet);
-  for (const key of sliders) {
-    const meta = SLIDER_META[key];
-    const value = Number.isInteger(checkin?.[key]) ? checkin[key] : null;
-    const blob = el('div', `blob blob--${meta.tone} aura-blob`);
-    blob.dataset.slider = key;
-    // Ohne Wert ruhig und klein, mit Wert je nach Höhe größer und satter
-    blob.style.setProperty('--intensity', String(value ? 0.15 + (value / 5) * 0.85 : 0.12));
-    blob.style.setProperty('--x', `${meta.x}%`);
-    blob.style.setProperty('--y', `${meta.y}%`);
-    container.append(blob);
-  }
+/*
+  Aura aus den Werten des Tages: je Slider mit Wert ein Verlauf an fester Stelle,
+  größer und satter mit höherem Wert, höchstens vier. subtle für den Check-in selbst.
+*/
+export function auraBlobs(checkin, sliders, { subtle = false } = {}) {
+  const factor = subtle ? 0.6 : 1;
+  return sliders
+    .filter((key) => Number.isInteger(checkin?.[key]))
+    .slice(0, 4)
+    .map((key) => ({ ...SLIDER_META[key], intensity: (0.15 + (checkin[key] / 5) * 0.85) * factor }))
+    .map(({ tone, x, y, intensity }) => ({ tone, x, y, intensity }));
 }

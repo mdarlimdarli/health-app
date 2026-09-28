@@ -32,11 +32,22 @@ p {
   margin: 0;
 }
 
-h1,
+/* Überschriften und Begrüßung */
 h2 {
   font-size: var(--font-size-heading);
   font-weight: var(--font-weight-heading);
-  line-height: 1.25;
+  letter-spacing: var(--letter-spacing-heading);
+  line-height: 1.1;
+}
+
+/* Titel in Kopfzeile und Karten */
+h1,
+.card h2,
+.dialog h2 {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-title);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 button {
@@ -65,18 +76,26 @@ a {
 
 /* Hilfsklassen für Typografie */
 .number {
-  font-size: clamp(var(--font-size-number-min), 18vw, var(--font-size-number-max));
+  font-size: var(--font-size-number);
   font-weight: var(--font-weight-number);
   font-variant-numeric: tabular-nums;
   letter-spacing: var(--letter-spacing-number);
-  line-height: 1;
+  line-height: var(--line-height-number);
+  /* Ab 40 px optische Größe für Display-Zahlen */
+  font-variation-settings: "opsz" 32;
 }
 
 .label {
   font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-label);
   color: var(--color-text-secondary);
+}
+
+/* Im oberen Aura-Bereich: Ink mit Deckkraft statt Ink-2 */
+.on-aura {
+  color: var(--ink-aura);
 }
 
 .secondary {

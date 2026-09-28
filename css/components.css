@@ -1,13 +1,77 @@
-/* Komponenten: Shell, Kopfzeile, Tab-Bar, Karten, Verlaufsflecken */
+/* Komponenten: Shell, Aura, Kopfzeile, Tab-Bar, Karten, Formen */
 
-/* App-Shell */
+/* App-Shell: alles liegt auf Creme */
 .shell {
+  position: relative;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  isolation: isolate;
 }
 
-/* Kopfzeile mit Einstellungen oben rechts */
+/*
+  Aura: zwei bis drei große, weiche Verläufe hinter dem oberen Screenbereich.
+  Sie laufen nach unten in Creme aus, Karten und Listen liegen im ruhigen Bereich.
+  Jedes Modul hat eine feste Kombination (js/aura.js), Inhalt liegt immer darüber.
+*/
+.aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  height: var(--aura-height);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aura-layer {
+  position: absolute;
+  inset: 0;
+  animation: aura-in var(--aura-fade) var(--easing);
+}
+
+@keyframes aura-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/*
+  Verlauf von base zu transparent. --intensity (0 bis 1) steuert Größe und Deckkraft,
+  wo ein Wert sichtbar werden soll. multiply lässt Überlagerungen zu Mischtönen werden.
+*/
+.blob {
+  --intensity: 0.7;
+  --size: calc(240px + 180px * var(--intensity));
+  --c: var(--butter);
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle closest-side, var(--c) 0%, var(--c) 35%, transparent 100%);
+  opacity: calc(0.45 + 0.55 * var(--intensity));
+  filter: blur(var(--aura-blur));
+  mix-blend-mode: multiply;
+  will-change: transform;
+  transition: width var(--duration) var(--easing), height var(--duration) var(--easing), opacity var(--duration) var(--easing);
+}
+
+.blob--butter { --c: var(--butter); }
+.blob--mandarine { --c: var(--mandarine); }
+.blob--koralle { --c: var(--koralle); }
+.blob--rose { --c: var(--rose); }
+.blob--periwinkle { --c: var(--periwinkle); }
+.blob--salbei { --c: var(--salbei); }
+
+/* Positionierte Blobs der Aura: Mittelpunkt bei --x/--y */
+.aura .blob {
+  left: var(--x);
+  top: var(--y);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+}
+
+/* Kopfzeile: transparent über der Aura, beim Scrollen Creme */
 .app-header {
   position: sticky;
   top: 0;
@@ -17,7 +81,13 @@
   justify-content: space-between;
   height: calc(var(--header-height) + var(--safe-top));
   padding: var(--safe-top) calc(var(--page-margin) + var(--safe-right)) 0 calc(var(--page-margin) + var(--safe-left));
+  background: transparent;
+  transition: background-color var(--duration) var(--easing), box-shadow var(--duration) var(--easing);
+}
+
+.app-header--scrolled {
   background: var(--color-bg);
+  box-shadow: 0 var(--line-width) 0 var(--color-tabline);
 }
 
 .icon-button {
@@ -33,16 +103,16 @@
 
 .icon-button:active,
 .icon-button[aria-current="page"] {
-  background: var(--color-line);
+  background: var(--color-card);
 }
 
-/* Hauptbereich, Platz für die Tab-Bar lassen */
+/* Hauptbereich über der Aura, Platz für die Tab-Bar lassen */
 .view {
   position: relative;
+  z-index: 1;
   flex: 1;
   padding: var(--space-1) calc(var(--page-margin) + var(--safe-right)) calc(var(--tabbar-height) + var(--safe-bottom) + var(--space-3)) calc(var(--page-margin) + var(--safe-left));
   overflow-x: hidden;
-  isolation: isolate;
   animation: view-in var(--duration) var(--easing);
 }
 
@@ -51,7 +121,7 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Bottom-Tab-Bar */
+/* Tab-Bar: Creme mit feiner Linie, aktiver Tab mit Kreis in seiner Modulfarbe */
 .tabbar {
   position: fixed;
   left: 0;
@@ -62,26 +132,57 @@
   grid-template-columns: repeat(5, 1fr);
   padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
   background: var(--color-bg);
-  border-top: var(--line-width) solid var(--color-line);
+  border-top: var(--line-width) solid var(--color-tabline);
 }
 
 .tab {
+  --tab-tone: var(--butter);
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 6px;
   min-height: var(--tabbar-height);
+  padding-top: 4px;
   color: var(--color-text-secondary);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
   text-decoration: none;
   transition: color var(--duration) var(--easing);
 }
 
+.tab[data-route="heute"] { --tab-tone: var(--rose); }
+.tab[data-route="training"] { --tab-tone: var(--mandarine); }
+.tab[data-route="medis"] { --tab-tone: var(--butter); }
+.tab[data-route="checkin"] { --tab-tone: var(--periwinkle); }
+.tab[data-route="essen"] { --tab-tone: var(--salbei); }
+
+.tab svg {
+  position: relative;
+  z-index: 1;
+}
+
 .tab[aria-current="page"] {
   color: var(--color-text);
+}
+
+.tab[aria-current="page"] svg {
+  stroke-width: 2;
+}
+
+.tab[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  margin-left: -18px;
+  border-radius: 50%;
+  background: var(--tab-tone);
 }
 
 .tab svg,
@@ -95,43 +196,34 @@
   stroke-linejoin: round;
 }
 
-/* Karte: keine Schatten, Trennung über Linie */
+/* Karte: Sand auf Creme, Radius 24, keine Kontur, keine Schatten */
 .card {
   position: relative;
   padding: var(--space-3);
-  border: var(--line-width) solid var(--color-line);
+  background: var(--color-card);
   border-radius: var(--radius-card);
   overflow: hidden;
+  isolation: isolate;
 }
 
 .card > * {
   position: relative;
 }
 
-/*
-  Verlaufsfleck als Zustandsanzeige.
-  --intensity (0 bis 1) steuert Größe, Blur und Sättigung.
-  Farbe über Modifier-Klasse, z. B. .blob--sonne.
-*/
-.blob {
-  --intensity: 0.5;
-  --size: calc(120px + 160px * var(--intensity));
-  position: absolute;
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: calc(0.35 + 0.65 * var(--intensity));
-  filter: blur(calc(var(--blur-min) + (var(--blur-max) - var(--blur-min)) * var(--intensity))) saturate(calc(0.6 + 0.6 * var(--intensity)));
-  transition: width var(--duration) var(--easing), height var(--duration) var(--easing), opacity var(--duration) var(--easing), filter var(--duration) var(--easing);
+.card .blob {
+  z-index: -1;
 }
 
-.blob--sonne { background: var(--gradient-sonne); }
-.blob--zitrone { background: var(--gradient-zitrone); }
-.blob--himmel { background: var(--gradient-himmel); }
-.blob--flieder { background: var(--gradient-flieder); }
-.blob--salbei { background: var(--gradient-salbei); }
-.blob--rose { background: var(--gradient-rose); }
+/* Aktions-Karte: Ink mit Creme-Text */
+.card--action {
+  color: var(--color-bg);
+  background: var(--color-text);
+}
+
+.card--action .label,
+.card--action .secondary {
+  color: rgba(244, 239, 230, 0.78);
+}
 
 /* Platzhalter-Ansicht der leeren Module */
 .placeholder {
@@ -140,26 +232,19 @@
   padding-top: var(--space-3);
 }
 
-/* Abstand nach oben, damit der Blur nicht an der Kopfzeile abreißt */
-.placeholder .blob {
-  top: 160px;
-  right: -80px;
-  z-index: -1;
-}
-
-/* Abstände für Formularseiten */
+/* Abstände: Abschnitte großzügig, Karten 12 px */
 .stack {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-4);
   padding-top: var(--space-2);
 }
 
 .stack-tight {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--card-gap);
 }
 
-/* Eingabefelder: 16 px Schrift, sonst zoomt Safari beim Fokussieren */
+/* Eingabefelder als Pille, 16 px Schrift, sonst zoomt Safari beim Fokussieren */
 .field {
   display: grid;
   gap: var(--space-1);
@@ -167,17 +252,21 @@
 
 .input {
   width: 100%;
-  min-height: var(--tap-min);
-  padding: 0 var(--space-2);
+  min-height: var(--button-height);
+  padding: 0 var(--space-3);
   font: inherit;
   font-size: 16px;
   color: var(--color-text);
-  background: transparent;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: var(--radius-control);
+  background: var(--color-card);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-pill);
   transition: border-color var(--duration) var(--easing);
   -webkit-appearance: none;
   appearance: none;
+}
+
+.card .input {
+  background: var(--color-bg);
 }
 
 .input:focus {
@@ -186,11 +275,11 @@
 }
 
 .hint {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-text-secondary);
 }
 
-/* Rose als Markierung, der Text selbst bleibt gut lesbar */
+/* Fehler: Koralle als Punkt, der Text selbst bleibt Ink */
 .error-text {
   display: flex;
   align-items: baseline;
@@ -200,29 +289,36 @@
 .error-text::before {
   content: "";
   flex: none;
-  width: 8px;
-  height: 8px;
+  width: var(--dot);
+  height: var(--dot);
   border-radius: 50%;
-  background: var(--rose-to);
+  background: var(--koralle-deep);
+  transform: translateY(1px);
 }
 
-/* Buttons: flach, Linie oder gefüllt, keine Schatten */
+/* Buttons als Pille: primär Ink, sekundär Sand */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--tap-min);
-  padding: 0 var(--space-2);
-  font-weight: 500;
+  gap: var(--space-1);
+  min-height: var(--button-height);
+  padding: 0 var(--space-3);
+  font-weight: 800;
   white-space: nowrap;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: var(--radius-control);
+  color: var(--color-text);
+  background: var(--color-card);
+  border: 0;
+  border-radius: var(--radius-pill);
   transition: background-color var(--duration) var(--easing), opacity var(--duration) var(--easing), transform var(--duration) var(--easing);
+}
+
+.card .button:not(.button--primary):not(.button--danger) {
+  background: var(--color-bg);
 }
 
 .button:active {
   transform: scale(0.98);
-  background: var(--color-line);
 }
 
 .button:disabled {
@@ -232,18 +328,15 @@
 .button--primary {
   color: var(--color-bg);
   background: var(--color-text);
-  border-color: var(--color-text);
 }
 
 .button--primary:active {
-  background: var(--color-text);
   opacity: 0.85;
 }
 
 .button--danger {
-  color: var(--color-text);
-  background: var(--rose-from);
-  border-color: var(--rose-from);
+  color: #FFFFFF;
+  background: var(--koralle-deep);
 }
 
 .button-row {
@@ -253,10 +346,10 @@
 }
 
 .button-row .button {
-  padding: 0 var(--space-1);
+  padding: 0 var(--space-2);
 }
 
-/* Karten mit Verlaufsfleck als Zustandsanzeige */
+/* Karten, die einen Zustand zeigen */
 .status-card,
 .warning-card {
   display: grid;
@@ -267,28 +360,13 @@
   margin-top: var(--space-2);
 }
 
-.status-card .blob {
-  top: -60px;
-  right: -60px;
-}
-
-.warning-card {
-  padding: var(--space-2);
-}
-
-.warning-card .blob {
-  --intensity: 0.2;
-  top: -80px;
-  left: -80px;
-}
-
 /* Modaler Dialog */
 .dialog {
   width: min(100% - 2 * var(--page-margin), 360px);
   padding: var(--space-3);
   color: var(--color-text);
   background: var(--color-bg);
-  border: var(--line-width) solid var(--color-line);
+  border: 0;
   border-radius: var(--radius-card);
 }
 
@@ -321,10 +399,11 @@
   z-index: 20;
   width: max-content;
   max-width: calc(100% - 2 * var(--page-margin));
-  padding: var(--space-1) var(--space-2);
+  padding: 12px var(--space-3);
+  font-weight: 700;
   color: var(--color-bg);
   background: var(--color-text);
-  border-radius: var(--radius-control);
+  border-radius: var(--radius-pill);
   opacity: 0;
   transform: translate(-50%, 8px);
   pointer-events: none;
@@ -337,8 +416,8 @@
 }
 
 .toast--error {
-  color: var(--color-text);
-  background: var(--rose-from);
+  color: #FFFFFF;
+  background: var(--koralle-deep);
 }
 
 /* Profil-Formular und Onboarding */
@@ -347,13 +426,6 @@
   display: grid;
   gap: var(--space-1);
   padding-top: var(--space-2);
-}
-
-/* Mit Abstand nach oben, damit der Blur nicht an der Kopfzeile abreißt */
-.intro .blob {
-  top: 120px;
-  right: -100px;
-  z-index: -1;
 }
 
 .fieldset {
@@ -370,7 +442,7 @@
   margin-bottom: var(--space-1);
 }
 
-/* Schalter: Zeile mit Text links, Switch rechts */
+/* Schalter: Pille mit Kreis-Knopf */
 .switch-row {
   display: flex;
   align-items: center;
@@ -387,8 +459,9 @@
   width: 52px;
   height: 32px;
   margin: 0;
-  border-radius: 16px;
+  border-radius: var(--radius-pill);
   background: var(--color-line);
+  cursor: pointer;
   transition: background-color var(--duration) var(--easing);
 }
 
@@ -400,27 +473,22 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--color-bg);
+  background: #FFFFFF;
   transition: transform var(--duration) var(--easing);
 }
 
 .switch:checked {
-  background: var(--flieder-to);
+  background: var(--color-text);
 }
 
 .switch:checked::after {
   transform: translateX(20px);
 }
 
-/* Regler mit großer Zahl und Farbfläche */
+/* Regler mit großer Zahl */
 .range-block {
   display: grid;
   gap: var(--space-1);
-}
-
-.range-block .blob {
-  top: -80px;
-  right: -80px;
 }
 
 .range {
@@ -433,37 +501,38 @@
 }
 
 .range::-webkit-slider-runnable-track {
-  height: 2px;
-  background: var(--color-text);
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
 }
 
 .range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 28px;
-  height: 28px;
-  margin-top: -13px;
+  width: 32px;
+  height: 32px;
+  margin-top: -14px;
   border-radius: 50%;
   background: var(--color-text);
   border: 0;
 }
 
 .range::-moz-range-track {
-  height: 2px;
-  background: var(--color-text);
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
 }
 
 .range::-moz-range-thumb {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--color-text);
   border: 0;
 }
 
-/* Checkbox-Zeilen, z. B. Schonungs-Tags */
+/* Checkbox-Zeilen, z. B. Schonungs-Tags: runde Haken */
 .check-list {
   display: grid;
-  border-top: var(--line-width) solid var(--color-line);
 }
 
 .check-row {
@@ -472,42 +541,59 @@
   gap: var(--space-2);
   min-height: var(--tap-min);
   padding: var(--space-1) 0;
-  border-bottom: var(--line-width) solid var(--color-line);
+}
+
+.check-row + .check-row {
+  border-top: var(--line-width) solid var(--color-line);
 }
 
 .check-row input {
   -webkit-appearance: none;
   appearance: none;
   flex: none;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   margin: 0;
   border: 1.5px solid var(--color-text);
-  border-radius: 6px;
+  border-radius: 50%;
   transition: background-color var(--duration) var(--easing);
 }
 
 .check-row input:checked {
-  border-color: var(--rose-to);
-  background: var(--rose-to) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F6F2EC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 18px no-repeat;
+  border-color: var(--color-text);
+  background: var(--color-text) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F4EFE6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 18px no-repeat;
 }
 
-/* Chips für Mehrfachauswahl */
+/* Chips und Tags: Pille, 32 px hoch, Tap-Fläche nach oben und unten erweitert */
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: 12px var(--space-1);
 }
 
 .chip {
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: var(--tap-min);
-  padding: 0 var(--space-2);
-  border: var(--line-width) solid var(--color-line);
-  border-radius: 22px;
-  transition: background-color var(--duration) var(--easing), border-color var(--duration) var(--easing);
+  height: var(--chip-height);
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  background: var(--color-card);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color var(--duration) var(--easing), color var(--duration) var(--easing);
+}
+
+.card .chip {
+  background: var(--color-bg);
+}
+
+.chip::before {
+  content: "";
+  position: absolute;
+  inset: -6px 0;
 }
 
 .chip input {
@@ -516,10 +602,11 @@
   pointer-events: none;
 }
 
-.chip--salbei:has(input:checked) {
-  background: var(--salbei-from);
-  border-color: var(--salbei-from);
-}
+/* Gewählt: deep der Modulfarbe mit weißer Schrift */
+.chip--salbei:has(input:checked) { color: #FFFFFF; background: var(--salbei-deep); }
+.chip--butter:has(input:checked) { color: #FFFFFF; background: var(--butter-deep); }
+.chip--mandarine:has(input:checked) { color: #FFFFFF; background: var(--mandarine-deep); }
+.chip--koralle:has(input:checked) { color: #FFFFFF; background: var(--koralle-deep); }
 
 .chip:has(input:focus-visible) {
   outline: 2px solid var(--color-text);
@@ -547,17 +634,19 @@ a.button {
   gap: var(--space-1);
 }
 
+/* Monat neben der Tageszahl, auf einer Grundlinie */
 .month {
-  font-size: var(--font-size-heading);
-  font-weight: var(--font-weight-heading);
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-month);
+  font-weight: var(--font-weight-month);
+  letter-spacing: -0.01em;
+  color: var(--color-text);
 }
 
 .card-number {
-  font-size: 32px;
-  font-weight: 600;
+  font-size: var(--font-size-card-number);
+  font-weight: var(--font-weight-card-number);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--letter-spacing-number);
+  letter-spacing: -0.03em;
   line-height: 1;
 }
 
@@ -569,7 +658,7 @@ a.button {
 .button--small {
   gap: 6px;
   min-height: var(--tap-min);
-  padding: 0 12px;
+  padding: 0 var(--space-2);
   font-size: 14px;
   text-decoration: none;
 }
@@ -591,11 +680,6 @@ a.button {
 .next-card {
   display: grid;
   gap: var(--space-1);
-}
-
-.phase-card .blob {
-  top: -80px;
-  right: -80px;
 }
 
 .next-card .button,
@@ -645,15 +729,13 @@ a.button {
   padding: var(--space-2) 0;
 }
 
-.week .blob {
-  top: 10px;
-  left: 50%;
-  margin-left: calc(var(--size) / -2);
-  z-index: -1;
-}
-
 .week > .label {
   justify-self: start;
+}
+
+.week .week-bar {
+  width: 100%;
+  margin-bottom: var(--space-1);
 }
 
 .ring {
@@ -678,13 +760,13 @@ a.button {
 }
 
 .ring-value {
-  stroke: url(#ring-sonne);
+  stroke: url(#ring-mandarine);
   stroke-linecap: round;
   transition: stroke-dashoffset 600ms var(--easing);
 }
 
-.ring-stop-from { stop-color: var(--sonne-from); }
-.ring-stop-to { stop-color: var(--sonne-to); }
+.ring-stop-from { stop-color: var(--mandarine); }
+.ring-stop-to { stop-color: var(--mandarine-deep); }
 
 .ring-center {
   position: absolute;
@@ -734,7 +816,7 @@ a.button {
   aspect-ratio: 200 / 135;
   object-fit: cover;
   object-position: 50% 69%;
-  border-radius: 12px;
+  border-radius: 16px;
   background: var(--color-bg);
 }
 
@@ -752,10 +834,10 @@ a.button {
 .progression::before {
   content: "";
   flex: none;
-  width: 8px;
-  height: 8px;
+  width: var(--dot);
+  height: var(--dot);
   border-radius: 50%;
-  background: var(--sonne-to);
+  background: var(--mandarine-deep);
   transform: translateY(-1px);
 }
 
@@ -815,15 +897,14 @@ a.button {
 .set-row {
   display: grid;
   gap: var(--space-1);
-  padding: 12px;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: 16px;
-  transition: background-color var(--duration) var(--easing), border-color var(--duration) var(--easing);
+  padding: 12px var(--space-2);
+  background: var(--color-bg);
+  border-radius: 20px;
+  transition: background-color var(--duration) var(--easing);
 }
 
 .set-row--done {
-  background: color-mix(in srgb, var(--sonne-from) 22%, var(--color-bg));
-  border-color: var(--sonne-from);
+  background: color-mix(in srgb, var(--mandarine) 30%, var(--color-bg));
 }
 
 .set-top {
@@ -838,13 +919,14 @@ a.button {
 
 .rpe {
   min-height: var(--tap-min);
-  padding: 0 12px;
+  padding: 0 var(--space-2);
   font: inherit;
   font-size: 14px;
+  font-weight: 700;
   color: var(--color-text);
-  background: transparent;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: 12px;
+  background: var(--color-card);
+  border: 0;
+  border-radius: var(--radius-pill);
   -webkit-appearance: none;
   appearance: none;
 }
@@ -871,8 +953,8 @@ a.button {
 }
 
 .set-row--done .set-check {
-  background: var(--sonne-to);
-  border-color: var(--sonne-to);
+  background: var(--mandarine-deep);
+  border-color: var(--mandarine-deep);
   color: #FFFFFF;
 }
 
@@ -886,19 +968,23 @@ a.button {
   gap: var(--space-1);
 }
 
+/* Stepper: Pille mit zwei runden Knöpfen */
 .stepper {
   display: grid;
   grid-template-columns: var(--tap-min) 1fr var(--tap-min);
   align-items: center;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: 12px;
-  background: var(--color-bg);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
 }
 
 .stepper-button {
   display: grid;
   place-items: center;
-  height: 48px;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 50%;
+  background: var(--color-bg);
 }
 
 .stepper-button:active {
@@ -907,7 +993,7 @@ a.button {
 
 .stepper-value {
   text-align: center;
-  font-weight: 600;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -929,11 +1015,9 @@ a.button {
   padding: var(--space-3) var(--space-2) var(--space-2);
   overflow: hidden;
   isolation: isolate;
-  background: var(--color-bg);
-  border: var(--line-width) solid var(--color-line);
+  background: var(--color-card);
   border-radius: var(--radius-card);
   animation: view-in var(--duration) var(--easing);
-  transition: border-color var(--duration) var(--easing);
 }
 
 .rest-timer .blob {
@@ -943,16 +1027,8 @@ a.button {
   z-index: -1;
 }
 
-.rest-time {
-  font-size: 72px;
-}
-
 .rest-timer .button-row {
   width: 100%;
-}
-
-.rest-timer--done {
-  border-color: var(--salbei-to);
 }
 
 /* Dialoge im Training */
@@ -982,15 +1058,19 @@ a.button {
   gap: var(--space-1);
 }
 
+/* Gesamtgefühl: fünf Kreise */
 .feel-option {
   position: relative;
   display: grid;
   place-items: center;
-  height: 56px;
-  font-size: 22px;
-  font-weight: 600;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: 14px;
+  justify-self: center;
+  width: var(--tap-circle);
+  height: var(--tap-circle);
+  font-size: 20px;
+  font-weight: 800;
+  background: var(--color-card);
+  border-radius: 50%;
+  cursor: pointer;
   transition: background-color var(--duration) var(--easing);
 }
 
@@ -1001,8 +1081,7 @@ a.button {
 }
 
 .feel-option:has(input:checked) {
-  background: var(--sonne-from);
-  border-color: var(--sonne-from);
+  background: var(--mandarine);
 }
 
 .feel-scale {
@@ -1010,31 +1089,39 @@ a.button {
   justify-content: space-between;
 }
 
+/* Mehrzeilig geht nicht als Pille, daher Kartenradius */
 .textarea {
-  min-height: 88px;
-  padding: 12px var(--space-2);
+  min-height: 96px;
+  padding: 14px var(--space-3);
+  border-radius: var(--radius-card);
   resize: vertical;
 }
 
 /* Fortschritt */
+/* Umschalter: Pille aus Sand, aktives Segment Ink */
 .segmented {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
   gap: 4px;
   padding: 4px;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: 14px;
+  background: var(--color-card);
+  border-radius: var(--radius-pill);
+}
+
+.card .segmented {
+  background: var(--color-bg);
 }
 
 .segment {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 40px;
+  min-height: var(--tap-min);
   font-size: 14px;
-  font-weight: 500;
-  border-radius: 10px;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
 }
 
 .segment input {
@@ -1062,14 +1149,15 @@ a.button {
 
 .chart-line {
   fill: none;
-  stroke: var(--sonne-to);
+  stroke: var(--mandarine-deep);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
+/* Punkte und Markierungen in Koralle deep */
 .chart-dot {
-  fill: var(--sonne-to);
+  fill: var(--koralle-deep);
 }
 
 .chart-axis {
@@ -1099,13 +1187,6 @@ a.button {
   padding-top: var(--space-2);
 }
 
-.meds-head .blob,
-.home-intro .blob {
-  top: 60px;
-  right: -90px;
-  z-index: -1;
-}
-
 .slot {
   display: grid;
   gap: var(--space-1);
@@ -1118,8 +1199,9 @@ a.button {
 }
 
 .slot-title .secondary {
-  font-size: 13px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .med-list {
@@ -1148,19 +1230,22 @@ a.button {
 }
 
 .med-name {
-  font-weight: 600;
+  font-weight: 700;
 }
 
+/* Tag als Pille */
 .med-tag {
-  display: inline-block;
-  padding: 1px 8px;
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
-  vertical-align: 2px;
-  border-radius: 10px;
-  background: var(--zitrone-from);
+  vertical-align: 1px;
+  border-radius: var(--radius-pill);
+  background: var(--butter);
 }
 
 .med-check {
@@ -1190,8 +1275,9 @@ a.button {
 }
 
 .med-row--done .med-check {
-  background: var(--zitrone-to);
-  border-color: var(--zitrone-to);
+  color: #FFFFFF;
+  background: var(--butter-deep);
+  border-color: var(--butter-deep);
 }
 
 .med-row--done .med-check svg {
@@ -1242,6 +1328,7 @@ a.button {
 }
 
 .streak-card .blob {
+  --size: calc(160px + 160px * var(--intensity));
   top: -70px;
   right: -60px;
 }
@@ -1264,12 +1351,12 @@ a.button {
 
 /* Messwerte: zwei Himmel-Töne */
 .chart-line--sys {
-  stroke: var(--himmel-to);
+  stroke: var(--periwinkle-deep);
   stroke-width: 1.5;
 }
 
 .chart-line--dia {
-  stroke: var(--himmel-from);
+  stroke: color-mix(in srgb, var(--periwinkle-deep) 55%, var(--periwinkle));
   stroke-width: 1.5;
 }
 
@@ -1289,8 +1376,8 @@ a.button {
   vertical-align: middle;
 }
 
-.legend--sys::before { background: var(--himmel-to); }
-.legend--dia::before { background: var(--himmel-from); }
+.legend--sys::before { background: var(--periwinkle-deep); }
+.legend--dia::before { background: color-mix(in srgb, var(--periwinkle-deep) 55%, var(--periwinkle)); }
 
 .manage-card {
   display: grid;
@@ -1303,11 +1390,6 @@ a.button {
 
 .manage-card--paused h2 {
   color: var(--color-text-secondary);
-}
-
-.chip--zitrone:has(input:checked) {
-  background: var(--zitrone-from);
-  border-color: var(--zitrone-from);
 }
 
 .date-row {
@@ -1325,11 +1407,6 @@ a.button {
   display: grid;
   padding-top: var(--space-2);
   padding-bottom: 4px;
-}
-
-.due-card .blob {
-  top: -80px;
-  right: -80px;
 }
 
 .due-head {
@@ -1351,12 +1428,14 @@ a.button {
   height: 18px;
   padding: 0 5px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 800;
   line-height: 18px;
+  letter-spacing: 0;
   text-align: center;
-  color: var(--color-text);
-  background: var(--zitrone-to);
-  border-radius: 9px;
+  color: #FFFFFF;
+  background: var(--butter-deep);
+  border-radius: var(--radius-pill);
+  z-index: 2;
 }
 
 /* Erinnerungen */
@@ -1378,51 +1457,8 @@ a.button {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 12px;
   line-height: 1.5;
-  background: var(--color-line);
-  border-radius: 12px;
-}
-
-/* Tagesfläche: je Slider ein Verlauf an fester Stelle, überlagernd gemischt */
-.day-aura {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
   background: var(--color-bg);
-}
-
-.aura-blob {
-  left: var(--x);
-  top: var(--y);
-  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
-  /* Weich überlagern statt multiplizieren, sonst werden Mischtöne schlammig */
-  opacity: calc(0.25 + 0.55 * var(--intensity));
-}
-
-.day-aura--quiet .aura-blob {
-  opacity: 0.35;
-}
-
-.day-card {
-  position: relative;
-  min-height: 260px;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.day-card .day-aura {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-}
-
-.day-card-content {
-  display: grid;
-  align-content: end;
-  gap: var(--space-2);
-  min-height: 260px;
-  padding: var(--space-3);
+  border-radius: 16px;
 }
 
 .day-values {
@@ -1436,18 +1472,16 @@ a.button {
   gap: 2px;
 }
 
-.day-card-content .button {
+/* Kopfbereich im Aura-Bereich: Begrüßung, Tageszahl, Werte */
+.hero {
+  display: grid;
+  gap: var(--space-1);
+  padding-top: var(--space-2);
+}
+
+.hero .button {
   justify-self: start;
-}
-
-.checkin > .day-aura .aura-blob {
-  --size: calc(70px + 130px * var(--intensity));
-}
-
-.checkin > .day-aura {
-  height: 170px;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: var(--radius-card);
+  margin-top: var(--space-1);
 }
 
 /* Check-in */
@@ -1476,11 +1510,11 @@ a.button {
   gap: var(--space-2);
 }
 
-.slider-card--sonne { --tone-from: var(--sonne-from); --tone-to: var(--sonne-to); }
-.slider-card--salbei { --tone-from: var(--salbei-from); --tone-to: var(--salbei-to); }
-.slider-card--rose { --tone-from: var(--rose-from); --tone-to: var(--rose-to); }
-.slider-card--himmel { --tone-from: var(--himmel-from); --tone-to: var(--himmel-to); }
-.slider-card--flieder { --tone-from: var(--flieder-from); --tone-to: var(--flieder-to); }
+.slider-card--mandarine { --tone: var(--mandarine); }
+.slider-card--salbei { --tone: var(--salbei); }
+.slider-card--koralle { --tone: var(--koralle); }
+.slider-card--periwinkle { --tone: var(--periwinkle); }
+.slider-card--rose { --tone: var(--rose); }
 
 .slider-head {
   display: flex;
@@ -1488,20 +1522,23 @@ a.button {
   justify-content: space-between;
 }
 
+/* Fünf Kreise, gewählte Stufen im base-Ton, satter mit höherem Wert. Zahl bleibt Ink. */
 .tap-scale {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-1);
+  grid-template-columns: repeat(5, var(--tap-circle));
+  justify-content: space-between;
 }
 
-/* Je höher der Wert, desto satter die Fläche */
 .tap {
-  height: 52px;
+  display: grid;
+  place-items: center;
+  width: var(--tap-circle);
+  height: var(--tap-circle);
   font-size: 18px;
-  font-weight: 600;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: 14px;
-  transition: background-color var(--duration) var(--easing), border-color var(--duration) var(--easing), transform var(--duration) var(--easing);
+  font-weight: 800;
+  background: var(--color-bg);
+  border-radius: 50%;
+  transition: background-color var(--duration) var(--easing), transform var(--duration) var(--easing);
 }
 
 .tap:active {
@@ -1509,8 +1546,7 @@ a.button {
 }
 
 .tap--on {
-  border-color: transparent;
-  background: color-mix(in srgb, var(--tone-to) calc(var(--level) * 100%), var(--tone-from));
+  background: color-mix(in srgb, var(--tone) calc(30% + var(--level) * 70%), var(--color-bg));
 }
 
 .tap-ends {
@@ -1524,11 +1560,6 @@ a.button {
   gap: var(--space-1);
 }
 
-.cycle-card .blob {
-  top: -60px;
-  right: -60px;
-}
-
 .save-status {
   text-align: center;
 }
@@ -1538,20 +1569,21 @@ a.button {
   stroke-width: 1.5;
 }
 
-.line--sonne { stroke: var(--sonne-to); }
-.line--himmel { stroke: var(--himmel-to); }
-.line--salbei { stroke: var(--salbei-to); }
-.line--rose { stroke: var(--rose-to); }
-.line--flieder { stroke: var(--flieder-to); }
+.line--mandarine { stroke: var(--mandarine-deep); }
+.line--periwinkle { stroke: var(--periwinkle-deep); }
+.line--salbei { stroke: var(--salbei-deep); }
+.line--koralle { stroke: var(--koralle-deep); }
+.line--rose { stroke: var(--rose-deep); }
 
+/* Markierungen in Koralle deep: Training als Strich, Periode als Punkt */
 .marker--training {
-  stroke: var(--color-text-secondary);
+  stroke: var(--koralle-deep);
   stroke-width: 2;
   stroke-linecap: round;
 }
 
 .marker--period {
-  fill: var(--flieder-to);
+  fill: var(--koralle-deep);
 }
 
 .chart-legend--wrap {
@@ -1559,24 +1591,66 @@ a.button {
   gap: 6px var(--space-2);
 }
 
-.legend--sonne::before { background: var(--sonne-to); }
-.legend--himmel::before { background: var(--himmel-to); }
-.legend--salbei::before { background: var(--salbei-to); }
-.legend--rose::before { background: var(--rose-to); }
-.legend--flieder::before { background: var(--flieder-to); }
+.legend--mandarine::before { background: var(--mandarine-deep); }
+.legend--periwinkle::before { background: var(--periwinkle-deep); }
+.legend--salbei::before { background: var(--salbei-deep); }
+.legend--koralle::before { background: var(--koralle-deep); }
+.legend--rose::before { background: var(--rose-deep); }
 
 .legend--training::before {
   width: 2px;
   height: 10px;
-  background: var(--color-text-secondary);
+  background: var(--koralle-deep);
 }
 
 .legend--period::before {
-  width: 6px;
-  height: 6px;
+  width: var(--dot);
+  height: var(--dot);
   border-radius: 50%;
-  background: var(--flieder-to);
+  background: var(--koralle-deep);
 }
+
+/* Kalenderpunkte in Auswertungen: 12 px, eine Zeile pro Woche */
+.dot-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, var(--dot));
+  justify-content: space-between;
+  row-gap: 14px;
+  margin-top: var(--space-1);
+}
+
+.dot-calendar-head {
+  display: grid;
+  grid-template-columns: repeat(7, var(--dot));
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.cal-dot {
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  background: var(--color-line);
+}
+
+.cal-dot--training { background: var(--mandarine-deep); }
+.cal-dot--period { background: var(--koralle-deep); }
+.cal-dot--empty { background: transparent; }
+
+.legend--cal-training::before,
+.legend--cal-period::before,
+.legend--cal-none::before {
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+}
+
+.legend--cal-training::before { background: var(--mandarine-deep); }
+.legend--cal-period::before { background: var(--koralle-deep); }
+.legend--cal-none::before { background: var(--color-line); }
 
 .stat-card {
   display: grid;
@@ -1626,49 +1700,66 @@ a.button {
   gap: var(--space-2);
 }
 
-/* Tagesleiste: Kreise, gewählter Tag gefüllt, heute mit Punkt */
+/*
+  Wochentags-Leiste (Training, Medis, Essen): Kreise 40 px,
+  aktiver Tag in deep der Modulfarbe mit weißer Zahl, markierte Tage mit Punkt darunter.
+*/
 .week-bar {
+  --week-tone: var(--color-text);
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+  grid-template-columns: repeat(7, var(--day-circle));
+  justify-content: space-between;
 }
+
+.week-bar--mandarine { --week-tone: var(--mandarine-deep); }
+.week-bar--butter { --week-tone: var(--butter-deep); }
+.week-bar--salbei { --week-tone: var(--salbei-deep); }
 
 .week-day {
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 4px;
-  padding-bottom: 8px;
+  gap: 6px;
+  padding-bottom: 12px;
   color: var(--color-text);
   text-decoration: none;
+}
+
+.week-day .label {
+  font-size: 11px;
 }
 
 .week-circle {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-weight: 600;
+  width: var(--day-circle);
+  height: var(--day-circle);
+  font-size: 15px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
-  border: var(--line-width) solid var(--color-line);
+  background: var(--color-card);
+  border-radius: 50%;
   transition: background-color var(--duration) var(--easing);
 }
 
-.week-day--active .week-circle {
-  color: var(--color-bg);
-  background: var(--color-text);
-  border-color: var(--color-text);
+.week-day--today .week-circle {
+  box-shadow: inset 0 0 0 1.5px var(--color-text);
 }
 
-.week-day--today::after {
+.week-day--active .week-circle {
+  color: #FFFFFF;
+  background: var(--week-tone);
+  box-shadow: none;
+}
+
+.week-day--marked::after {
   content: "";
   position: absolute;
   bottom: 0;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--salbei-to);
+  background: var(--week-tone);
 }
 
 .meal-card {
@@ -1704,21 +1795,21 @@ a.button {
   background: var(--color-line);
 }
 
-.rating-dot--gruen { background: var(--salbei-to); }
-.rating-dot--gelb { background: var(--zitrone-to); }
-.rating-dot--rot { background: var(--rose-to); }
+.rating-dot--gruen { background: var(--salbei-deep); }
+.rating-dot--gelb { background: var(--butter-deep); }
+.rating-dot--rot { background: var(--koralle-deep); }
 
 .test-tag {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
-  padding: 0 12px;
+  height: var(--chip-height);
+  padding: 0 14px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
-  border-radius: 14px;
-  background: var(--flieder-from);
+  border-radius: var(--radius-pill);
+  background: var(--rose);
 }
 
 .ingredient-list {
@@ -1773,9 +1864,10 @@ a.button {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  min-height: 52px;
-  border: var(--line-width) solid var(--color-line);
-  border-radius: var(--radius-control);
+  min-height: var(--button-height);
+  font-weight: 700;
+  background: var(--color-card);
+  border-radius: var(--radius-pill);
   transition: background-color var(--duration) var(--easing);
 }
 
@@ -1794,8 +1886,8 @@ a.button {
 }
 
 .thumb[aria-pressed="true"] {
-  background: var(--salbei-from);
-  border-color: var(--salbei-from);
+  color: #FFFFFF;
+  background: var(--salbei-deep);
 }
 
 .food-list {
@@ -1839,4 +1931,22 @@ a.button {
   max-height: 320px;
   overflow: auto;
   white-space: pre-wrap;
+}
+
+/* Buttons auf Aktions-Karten: Creme auf Ink */
+.card--action .button {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+/* In Karten kleinere Verläufe, sie zeigen dort nur einen Wert */
+.card .blob {
+  --size: calc(140px + 140px * var(--intensity));
+}
+
+/* Datum beim Blättern: Titelgröße, damit es auf eine Zeile passt */
+.date-nav h2 {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-title);
+  letter-spacing: -0.02em;
 }

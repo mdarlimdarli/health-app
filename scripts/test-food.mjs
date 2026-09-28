@@ -1,17 +1,21 @@
 #!/usr/bin/env node
 /*
-  Tests für Ampel, Ausschlüsse und Vorschläge. Synthetische Profile, dazu die Beispieldatei.
+  Tests für Ampel, Ausschlüsse und Vorschläge gegen den neutralen Beispielplan data/meals.example.json.
+  Liegt lokal ein eigener Plan data/meals.json (ignoriert, nie im Repo), wird er zusätzlich auf das Schema geprüft.
   Aufruf: node scripts/test-food.mjs
 */
 
 import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { foodRating, mealRating, isExcluded, candidates, resolveMeal, validateMeals } from '../js/food-rules.js';
+import { foodRating, mealRating, isExcluded, candidates, resolveMeal, validateMeals, validateMealsFile } from '../js/food-rules.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const data = JSON.parse(await readFile(path.join(root, 'data', 'meals.json'), 'utf8'));
+const data = JSON.parse(await readFile(path.join(root, 'data', 'meals.example.json'), 'utf8'));
+const ownPath = path.join(root, 'data', 'meals.json');
+const own = existsSync(ownPath) ? JSON.parse(await readFile(ownPath, 'utf8')) : null;
 const foods = new Map(data.foods.map((f) => [f.id, f]));
 
 let passed = 0;
@@ -26,12 +30,33 @@ function test(name, fn) {
   }
 }
 
-test('Beispieldatei: 3 Gerichte, 12 Lebensmittel, gültig', () => {
+test('Beispielplan: 3 Gerichte, 10 Lebensmittel, Schema gültig', () => {
   assert.equal(data.meals.length, 3);
-  assert.equal(data.foods.length, 12);
-  assert.deepEqual(validateMeals(data), []);
-  assert.ok(data.foods.every((f) => !('ampel' in f) && !('rating' in f)), 'Ampel darf nicht in der Datei stehen');
+  assert.equal(data.foods.length, 10);
+  assert.deepEqual(validateMealsFile(data), []);
 });
+
+test('Schema-Prüfung lehnt fehlerhafte Pläne ab', () => {
+  assert.ok(validateMealsFile(null).length);
+  assert.ok(validateMealsFile({ foods: [] }).length);
+  const broken = structuredClone(data);
+  broken.foods[0].fructose = 'sehr hoch';
+  broken.foods[1].ampel = 'rot';
+  broken.meals[0].slot = 'mitternacht';
+  broken.meals[1].ingredients.push('gibt-es-nicht');
+  broken.weekPlan[0].weekday = 9;
+  broken.foods.push({ ...broken.foods[2] });
+  const errors = validateMealsFile(broken).join(' ');
+  for (const part of ['niedrig, mittel oder hoch', 'Ampel gehört nicht', 'mitternacht', 'gibt-es-nicht', 'weekday 9', 'doppelt']) {
+    assert.ok(errors.includes(part), `erwartet: ${part}`);
+  }
+});
+
+if (own) {
+  test('Eigener Plan data/meals.json (nur lokal): Schema gültig', () => {
+    assert.deepEqual(validateMealsFile(own), []);
+  });
+}
 
 test('Ampel ohne Unverträglichkeiten ist neutral', () => {
   assert.equal(foodRating(foods.get('zwiebel'), []).level, 'neutral');

@@ -17,31 +17,57 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
+/js/app.js (Router, Shell), aura.js (Aura je Screen), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
 /js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
 /js/vendor/idb.js
-/data/exercises.json, plans.json (optionale Überschreibung), meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
+/data/exercises.json, plans.json (optionale Überschreibung), meals.example.json (neutraler Beispiel-Essensplan), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
 /scripts/generate-plans.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
 /push-worker/ (Vorlagen für die Push-Action im Repo health-data, wird nicht deployt)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
 
 ## Design-System (verbindlich)
-Ästhetik: Swiss Design, clean, minimalistisch, mit weichen Farbverläufen als Zustandsanzeige. Große Zahlen tragen die Information, Text ist sekundär.
-- Hintergrund: #F6F2EC (warmes Off-White). Text: #161616. Sekundärtext: #6F6A63. Linien: #E3DDD3.
-- Akzentverläufe (radial, weich, blur 40 bis 80 px, immer auf dem Off-White):
-  - Sonne: #FFB347 zu #FF6A3D (Energie, Training)
-  - Zitrone: #F7E463 zu #FFD23F (Medikamente, Erinnerung)
-  - Himmel: #8BB8FF zu #5A8DEE (Schlaf, Ruhe)
-  - Flieder: #C9B8FF zu #9A8CFF (Zyklus)
-  - Salbei: #B7D3A8 zu #7FA36A (Verdauung, Ernährung)
-  - Rose: #FFB3C7 zu #FF7A9E (Schmerz, Warnung)
-- Ein Verlauf zeigt Intensität: je höher der Wert, desto satter und größer der Blur-Fleck. Slider-Werte werden nicht nur als Zahl, sondern als Farbfläche sichtbar.
-- Typografie: Inter. Große Zahlen 56 bis 72 px, Gewicht 500, tabular-nums, letter-spacing -0.02em. Überschriften 20 px, Gewicht 600. Fließtext 15 px, Gewicht 400, line-height 1.45. Labels 12 px, Uppercase, letter-spacing 0.08em, Sekundärfarbe.
-- Raster: 8 px. Seitenrand 20 px. Karten: Radius 20 px, keine Schatten, Trennung über Farbe oder 1 px Linie.
-- Bottom-Tab-Bar mit 5 Einträgen: Heute, Training, Medis, Check-in, Essen. Einstellungen über Icon oben rechts. Safe Areas (env(safe-area-inset-*)) beachten.
-- Interaktion: Tap-Ziele mind. 44 px. Keine Hover-Zustände nötig. Übergänge 180 ms ease-out. Haptik nicht verfügbar, dafür klare visuelle Bestätigung.
+Ästhetik: Swiss Design, clean, minimalistisch. Jeder Screen liegt auf Creme und trägt eine Aura aus weichen Farbverläufen. Große Zahlen tragen die Information, Text ist sekundär. Alle Werte stehen als Tokens in css/tokens.css.
+
+### Farben
+- Neutral: Creme #F4EFE6 (Grund überall), Sand #EEE7DB (Karten), Ink #161616 (Text), Ink-2 #6C6761 (Sekundärtext, 4,5:1 auch auf Sand), Linie #E1DACF.
+- Modulfarben in zwei Stufen, base für Verläufe und Flächen, deep für Linien, aktive Elemente und Flächen mit weißer Schrift. Die deep-Werte sind abgedunkelt, damit weiße Schrift mindestens 4,5:1 erreicht:
+  - Butter: base #F5D96B, deep #8C7221 (Medis)
+  - Mandarine: base #F49A5A, deep #C0561E (Training, Energie)
+  - Koralle: base #F27A6B, deep #C7392B (Schmerz, Warnung, Markierungen)
+  - Rosé: base #F3B8CB, deep #C54B7A (Zyklus, Stimmung)
+  - Periwinkle: base #A9B8F0, deep #4A5FCC (Schlaf, Check-in)
+  - Salbei: base #B9CFA6, deep #598141 (Verdauung, Ernährung)
+- Text immer Ink. Sekundärtext Ink-2 auf Creme und Sand. Im oberen Aura-Bereich Ink mit 78 Prozent Deckkraft (Klasse .on-aura), das hält 4,5:1.
+- Jede Text-Farbe-Kombination mindestens 4,5:1 (WCAG AA). Große Zahlen in Ink, nie in einem deep-Ton.
+
+### Aura
+- Kein Screen hat eine farbige Vollfläche. Die Aura (js/aura.js, #aura in der Shell) besteht aus zwei bis drei, höchstens vier Verläufen von base zu transparent, blur 56 px, mix-blend-mode multiply, Größe 240 bis 420 px. Sie liegt hinter dem oberen Bereich, läuft nach unten in Creme aus, pointer-events none, 400 ms Einblenden beim Routing, sonst keine Animation. Die Kopfzeile ist darüber transparent und wird beim Scrollen Creme.
+- Feste Kombinationen: Startseite Butter, Rosé, Periwinkle (mit Check-in-Daten wächst je Slider ein Verlauf nach Wert: Energie Mandarine oben links, Schlaf Periwinkle oben rechts, Verdauung Salbei unten links, Schmerz Koralle unten rechts). Check-in sehr dezent, baut sich beim Antippen auf. Training Mandarine und Butter dezent oben, während der Einheit nur ein Verlauf. Medis Butter und Mandarine großzügig oben. Auswertung Periwinkle und Rosé. Ernährung Salbei und Butter. Einstellungen und Profil nur Creme.
+- In Karten nur Verläufe, die einen Wert zeigen (Streak, Pausentimer, Regler im Profil), nie zur Dekoration.
+
+### Typografie (Inter Variable, Gewichte 100 bis 900, opsz)
+- Große Zahlen: 72 px, Gewicht 900, line-height 0.9, letter-spacing -0.05em, tabular-nums, font-variation-settings "opsz" 32.
+- Überschriften und Begrüßung: 28 px, Gewicht 900, letter-spacing -0.03em. Titel in Karten, Dialogen und Kopfzeile: 20 px, Gewicht 800.
+- Begrüßung steht direkt über der Tageszahl. Monat 20 px, Gewicht 700, auf derselben Grundlinie neben der Zahl.
+- Kartenzahlen und Chips: 32 px, Gewicht 800.
+- Labels und Tab-Beschriftungen: 12 px, Gewicht 700, Uppercase, letter-spacing 0.08em.
+- Fließtext und Hinweise: Gewicht 500, mindestens 16 px, line-height 1.45.
+
+### Formen
+- Karten: Sand auf Creme, Rechteck mit Radius 24 px, keine Kontur, keine Schatten, Abstand 12 px. Aktions-Karten Ink mit Creme-Text.
+- Alles Interaktive ist vollrund (--radius-pill): Buttons als Pille (Höhe 52 px, Padding 0 24 px, primär Ink mit Creme-Text, sekundär Sand mit Ink-Text), Chips und Tags als Pille (Höhe 32 px, gewählt in deep der Modulfarbe mit weißer Schrift), Eingabefelder als Pille, Schalter als Pille mit Kreis-Knopf, Stepper als Pille mit runden Knöpfen.
+- Check-in-Stufen als fünf Kreise (52 px, Zahl zentriert, gewählt im base-Ton, satter mit höherem Wert). Haken und Gesamtgefühl ebenfalls als Kreise.
+- Wochentags-Leiste (Training, Medis, Essen, js/week-bar.js): Reihe von Kreisen 40 px, aktiver Tag gefüllt in deep der Modulfarbe mit weißer Zahl, heute mit Ring, erledigte Tage mit Punkt.
+- Kalenderpunkte in Auswertungen als Kreise 12 px. Fortschrittsring bleibt ein Kreis.
+- Kein Radius unter 12 px irgendwo in der App. Mehrzeilige Felder bekommen den Kartenradius.
+
+### Elemente
+- Tab-Bar: Creme mit 1 px Linie in Ink 12 Prozent, 5 Einträge (Heute, Training, Medis, Check-in, Essen). Aktives Icon mit 2 px Linie und Ink-Label, dahinter ein Kreis 36 px im base-Ton der Modulfarbe (Heute Rosé, Training Mandarine, Medis Butter, Check-in Periwinkle, Essen Salbei). Inaktiv Ink-2. Einstellungen über Icon oben rechts. Safe Areas (env(safe-area-inset-*)) beachten.
+- Diagramme: Linien im deep-Ton der Modulfarbe, keine Gitterlinien, Punkte und Markierungen in Koralle deep.
+- Raster: 8 px. Seitenrand 20 px.
+- Interaktion: Tap-Ziele mind. 44 px (Chips mit erweiterter Tap-Fläche). Keine Hover-Zustände nötig. Übergänge 180 ms ease-out. Haptik nicht verfügbar, dafür klare visuelle Bestätigung.
 - Icons: dünne Linien-Icons (1.5 px), selbst als SVG, keine Icon-Bibliothek.
-- Verbotene Muster: Balkendiagramme mit vielen Farben, Schlagschatten, Bootstrap-Look, Emojis im UI.
+- Verbotene Muster: farbige Vollflächen, Balkendiagramme mit vielen Farben, Schlagschatten, Konturen um Karten, Bootstrap-Look, Emojis im UI.
 
 ## Regeln für Code
 - Alles muss offline funktionieren, außer Sync und YouTube-Links.
@@ -77,13 +103,15 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 
 ## Check-in und Startseite
 - Ein Check-in pro Tag (Store checkins, Index date), nachträglich editierbar, jede Auswahl wird sofort gespeichert.
-- Slider nur aus profile.checkin.sliders (energy Sonne, digestion Salbei, pain Rose, sleep Himmel, mood Flieder). Schmerzseite nur bei painSideToggle.enabled, Zyklus nur bei cycleTracking, sonst komplett ausgeblendet.
+- Slider nur aus profile.checkin.sliders (energy Mandarine, digestion Salbei, pain Koralle, sleep Periwinkle, mood Rosé). Schmerzseite nur bei painSideToggle.enabled, Zyklus nur bei cycleTracking, sonst komplett ausgeblendet.
 - Zyklusphasen für die Auswertung kommen aus profile.checkin.cyclePhases, nie fest im Code.
 - Auswertung zeigt nur Zahlen und Verläufe, keine Interpretation.
 
 ## Ernährung und Auszug
-- Inhalte (foods, meals, weekPlan) kommen von außen in data/meals.json. Die Ampel wird zur Laufzeit aus profile.diet.intolerances berechnet und nie in der Datei gespeichert.
-- Gerichte mit einem Tag oder einer Zutat aus profile.diet.dislikes werden nie vorgeschlagen. Tags in meals.json und dislikes im Profil müssen dasselbe Vokabular nutzen (exakter Vergleich).
+- Der Essensplan ist persönlich und wird behandelt wie das Profil: data/meals.json wird nie committet (.gitignore) und nie deployt. Öffentlich ist nur data/meals.example.json (3 neutrale Gerichte, 10 Lebensmittel).
+- Der aktive Plan lebt in IndexedDB (settings, key "meals") und ist Teil der verschlüsselten Sicherung. Er kommt per "Essensplan aus Datei importieren" (Schema-Prüfung mit validateMealsFile, Versionsanzeige) und geht per "Essensplan exportieren" wieder hinaus. Ohne eigenen Plan zeigt der Tab Essen den Beispielplan mit Hinweis "Eigenen Plan importieren".
+- Die Ampel wird zur Laufzeit aus profile.diet.intolerances berechnet und nie in der Datei gespeichert.
+- Gerichte mit einem Tag oder einer Zutat aus profile.diet.dislikes werden nie vorgeschlagen. Tags im Essensplan und dislikes im Profil müssen dasselbe Vokabular nutzen (exakter Vergleich).
 - Vorschläge bevorzugen profile.diet.cuisines, dann die bessere Ampel. Eigene Tausche in settings mealSwaps, Feedback in mealFeedback.
 - Auszug für die Beratung ist unverschlüsseltes Markdown, ohne Namen der Person, Medikamente standardmäßig anonymisiert, keine Interpretation.
-- Nach Änderungen an den Regeln: node scripts/test-food.mjs.
+- Nach Änderungen an den Regeln: node scripts/test-food.mjs (läuft gegen data/meals.example.json, prüft eine lokale data/meals.json zusätzlich auf das Schema).

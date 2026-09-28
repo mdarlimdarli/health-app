@@ -1,5 +1,5 @@
 /*
-  Medis: Heute (#/medis), Übersicht (#/medis/uebersicht), Verwaltung (#/medis/verwalten),
+  Medis: Tag (#/medis, #/medis/YYYY-MM-DD zum Nachtragen), Übersicht (#/medis/uebersicht), Verwaltung (#/medis/verwalten),
   Formular (#/medis/neu, #/medis/bearbeiten/<id>).
   Keine Medikamente im Code: alle Einträge kommen aus dem Store meds.
 */
@@ -8,6 +8,7 @@ import * as db from '../db.js';
 import * as S from '../meds-schedule.js';
 import { loadMeds, loadLogs, setTaken, saveMeasurement, saveMed, removeMed, nowMinutes, slotTimes } from '../meds-store.js';
 import { toast, confirmDialog, todayISO, el } from '../ui.js';
+import { weekBar } from '../week-bar.js';
 
 const TABS = [['', 'Heute'], ['uebersicht', 'Übersicht'], ['verwalten', 'Verwalten']];
 
@@ -62,34 +63,34 @@ function measurementText(values) {
 
 /* Heute */
 
-async function renderToday(root) {
+async function renderToday(root, date = todayISO()) {
   const today = todayISO();
+  // Zukunft nur ansehen, abhaken erst am Tag selbst
+  const readOnly = date > today;
   const [meds, { logs, firstLogDates }] = await Promise.all([loadMeds(), loadLogs()]);
-  const plan = S.dayPlan(meds, logs, today, firstLogDates);
+  const plan = S.dayPlan(meds, logs, date, firstLogDates);
   const times = slotTimes();
 
   root.replaceChildren(subnav(''));
-  const head = el('div', 'meds-head');
-  const blob = el('div', 'blob blob--zitrone');
+  const head = el('div', 'meds-head hero');
   const counter = el('div', 'day-line');
   const doneEl = el('span', 'number');
   const totalEl = el('span', 'month');
   counter.append(doneEl, totalEl);
-  head.append(blob, el('p', 'label', formatDay(today)), counter, el('p', 'secondary', 'heute erledigt'));
-  root.append(head);
+  head.append(el('p', 'label on-aura', date === today ? `Heute, ${formatDay(date)}` : formatDay(date)), counter, el('p', 'on-aura', readOnly ? 'geplant' : 'erledigt'));
+  root.append(head, weekBar({ date, today, tone: 'butter', href: (day) => (day === today ? '#/medis' : `#/medis/${day}`), label: 'Tag wählen' }));
 
   const items = plan.flatMap((slot) => slot.items).filter((item) => item.state !== 'spaeter');
   const updateCounter = () => {
     const done = items.filter((item) => item.state === 'erledigt').length;
     doneEl.textContent = String(done);
     totalEl.textContent = `von ${items.length}`;
-    blob.style.setProperty('--intensity', String(items.length ? 0.25 + (done / items.length) * 0.75 : 0.25));
   };
   updateCounter();
 
   if (!plan.length) {
     const empty = el('div', 'card stack-tight');
-    empty.append(el('p', null, meds.length ? 'Heute steht nichts an.' : 'Noch keine Einträge.'));
+    empty.append(el('p', null, meds.length ? 'An diesem Tag steht nichts an.' : 'Noch keine Einträge.'));
     const add = el('a', 'button', 'Eintrag anlegen');
     add.href = '#/medis/neu';
     empty.append(add);
@@ -102,7 +103,7 @@ async function renderToday(root) {
     const title = el('h2', 'slot-title');
     title.append(el('span', null, slot.label), el('span', 'secondary', `ab ${S.slotTime(slot.id, times)}`));
     const list = el('div', 'card med-list');
-    for (const item of slot.items) list.append(item.state === 'spaeter' ? laterRow(item) : S.isMeasurement(item.med) ? measureRow(item, today, updateCounter) : medRow(item, today, updateCounter));
+    for (const item of slot.items) list.append(item.state === 'spaeter' ? laterRow(item) : S.isMeasurement(item.med) ? measureRow(item, date, updateCounter, readOnly) : medRow(item, date, updateCounter, readOnly));
     section.append(title, list);
     root.append(section);
   }
@@ -131,10 +132,11 @@ function laterRow(item) {
   return row;
 }
 
-function medRow(item, today, onChange) {
+function medRow(item, today, onChange, readOnly = false) {
   const { row, body, meta } = rowBase(item);
   const check = el('button', 'med-check');
   check.type = 'button';
+  check.disabled = readOnly;
   check.append(svgIcon(ICON_CHECK));
   const show = () => {
     const done = item.state === 'erledigt';
@@ -157,7 +159,7 @@ function medRow(item, today, onChange) {
   return row;
 }
 
-function measureRow(item, today, onChange) {
+function measureRow(item, today, onChange, readOnly = false) {
   const { row, body, meta } = rowBase(item);
   row.classList.add('med-row--measure');
   const form = el('form', 'measure-form');
@@ -178,6 +180,7 @@ function measureRow(item, today, onChange) {
   const save = el('button', 'button button--primary', 'Speichern');
   save.type = 'submit';
   form.append(sys.wrap, dia.wrap, pulse.wrap, save);
+  if (readOnly) form.querySelectorAll('input, button').forEach((node) => { node.disabled = true; });
 
   const show = () => {
     const values = item.log?.values;
@@ -254,7 +257,7 @@ async function renderOverview(root) {
   for (const med of critical) {
     const value = S.streak(med, logs, today, firstLogDates.get(med.id));
     const card = el('div', 'card streak-card');
-    const blob = el('div', 'blob blob--zitrone');
+    const blob = el('div', 'blob blob--butter');
     blob.style.setProperty('--intensity', String(Math.min(1, 0.2 + value / 30)));
     const line = el('div', 'day-line');
     line.append(el('span', 'number', String(value)), el('span', 'month', value === 1 ? 'Tag in Folge' : 'Tage in Folge'));
@@ -356,7 +359,7 @@ async function renderManage(root) {
 function chipGroup(name, options, selected, type = 'checkbox') {
   const wrap = el('div', 'chips');
   for (const [value, label] of options) {
-    const chip = el('label', 'chip chip--zitrone');
+    const chip = el('label', 'chip chip--butter');
     const input = el('input');
     input.type = type;
     input.name = name;
@@ -547,5 +550,5 @@ export async function render(root) {
   if (sub === 'verwalten') return renderManage(view);
   if (sub === 'neu') return renderForm(view, null);
   if (sub === 'bearbeiten') return renderForm(view, decodeURIComponent(param));
-  return renderToday(view);
+  return renderToday(view, /^\d{4}-\d{2}-\d{2}$/.test(sub) ? sub : todayISO());
 }

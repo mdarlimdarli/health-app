@@ -39,7 +39,8 @@ export async function buildReport({ weeks = 4, anonymize = true } = {}) {
     library = new Map((await (await fetch('./data/exercises.json')).json()).exercises.map((e) => [e.id, e]));
   } catch { /* ohne Bibliothek nur IDs */ }
   try {
-    foods = await (await fetch('./data/meals.json')).json();
+    const { loadMeals } = await import('./food-data.js');
+    foods = (await loadMeals()) ?? foods;
   } catch { /* ohne Essensplan nur IDs */ }
 
   // Medikamente nummerieren, Messungen behalten ihren Namen

@@ -1,22 +1,17 @@
 /*
   Essen: Wochenplan (#/essen) und Ampelliste der Lebensmittel (#/essen/lebensmittel).
-  Inhalte kommen aus data/meals.json. Ampel, Ausschlüsse und bevorzugte Küchen
+  Der eigene Plan kommt per Import in IndexedDB, ohne ihn zeigt die App den Beispielplan. Ampel, Ausschlüsse und bevorzugte Küchen
   richten sich nach profile.diet, berechnet in js/food-rules.js.
 */
 
 import { INTOLERANCE_LABELS, MEAL_SLOTS, RATING_LABELS, foodRating, mealRating, candidates, resolveMeal, excludedBy } from '../food-rules.js';
 import { loadMeals, diet, weekdayOf, getSwaps, setSwap, getFeedback, saveFeedback } from '../food-data.js';
 import { todayISO, toast, el } from '../ui.js';
+import { weekBar } from '../week-bar.js';
 
-const WEEKDAY_SHORT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 const TOLERATED = [['gut', 'gut'], ['mittel', 'mittel'], ['schlecht', 'schlecht']];
 
 /* Hilfen */
-
-function addDays(iso, days) {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
-}
 
 function formatDay(iso) {
   const [y, m, d] = iso.split('-').map(Number);
@@ -109,53 +104,36 @@ function openSheet(build) {
   });
 }
 
-/* Woche */
+/* Kopf: eigener Plan mit Version oder Hinweis auf den Beispielplan */
 
-function weekStart(iso) {
-  return addDays(iso, 1 - weekdayOf(iso));
+function planHead(data) {
+  if (!data || data.source === 'beispiel') {
+    const card = el('div', 'card card--action stack-tight');
+    const link = el('a', 'button', 'Eigenen Plan importieren');
+    link.href = '#/einstellungen';
+    card.append(el('p', 'label', 'Beispielplan'), el('h2', null, data ? 'Das ist ein neutraler Beispielplan' : 'Noch kein Essensplan'), el('p', 'secondary', 'Importiere deinen eigenen Plan in den Einstellungen. Er bleibt auf dem Gerät und in deiner verschlüsselten Sicherung.'), link);
+    return card;
+  }
+  const head = el('div', 'food-head');
+  const version = el('p', 'hint', `Eigener Plan, Version ${data.version}${data.updatedAt ? ` vom ${data.updatedAt.split('-').reverse().join('.')}` : ''}`);
+  const link = el('a', 'button button--small', 'Plan ändern');
+  link.href = '#/einstellungen';
+  head.append(version, link);
+  return head;
 }
+
+/* Woche */
 
 async function renderWeek(root, date) {
   const data = await loadMeals();
   const today = todayISO();
   root.replaceChildren(subnav('woche'));
 
-  const head = el('div', 'food-head');
-  const version = el('p', 'hint');
-  const refresh = el('button', 'button button--small', 'Essensplan aktualisieren');
-  refresh.type = 'button';
-  version.textContent = data ? `Version ${data.version}${data.updatedAt ? ` vom ${data.updatedAt.split('-').reverse().join('.')}` : ''}` : 'Noch kein Essensplan geladen';
-  refresh.addEventListener('click', async () => {
-    refresh.disabled = true;
-    const before = data?.version;
-    const next = await loadMeals({ fresh: true });
-    refresh.disabled = false;
-    if (!next) return toast('Essensplan nicht erreichbar. Bist du online?', { error: true });
-    toast(next.version !== before ? `Neue Version ${next.version} geladen` : `Version ${next.version} ist aktuell`);
-    renderWeek(root, date);
-  });
-  head.append(version, refresh);
-  root.append(head);
+  root.append(planHead(data));
+  if (!data?.meals.length) return;
 
-  if (!data?.meals.length) {
-    root.append(el('p', 'secondary', 'Noch kein Essensplan. Die Inhalte kommen später über data/meals.json.'));
-    return;
-  }
-
-  // Tagesleiste der aktuellen Woche
-  const start = weekStart(date);
-  const bar = el('div', 'week-bar');
-  bar.setAttribute('role', 'tablist');
-  for (let i = 0; i < 7; i++) {
-    const day = addDays(start, i);
-    const link = el('a', `week-day${day === date ? ' week-day--active' : ''}${day === today ? ' week-day--today' : ''}`);
-    link.href = `#/essen/${day}`;
-    link.setAttribute('role', 'tab');
-    link.setAttribute('aria-selected', String(day === date));
-    link.setAttribute('aria-label', formatDay(day));
-    link.append(el('span', 'label', WEEKDAY_SHORT[i]), el('span', 'week-circle', String(Number(day.slice(8)))));
-    bar.append(link);
-  }
+  // Wochentags-Leiste der Woche des gewählten Tages
+  const bar = weekBar({ date, today, tone: 'salbei', href: (day) => `#/essen/${day}`, label: 'Tag wählen' });
   root.append(bar, el('h2', null, formatDay(date)));
 
   const swaps = await getSwaps();
@@ -209,7 +187,9 @@ async function mealCard({ data, date, slot, resolved, profileDiet, foodsById, re
     swaps.append(el('p', 'label', 'Austausch'));
     for (const swap of meal.swaps) {
       const row = el('p');
-      row.append(el('strong', null, `Statt ${foodsById.get(swap.ingredient)?.name ?? swap.ingredient}: `), document.createTextNode(`${swap.alternative}. ${swap.why ?? ''}`));
+      // alternative darf eine Lebensmittel-ID oder freier Text sein
+      const alternative = foodsById.get(swap.alternative)?.name ?? swap.alternative;
+      row.append(el('strong', null, `Statt ${foodsById.get(swap.ingredient)?.name ?? swap.ingredient}: `), document.createTextNode(`${alternative}. ${swap.why ?? ''}`));
       swaps.append(row);
     }
     recipe.append(swaps);
@@ -324,8 +304,19 @@ async function renderFoods(root) {
   const profileDiet = diet();
   root.replaceChildren(subnav('lebensmittel'));
   if (!data?.foods.length) {
-    root.append(el('p', 'secondary', 'Noch keine Lebensmittel. Die Inhalte kommen später über data/meals.json.'));
+    root.append(planHead(data));
     return;
+  }
+  if (data.source === 'beispiel') root.append(el('p', 'hint', 'Beispielplan. Deinen eigenen Plan importierst du in den Einstellungen.'));
+
+  // Grundregeln aus dem Essensplan, falls vorhanden
+  if (data.notes?.length) {
+    const rules = el('details', 'details');
+    rules.append(el('summary', null, 'Grundregeln'));
+    const list = el('ul', 'hint-list');
+    data.notes.forEach((note) => list.append(el('li', null, note)));
+    rules.append(list);
+    root.append(rules);
   }
 
   const search = el('input', 'input');
