@@ -1,14 +1,14 @@
 # CLAUDE.md
 
 ## Projekt
-Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persönliche Angaben stehen nur im Profil, siehe Personenneutralität). Läuft als PWA auf einem iPhone SE 2022 (Viewport 375 x 667 px, Touch ID, Safari). Wird über GitHub Pages ausgeliefert (Repo: health-app). Alle Daten bleiben lokal auf dem Gerät und werden zusätzlich verschlüsselt in ein privates GitHub-Repo (health-data) gesichert.
+Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persönliche Angaben stehen nur im Profil, siehe Personenneutralität). Läuft als PWA auf einem iPhone SE 2022 (Viewport 375 x 667 px, Touch ID, Safari). Wird über GitHub Pages ausgeliefert (Repo: health-app). Alle Daten bleiben lokal auf dem Gerät und werden zusätzlich verschlüsselt in ein privates GitHub-Daten-Repo gesichert (Standard health-data, in den Einstellungen änderbar, settings key syncRepo).
 
 ## Stack, bewusst einfach
 - Vanilla HTML, CSS, JavaScript (ES Modules). Kein Framework, kein Build-Schritt außer optionalem Minify.
 - Speicher: IndexedDB über die Bibliothek `idb` (als lokale Kopie im Repo, nicht per CDN, damit alles offline läuft).
 - Service Worker für Offline-Betrieb (App Shell cachen, Daten nie im SW-Cache).
 - Verschlüsselung: WebCrypto, AES-GCM, Schlüssel per PBKDF2 (mind. 300.000 Iterationen) aus einem Nutzerpasswort. Passwort wird nie gespeichert, nur der Schlüssel in der Session.
-- Sync: GitHub Contents API, eine Datei `data.json.enc` pro Sicherung plus `manifest.json` im Repo health-data. Token (fine-grained PAT) liegt in IndexedDB, wird nie geloggt.
+- Sync: GitHub Contents API, eine Datei `data.json.enc` pro Sicherung plus `manifest.json` im Daten-Repo (settings syncRepo, Standard health-data, gilt für Sync und Push-Dateien). Token (fine-grained PAT) liegt in IndexedDB, wird nie geloggt.
 - Schrift: Inter, selbst gehostet als woff2 (Variable Font), Subsets Latin. Keine Google-Fonts-Verlinkung.
 - Sprache der Oberfläche: Deutsch, Du-Form. Keine Gedankenstriche im UI-Text.
 

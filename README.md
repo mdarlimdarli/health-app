@@ -4,7 +4,7 @@ Persönliche Health- und Fitness-App als Progressive Web App, für eine Person p
 
 Die verbindlichen Regeln für Design und Code stehen in [CLAUDE.md](CLAUDE.md).
 
-Alles Persönliche (Name, Trainingsvorgaben, Ernährung) steht im Profil. Es lebt nur auf dem Gerät und in der verschlüsselten Sicherung, nie im Repo. Beim ersten Start richtest du es in der App ein. Felder, Import und die Einrichtung für eine andere Person beschreibt [PROFILE.md](PROFILE.md).
+Alles Persönliche (Name, Trainingsvorgaben, Ernährung) steht im Profil. Es lebt nur auf dem Gerät und in der verschlüsselten Sicherung, nie im Repo. Beim ersten Start richtest du es in der App ein. Die Felder und den Import beschreibt [PROFILE.md](PROFILE.md), die Einrichtung für eine andere Person [ONBOARDING.md](ONBOARDING.md).
 
 ## Auf dem iPhone installieren
 
@@ -28,9 +28,10 @@ Neue Versionen lädt die App automatisch im Hintergrund, sobald sie online ist. 
 
 ## Sicherung einrichten
 
-1. Auf GitHub ein **privates** Repo `health-data` anlegen (darf leer sein).
-2. Einen Fine-grained Token erstellen: nur Zugriff auf `health-data`, Berechtigung **Contents: Read and write**. Dieser Token ist ein anderer als der zum Pushen des Codes.
-3. In der App oben rechts die Einstellungen öffnen, GitHub-Owner und Token eintragen und speichern.
+1. Auf GitHub ein **privates** Daten-Repo anlegen (darf leer sein). Standardname ist `health-data`, jeder andere Name geht auch.
+2. Einen Fine-grained Token erstellen: nur Zugriff auf dieses Repo, Berechtigung **Contents: Read and write**. Dieser Token ist ein anderer als der zum Pushen des Codes.
+3. In der App oben rechts die Einstellungen öffnen und unter GitHub Owner, **Daten-Repo** (leer lassen für `health-data`) und Token eintragen. Unter dem Feld steht der vollständige Pfad `owner/repo` als Vorschau. Dann speichern.
+   Wechselst du später das Daten-Repo, beginnt die App dort mit einer neuen Sicherung. Die alte bleibt im bisherigen Repo liegen.
 4. Ein Passwort setzen und gut aufbewahren. Ohne dieses Passwort lässt sich die Sicherung nicht mehr lesen.
 5. „Jetzt sichern“ tippen. Danach sichert die App automatisch, 30 Sekunden nach jeder Änderung, sofern du online bist.
 
@@ -38,7 +39,7 @@ Im Repo liegen dann `data.json.enc` (verschlüsselt) und `manifest.json` (nur Ze
 
 ## Push-Erinnerungen einrichten
 
-Die App zeigt fällige Einträge immer auf der Startseite und als Zahl am Tab Medis. Push-Mitteilungen aufs Handy kommen ohne eigenen Server über eine GitHub Action im privaten Repo `health-data`.
+Die App zeigt fällige Einträge immer auf der Startseite und als Zahl am Tab Medis. Push-Mitteilungen aufs Handy kommen ohne eigenen Server über eine GitHub Action in deinem privaten Daten-Repo. Unten steht dafür `health-data`. Hast du in den Einstellungen einen anderen Namen eingetragen, gilt überall dieser.
 
 **So funktioniert es:** Beim Aktivieren legt die App im Repo `health-data` zwei Dateien ab. `reminders.json` enthält deine Uhrzeiten, `subscriptions.json` die Push-Adresse deines iPhones. Die Action läuft zu diesen Uhrzeiten, liest beide Dateien und verschickt eine allgemeine Mitteilung ohne Medikamentennamen.
 

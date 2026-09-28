@@ -28,7 +28,7 @@ export const DATA_STORES = Object.keys(SCHEMA).filter((name) => name !== 'syncQu
 
 // Einstellungen, die das Gerät nie verlassen: weder Sicherung noch Export.
 // Das Profil (key "profile") gehört bewusst nicht dazu, es wandert mit der Sicherung.
-export const LOCAL_SETTINGS = new Set(['syncOwner', 'syncToken', 'syncShas', 'lastSync', 'cryptoCheck', 'pushEndpoint', 'vapidPublicKey']);
+export const LOCAL_SETTINGS = new Set(['syncOwner', 'syncToken', 'syncRepo', 'syncShas', 'lastSync', 'cryptoCheck', 'pushEndpoint', 'vapidPublicKey']);
 
 const changeListeners = new Set();
 let dbPromise = null;

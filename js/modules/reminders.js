@@ -9,6 +9,7 @@ import { getProfile, saveProfile } from '../profile.js';
 import { loadMeds } from '../meds-store.js';
 import { pushSupport, currentSubscription, enablePush, disablePush, writeReminders, reminderTimes, workflowSnippet } from '../push.js';
 import { toast, el } from '../ui.js';
+import { DEFAULT_REPO } from '../sync.js';
 
 function errorText(error) {
   return error instanceof Error && error.message ? error.message : 'Etwas ist schiefgelaufen.';
@@ -29,6 +30,7 @@ export async function renderReminders(container) {
   const active = Boolean(subscription);
   const configured = Boolean((await db.getSetting('syncOwner')) && (await db.getSetting('syncToken')));
   const critical = (await loadMeds()).filter((med) => med.critical && med.active !== false);
+  const repo = (await db.getSetting('syncRepo')) || DEFAULT_REPO;
 
   container.replaceChildren();
   container.className = 'stack-tight';
@@ -86,7 +88,7 @@ export async function renderReminders(container) {
   keyInput.placeholder = 'Öffentlicher VAPID-Schlüssel';
   keyInput.value = (await db.getSetting('vapidPublicKey')) ?? '';
   keyField.append(el('span', 'label', 'VAPID public key'), keyInput);
-  if (!active) container.append(keyField, el('p', 'hint', 'Den Schlüssel erzeugst du einmal, die Anleitung steht in der README. Der private Schlüssel gehört nur in die Secrets von health-data.'));
+  if (!active) container.append(keyField, el('p', 'hint', `Den Schlüssel erzeugst du einmal, die Anleitung steht in der README. Der private Schlüssel gehört nur in die Secrets von ${repo}.`));
 
   const pushButton = el('button', active ? 'button' : 'button button--primary', active ? 'Push abschalten' : 'Push aktivieren');
   pushButton.type = 'button';
@@ -111,7 +113,7 @@ export async function renderReminders(container) {
   // Zeitplan für die Action
   const details = el('details', 'details');
   details.append(el('summary', null, 'Zeitplan für die GitHub Action'));
-  const explain = el('p', 'hint', 'GitHub liest den Zeitplan nur aus der Workflow-Datei. Ersetze die cron-Zeilen in .github/workflows/reminders.yml im Repo health-data durch diese. Die Zeiten sind in UTC, je eine Zeile für Winter- und Sommerzeit. Das Script schickt trotzdem nur einmal pro Uhrzeit und Tag.');
+  const explain = el('p', 'hint', `GitHub liest den Zeitplan nur aus der Workflow-Datei. Ersetze die cron-Zeilen in .github/workflows/reminders.yml im Repo ${repo} durch diese. Die Zeiten sind in UTC, je eine Zeile für Winter- und Sommerzeit. Das Script schickt trotzdem nur einmal pro Uhrzeit und Tag.`);
   const pre = el('pre', 'code', workflowSnippet() || '    # Noch keine Uhrzeiten');
   const copy = el('button', 'button button--small', 'Kopieren');
   copy.type = 'button';

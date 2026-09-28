@@ -46,11 +46,16 @@ const TEMPLATE = `
 
     <form class="stack-tight" data-form="github" autocomplete="off">
       <h2>GitHub</h2>
-      <p class="secondary">Gesichert wird verschlüsselt ins private Repo health-data.</p>
+      <p class="secondary" data-repo-intro></p>
       <label class="field">
         <span class="label">Owner</span>
         <input class="input" name="owner" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" required>
       </label>
+      <label class="field">
+        <span class="label">Daten-Repo</span>
+        <input class="input" name="repo" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="100" placeholder="health-data">
+      </label>
+      <p class="hint repo-preview" data-repo-preview aria-live="polite"></p>
       <label class="field">
         <span class="label">Token</span>
         <input class="input" name="token" type="password" autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -153,6 +158,20 @@ export async function render(root) {
   let exportFile = null;
   let profileFile = null;
 
+  // Vorschau des vollständigen Pfads owner/repo, live beim Tippen
+  const updateRepoPreview = () => {
+    const owner = githubForm.owner.value.trim();
+    const repo = githubForm.repo.value.trim() || sync.DEFAULT_REPO;
+    const preview = $('[data-repo-preview]');
+    const valid = sync.isValidRepoName(repo);
+    preview.classList.toggle('error-text', !valid);
+    preview.textContent = !valid
+      ? 'Ungültiger Name: nur Buchstaben, Ziffern, Punkt, Minus und Unterstrich.'
+      : `Ziel: ${owner || 'owner'}/${repo}`;
+  };
+  githubForm.owner.addEventListener('input', updateRepoPreview);
+  githubForm.repo.addEventListener('input', updateRepoPreview);
+
   const prepareExport = async () => {
     exportFile = await buildExportFile();
     profileFile = hasProfile() ? await buildProfileFile() : null;
@@ -184,6 +203,9 @@ export async function render(root) {
     blob.style.setProperty('--intensity', String(Math.min(1, 0.35 + status.pending * 0.1)));
 
     githubForm.owner.value ||= status.owner;
+    githubForm.repo.value ||= status.repo;
+    $('[data-repo-intro]').textContent = `Gesichert wird verschlüsselt ins private Repo ${status.repo}.`;
+    updateRepoPreview();
     githubForm.token.placeholder = status.hasToken ? 'Gespeichert' : 'github_pat_...';
 
     $('[data-current-field]').hidden = !status.hasPassword;
@@ -230,9 +252,13 @@ export async function render(root) {
 
   githubForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    await sync.saveCredentials(githubForm.owner.value, githubForm.token.value);
-    githubForm.token.value = '';
-    toast('Gespeichert');
+    try {
+      await sync.saveCredentials(githubForm.owner.value, githubForm.token.value, githubForm.repo.value);
+      githubForm.token.value = '';
+      toast('Gespeichert');
+    } catch (error) {
+      toast(errorText(error), { error: true });
+    }
   });
 
   passwordForm.addEventListener('submit', async (event) => {

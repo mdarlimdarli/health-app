@@ -1,7 +1,7 @@
 /*
   Web Push ohne eigenen Server: Die App abonniert Push im Browser und legt
-  reminders.json (Uhrzeiten) und subscriptions.json (Push-Adressen) im Repo
-  health-data ab. Eine GitHub Action dort verschickt die Erinnerungen.
+  reminders.json (Uhrzeiten) und subscriptions.json (Push-Adressen) im
+  Daten-Repo ab (Standard health-data, in den Einstellungen änderbar). Eine GitHub Action dort verschickt die Erinnerungen.
   Die Nachricht ist bewusst allgemein und nennt keine Medikamente.
 */
 

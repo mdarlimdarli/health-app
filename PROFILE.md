@@ -5,7 +5,7 @@ Alles Persönliche steht im Profil: Name, Zyklus-Tracking, Trainingsvorgaben, Er
 ## Wo das Profil liegt
 
 - **Auf dem Gerät**, in IndexedDB (Store `settings`, key `profile`). Nie im Repo, nie auf GitHub Pages.
-- **In der verschlüsselten Sicherung** im privaten Repo `health-data`. Bei einem neuen Gerät kommt das Profil mit der Wiederherstellung automatisch mit.
+- **In der verschlüsselten Sicherung** im privaten Daten-Repo (Standard `health-data`, in den Einstellungen änderbar). Bei einem neuen Gerät kommt das Profil mit der Wiederherstellung automatisch mit.
 - **Als Datei nur, wenn du sie selbst exportierst.** Unter Einstellungen gibt es „Profil als Datei exportieren“ und „Profil aus Datei importieren“. Die Datei ist nicht verschlüsselt.
 
 Im Repo liegt nur die neutrale Vorlage [data/profile.example.json](data/profile.example.json). Eine lokale `data/profile.json` steht in `.gitignore`, du kannst sie als vorbereitete Import-Datei behalten.
@@ -107,15 +107,6 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 
 Die App nutzt alle Felder: `displayName`, `birthYear` (im Auszug für die Beratung), `cycleTracking`, `training`, `checkin`, `diet`, `reminders` und die Medikamente aus einer importierten Datei. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
 
-## So richtest du die App für eine andere Person ein
+## Einrichtung für eine andere Person
 
-1. **Fork anlegen.** Auf GitHub das Repo `health-app` öffnen und oben rechts auf **Fork** tippen.
-2. **Actions und Pages einschalten.** Im Fork unter **Actions** die Workflows erlauben (bei Forks sind sie zuerst aus). Dann unter **Settings > Pages > Source** die Option **GitHub Actions** wählen.
-3. **Eigenes Repo für die Sicherung.** Ein neues, **privates** Repo `health-data` anlegen. Es darf leer bleiben.
-4. **Eigenen Token erstellen.** Unter GitHub **Settings > Developer settings > Fine-grained tokens** einen Token nur für `health-data` mit **Contents: Read and write** erstellen. Den Token nie ins Repo schreiben, er gehört nur in die App.
-5. **Auf dem iPhone installieren.** `https://<github-name>.github.io/health-app/` in Safari öffnen und wie in der [README](README.md) beschrieben zum Home-Bildschirm hinzufügen.
-6. **Profil anlegen.** Beim ersten Start die Einrichtung ausfüllen. Oder vorher `data/profile.example.json` kopieren, anpassen, auf das iPhone legen (zum Beispiel über iCloud Drive) und in der Einrichtung „Profil importieren“ wählen. Diese Datei nicht committen.
-7. **Sicherung verbinden.** In der App oben rechts die Einstellungen öffnen, GitHub-Owner und Token eintragen, ein Passwort setzen und einmal „Jetzt sichern“ tippen. Ab dann steckt das Profil in der Sicherung.
-8. **Trainingsplan anpassen.** Die App erzeugt die Pläne selbst aus `training` im Profil. Persönliche Einschränkungen gehören als Schonungen (`avoidTags`) ins Profil, nicht in die Übungsbibliothek `data/exercises.json`. In der App lässt sich jede Übung per „Alternative“ dauerhaft tauschen oder per „Mag ich nicht“ ausschließen. Wer den Plan komplett von Hand festlegen will, legt `data/plans.json` im Format von `data/plans.generated.json` an. Sie ist dann öffentlich, also ohne persönliche Hinweise.
-
-**Updates aus dem Original holen:** Auf GitHub im Fork **Sync fork** nutzen. Da kein Profil im Repo liegt, gibt es dabei keine Konflikte mit persönlichen Daten.
+Die Schritt-für-Schritt-Anleitung (Fork, Daten-Repo, Token, Profil, Sicherung) steht in [ONBOARDING.md](ONBOARDING.md).

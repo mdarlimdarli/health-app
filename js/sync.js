@@ -1,5 +1,6 @@
 /*
-  Verschlüsselte Sicherung ins private Repo health-data über die GitHub Contents API.
+  Verschlüsselte Sicherung in ein privates Daten-Repo (Standard health-data, in den
+  Einstellungen änderbar) über die GitHub Contents API.
   data.json.enc: alle Stores, AES-GCM verschlüsselt.
   manifest.json: unverschlüsselt, nur Zeitpunkt und Anzahl der Einträge.
   Der Token wird nie geloggt und taucht in keiner Fehlermeldung auf.
@@ -10,7 +11,7 @@ import * as vault from './crypto.js';
 import { askPassword, confirmDialog, toast, formatDateTime } from './ui.js';
 
 const API = 'https://api.github.com';
-const REPO = 'health-data';
+export const DEFAULT_REPO = 'health-data';
 const DATA_PATH = 'data.json.enc';
 const MANIFEST_PATH = 'manifest.json';
 const DEBOUNCE_MS = 30000;
@@ -25,9 +26,9 @@ export class SyncError extends Error {
 }
 
 // Verständliche Meldung zu einem HTTP-Status, ohne Details aus der Anfrage
-export function httpErrorMessage(status) {
+export function httpErrorMessage(status, repo = DEFAULT_REPO) {
   if (status === 401 || status === 403) return 'Token ungültig oder abgelaufen.';
-  if (status === 404) return `Repo ${REPO} nicht gefunden oder der Token hat keinen Zugriff.`;
+  if (status === 404) return `Repo ${repo} nicht gefunden oder der Token hat keinen Zugriff.`;
   if (status === 409 || status === 422) return 'Die Sicherung auf GitHub wurde zwischenzeitlich geändert.';
   if (status >= 500) return 'GitHub ist gerade nicht erreichbar.';
   return `GitHub meldet Fehler ${status}.`;
@@ -52,19 +53,26 @@ export function onStatus(listener) {
 
 /* Zugangsdaten */
 
-async function credentials() {
-  const [owner, token] = await Promise.all([db.getSetting('syncOwner', ''), db.getSetting('syncToken', '')]);
-  return { owner: owner.trim(), token: token.trim() };
+// GitHub-Regeln für Repo-Namen: Buchstaben, Ziffern, Punkt, Minus, Unterstrich, höchstens 100 Zeichen
+export function isValidRepoName(name) {
+  return /^[A-Za-z0-9._-]{1,100}$/.test(name) && name !== '.' && name !== '..';
 }
 
-// Leerer Token lässt den gespeicherten unverändert
-export async function saveCredentials(owner, token) {
+async function credentials() {
+  const [owner, token, repo] = await Promise.all([db.getSetting('syncOwner', ''), db.getSetting('syncToken', ''), db.getSetting('syncRepo', DEFAULT_REPO)]);
+  return { owner: owner.trim(), token: token.trim(), repo: (repo || DEFAULT_REPO).trim() };
+}
+
+// Leerer Token lässt den gespeicherten unverändert, leeres Repo heißt Standard
+export async function saveCredentials(owner, token, repo = DEFAULT_REPO) {
   const current = await credentials();
   const nextOwner = owner.trim();
-  if (nextOwner !== current.owner) {
-    await db.setSetting('syncOwner', nextOwner);
-    await db.setSetting('syncShas', {});
-  }
+  const nextRepo = repo.trim() || DEFAULT_REPO;
+  if (!isValidRepoName(nextRepo)) throw new SyncError('Der Repo-Name darf nur Buchstaben, Ziffern, Punkt, Minus und Unterstrich enthalten.');
+  // Anderes Ziel: bekannte SHAs gelten nicht mehr
+  if (nextOwner !== current.owner || nextRepo !== current.repo) await db.setSetting('syncShas', {});
+  if (nextOwner !== current.owner) await db.setSetting('syncOwner', nextOwner);
+  if (nextRepo !== current.repo) await db.setSetting('syncRepo', nextRepo);
   if (token.trim()) await db.setSetting('syncToken', token.trim());
   lastError = null;
   emitStatus();
@@ -74,6 +82,7 @@ export async function getStatus() {
   const creds = await credentials();
   return {
     owner: creds.owner,
+    repo: creds.repo,
     hasToken: Boolean(creds.token),
     configured: Boolean(creds.owner && creds.token),
     hasPassword: await hasPassword(),
@@ -95,7 +104,7 @@ async function gh(creds, method, path, { body, accept = 'application/vnd.github+
   };
   if (body) headers['Content-Type'] = 'application/json';
   try {
-    return await fetch(`${API}/repos/${encodeURIComponent(creds.owner)}/${REPO}/contents/${path}`, {
+    return await fetch(`${API}/repos/${encodeURIComponent(creds.owner)}/${encodeURIComponent(creds.repo)}/contents/${path}`, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
@@ -112,14 +121,14 @@ async function gh(creds, method, path, { body, accept = 'application/vnd.github+
 async function remoteSha(creds, path) {
   const response = await gh(creds, 'GET', path, { accept: 'application/vnd.github.object+json' });
   if (response.status === 404) return null;
-  if (!response.ok) throw new SyncError(httpErrorMessage(response.status), response.status);
+  if (!response.ok) throw new SyncError(httpErrorMessage(response.status, creds.repo), response.status);
   return (await response.json()).sha;
 }
 
 async function remoteText(creds, path) {
   const response = await gh(creds, 'GET', path, { accept: 'application/vnd.github.raw+json' });
   if (response.status === 404) return null;
-  if (!response.ok) throw new SyncError(httpErrorMessage(response.status), response.status);
+  if (!response.ok) throw new SyncError(httpErrorMessage(response.status, creds.repo), response.status);
   return response.text();
 }
 
@@ -131,8 +140,8 @@ async function putFile(creds, path, text, sha, label) {
   if (sha) body.sha = sha;
   const response = await gh(creds, 'PUT', path, { body });
   // 409: SHA veraltet, 422: Datei existiert, aber kein SHA übergeben
-  if (response.status === 409 || response.status === 422) throw new SyncError(httpErrorMessage(response.status), 'conflict');
-  if (!response.ok) throw new SyncError(httpErrorMessage(response.status), response.status);
+  if (response.status === 409 || response.status === 422) throw new SyncError(httpErrorMessage(response.status, creds.repo), 'conflict');
+  if (!response.ok) throw new SyncError(httpErrorMessage(response.status, creds.repo), response.status);
   return (await response.json()).content.sha;
 }
 
