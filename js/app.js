@@ -27,7 +27,7 @@ const ROUTES = {
   heute: { title: 'Heute', tone: 'sonne', tab: true, load: () => import('./modules/home.js') },
   training: { title: 'Training', tone: 'sonne', tab: true, load: () => import('./modules/training.js') },
   medis: { title: 'Medis', tone: 'zitrone', tab: true, load: () => import('./modules/meds.js') },
-  checkin: { title: 'Check-in', tone: 'himmel', tab: true },
+  checkin: { title: 'Check-in', tone: 'himmel', tab: true, load: () => import('./modules/checkin.js') },
   essen: { title: 'Essen', tone: 'salbei', tab: true },
   einstellungen: { title: 'Einstellungen', tone: 'flieder', tab: false, load: () => import('./modules/settings.js') },
   profil: { title: 'Profil', tone: 'flieder', tab: false, load: () => import('./modules/profile-form.js') },

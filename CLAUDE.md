@@ -17,7 +17,7 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js
+/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche)
 /js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
@@ -74,3 +74,9 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - critical steht auf der Startseite immer oben, Streak nur für critical.
 - Push-Nachrichten sind allgemein und nennen nie Medikamente. reminders.json und subscriptions.json in health-data sind unverschlüsselt und enthalten nur Uhrzeiten und Push-Adressen.
 - Nach Änderungen an den Zeitplan-Regeln: node scripts/test-meds.mjs.
+
+## Check-in und Startseite
+- Ein Check-in pro Tag (Store checkins, Index date), nachträglich editierbar, jede Auswahl wird sofort gespeichert.
+- Slider nur aus profile.checkin.sliders (energy Sonne, digestion Salbei, pain Rose, sleep Himmel, mood Flieder). Schmerzseite nur bei painSideToggle.enabled, Zyklus nur bei cycleTracking, sonst komplett ausgeblendet.
+- Zyklusphasen für die Auswertung kommen aus profile.checkin.cyclePhases, nie fest im Code.
+- Auswertung zeigt nur Zahlen und Verläufe, keine Interpretation.

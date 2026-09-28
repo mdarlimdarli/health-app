@@ -1381,3 +1381,239 @@ a.button {
   background: var(--color-line);
   border-radius: 12px;
 }
+
+/* Tagesfläche: je Slider ein Verlauf an fester Stelle, überlagernd gemischt */
+.day-aura {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-bg);
+}
+
+.aura-blob {
+  left: var(--x);
+  top: var(--y);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  /* Weich überlagern statt multiplizieren, sonst werden Mischtöne schlammig */
+  opacity: calc(0.25 + 0.55 * var(--intensity));
+}
+
+.day-aura--quiet .aura-blob {
+  opacity: 0.35;
+}
+
+.day-card {
+  position: relative;
+  min-height: 260px;
+  border: var(--line-width) solid var(--color-line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.day-card .day-aura {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.day-card-content {
+  display: grid;
+  align-content: end;
+  gap: var(--space-2);
+  min-height: 260px;
+  padding: var(--space-3);
+}
+
+.day-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+.day-value {
+  display: grid;
+  gap: 2px;
+}
+
+.day-card-content .button {
+  justify-self: start;
+}
+
+.checkin > .day-aura .aura-blob {
+  --size: calc(70px + 130px * var(--intensity));
+}
+
+.checkin > .day-aura {
+  height: 170px;
+  border: var(--line-width) solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+/* Check-in */
+.date-nav {
+  display: grid;
+  grid-template-columns: var(--tap-min) 1fr var(--tap-min);
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.date-step {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.date-nav-text {
+  display: grid;
+  gap: 2px;
+}
+
+.slider-card {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.slider-card--sonne { --tone-from: var(--sonne-from); --tone-to: var(--sonne-to); }
+.slider-card--salbei { --tone-from: var(--salbei-from); --tone-to: var(--salbei-to); }
+.slider-card--rose { --tone-from: var(--rose-from); --tone-to: var(--rose-to); }
+.slider-card--himmel { --tone-from: var(--himmel-from); --tone-to: var(--himmel-to); }
+.slider-card--flieder { --tone-from: var(--flieder-from); --tone-to: var(--flieder-to); }
+
+.slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.tap-scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-1);
+}
+
+/* Je höher der Wert, desto satter die Fläche */
+.tap {
+  height: 52px;
+  font-size: 18px;
+  font-weight: 600;
+  border: var(--line-width) solid var(--color-line);
+  border-radius: 14px;
+  transition: background-color var(--duration) var(--easing), border-color var(--duration) var(--easing), transform var(--duration) var(--easing);
+}
+
+.tap:active {
+  transform: scale(0.95);
+}
+
+.tap--on {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--tone-to) calc(var(--level) * 100%), var(--tone-from));
+}
+
+.tap-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: calc(var(--space-1) * -1);
+}
+
+.cycle-card {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.cycle-card .blob {
+  top: -60px;
+  right: -60px;
+}
+
+.save-status {
+  text-align: center;
+}
+
+/* Auswertung */
+.trend-line {
+  stroke-width: 1.5;
+}
+
+.line--sonne { stroke: var(--sonne-to); }
+.line--himmel { stroke: var(--himmel-to); }
+.line--salbei { stroke: var(--salbei-to); }
+.line--rose { stroke: var(--rose-to); }
+.line--flieder { stroke: var(--flieder-to); }
+
+.marker--training {
+  stroke: var(--color-text-secondary);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.marker--period {
+  fill: var(--flieder-to);
+}
+
+.chart-legend--wrap {
+  flex-wrap: wrap;
+  gap: 6px var(--space-2);
+}
+
+.legend--sonne::before { background: var(--sonne-to); }
+.legend--himmel::before { background: var(--himmel-to); }
+.legend--salbei::before { background: var(--salbei-to); }
+.legend--rose::before { background: var(--rose-to); }
+.legend--flieder::before { background: var(--flieder-to); }
+
+.legend--training::before {
+  width: 2px;
+  height: 10px;
+  background: var(--color-text-secondary);
+}
+
+.legend--period::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--flieder-to);
+}
+
+.stat-card {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.stat-cell {
+  display: grid;
+  gap: 4px;
+}
+
+.stat-list {
+  display: grid;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 60px;
+}
+
+.stat-row + .stat-row {
+  border-top: var(--line-width) solid var(--color-line);
+}
+
+.training-card {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.training-card .button {
+  margin-top: var(--space-1);
+}

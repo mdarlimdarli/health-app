@@ -1,11 +1,14 @@
 /*
-  Startseite: Begrüßung, Tageszahl und fällige, noch nicht abgehakte Einträge.
-  Wichtige Einträge (critical) stehen immer oben.
+  Startseite (Tab Heute): Begrüßung, Datum, Zyklustag (nur mit cycleTracking),
+  Tagesfläche aus den Check-in-Werten, fällige Medikamente (wichtige zuerst, direkt abhakbar),
+  nächstes Training und das Gericht des Tages, sofern ein Essensplan existiert.
 */
 
+import * as db from '../db.js';
 import { getProfile } from '../profile.js';
 import { openItems, setTaken } from '../meds-store.js';
 import { isMeasurement, slotLabel } from '../meds-schedule.js';
+import { SLIDER_META, activeSliders, getCheckin, hasValues, cycleDayFor, renderAura } from '../checkin-core.js';
 import { todayISO, toast, el } from '../ui.js';
 
 const TIME_ZONE = 'Europe/Berlin';
@@ -30,6 +33,51 @@ function checkIcon() {
   svg.innerHTML = '<path d="m5 12.5 4.5 4.5L19 7.5"/>';
   return svg;
 }
+
+/* Tagesfläche mit Check-in */
+
+async function renderDay(container) {
+  const profile = getProfile();
+  const sliders = activeSliders(profile);
+  const today = todayISO();
+  const checkin = await getCheckin(today);
+  const filled = hasValues(checkin, sliders);
+
+  const card = el('div', 'day-card');
+  const aura = el('div');
+  renderAura(aura, checkin, sliders);
+  const content = el('div', 'day-card-content');
+
+  if (profile.cycleTracking) {
+    const cycleDay = await cycleDayFor(today);
+    if (cycleDay) {
+      const line = el('div', 'day-line');
+      line.append(el('span', 'number', String(cycleDay)), el('span', 'month', 'Zyklustag'));
+      content.append(line);
+    }
+  }
+
+  if (filled) {
+    const values = el('div', 'day-values');
+    for (const key of sliders) {
+      if (!Number.isInteger(checkin[key])) continue;
+      const item = el('span', `day-value day-value--${SLIDER_META[key].tone}`);
+      item.append(el('span', 'label', SLIDER_META[key].label), el('span', 'card-number', String(checkin[key])));
+      values.append(item);
+    }
+    const edit = el('a', 'button button--small', 'Check-in bearbeiten');
+    edit.href = '#/checkin';
+    content.append(values, edit);
+  } else {
+    const start = el('a', 'button button--primary', 'Check-in starten');
+    start.href = '#/checkin';
+    content.append(el('p', 'secondary', 'Wie geht es dir heute? Mit deinem Check-in füllt sich diese Fläche.'), start);
+  }
+  card.append(aura, content);
+  container.replaceChildren(card);
+}
+
+/* Fällige Medikamente */
 
 async function renderDue(container) {
   const items = await openItems();
@@ -72,18 +120,63 @@ async function renderDue(container) {
   container.append(card);
 }
 
+/* Nächstes Training */
+
+async function renderTraining(container) {
+  try {
+    const { nextTraining } = await import('./training.js');
+    const { plan, active, names } = await nextTraining();
+    if (!plan) return;
+    const card = el('div', 'card training-card');
+    card.append(el('p', 'label', active ? 'Einheit läuft' : 'Nächstes Training'), el('h2', null, active?.planName ?? plan.name));
+    card.append(el('p', 'secondary', active ? 'Mach dort weiter, wo du aufgehört hast.' : `${names.slice(0, 3).join(', ')}${names.length > 3 ? ` und ${names.length - 3} weitere` : ''}`));
+    const go = el('a', 'button button--primary', active ? 'Fortsetzen' : 'Zum Training');
+    go.href = active ? '#/training/einheit' : '#/training';
+    card.append(go);
+    container.replaceChildren(card);
+  } catch {
+    container.replaceChildren();
+  }
+}
+
+/*
+  Gericht des Tages: nur, wenn ein Essensplan existiert (settings mealPlan: { Datum: mealId })
+  und das Gericht in data/meals.json steht. Bis das Essensmodul da ist, bleibt die Karte weg.
+*/
+async function renderMeal(container) {
+  const plan = await db.getSetting('mealPlan');
+  const mealId = plan?.[todayISO()];
+  if (!mealId) return;
+  try {
+    const response = await fetch('./data/meals.json');
+    if (!response.ok) return;
+    const data = await response.json();
+    const meal = (data.meals ?? []).find((m) => m.id === mealId);
+    if (!meal) return;
+    const card = el('div', 'card');
+    card.append(el('p', 'label', 'Heute auf dem Plan'), el('h2', null, meal.name));
+    const link = el('a', 'button', 'Zum Essen');
+    link.href = '#/essen';
+    card.append(link);
+    container.replaceChildren(card);
+  } catch {
+    // kein Essensplan verfügbar
+  }
+}
+
 export async function render(root) {
   const { day, weekday, month, hour } = todayParts();
   const section = el('section', 'stack home');
   const intro = el('div', 'home-intro');
-  const blob = el('div', 'blob blob--sonne');
-  blob.style.setProperty('--intensity', '0.6');
   const line = el('div', 'day-line');
   line.append(el('span', 'number', day), el('span', 'month', month));
-  intro.append(blob, el('h2', null, greeting(hour)), el('p', 'label', weekday), line);
+  intro.append(el('h2', null, greeting(hour)), el('p', 'label', weekday), line);
 
+  const dayArea = el('div');
   const due = el('div');
-  section.append(intro, due);
+  const training = el('div');
+  const meal = el('div');
+  section.append(intro, dayArea, due, training, meal);
   root.replaceChildren(section);
-  await renderDue(due);
+  await Promise.all([renderDay(dayArea), renderDue(due), renderTraining(training), renderMeal(meal)]);
 }

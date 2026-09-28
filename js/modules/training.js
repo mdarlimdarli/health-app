@@ -939,6 +939,15 @@ async function renderProgress(root, lib) {
   update();
 }
 
+/* Für die Startseite: nächster Plan und laufende Einheit */
+
+export async function nextTraining() {
+  const lib = await loadLibrary();
+  const [plansData, workouts] = await Promise.all([loadPlans(lib), loadWorkouts()]);
+  const plan = nextPlan(plansData.plans, finishedOf(workouts));
+  return { plan, active: activeOf(workouts), names: plan.exercises.map((entry) => lib.get(entry.exerciseId)?.name).filter(Boolean) };
+}
+
 /* Einstieg aus dem Router */
 
 export async function render(root) {

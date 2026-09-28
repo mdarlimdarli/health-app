@@ -19,7 +19,17 @@ const DEFAULTS = {
   birthYear: null,
   cycleTracking: false,
   training: { daysPerWeek: 2, level: 1, goal: '', focus: [], avoidTags: [], pullPushRatio: '1:1', startPhase: 1 },
-  checkin: { sliders: ['energy', 'digestion', 'pain', 'sleep'], painSideToggle: { enabled: false, label: '' } },
+  checkin: {
+    sliders: ['energy', 'digestion', 'pain', 'sleep'],
+    painSideToggle: { enabled: false, label: '' },
+    // Nur für die Auswertung nach Zyklusphase, im Profil anpassbar
+    cyclePhases: [
+      { name: 'Periode', from: 1, to: 5 },
+      { name: 'Follikelphase', from: 6, to: 13 },
+      { name: 'Eisprungphase', from: 14, to: 16 },
+      { name: 'Lutealphase', from: 17, to: null },
+    ],
+  },
   meds: [],
   diet: { intolerances: [], cuisines: [], dislikes: [] },
   reminders: { times: [], timezone: 'Europe/Berlin' },
@@ -43,6 +53,8 @@ function normalize(raw) {
   for (const [key, value] of Object.entries(DEFAULTS)) {
     if (isObject(value)) result[key] = { ...structuredClone(value), ...(isObject(source[key]) ? source[key] : {}) };
   }
+  if (!Array.isArray(result.checkin.cyclePhases) || !result.checkin.cyclePhases.length) result.checkin.cyclePhases = structuredClone(DEFAULTS.checkin.cyclePhases);
+  result.checkin.sliders = stringList(result.checkin.sliders);
   result.checkin.painSideToggle = { ...DEFAULTS.checkin.painSideToggle, ...(isObject(result.checkin.painSideToggle) ? result.checkin.painSideToggle : {}) };
   result.displayName = typeof result.displayName === 'string' ? result.displayName.trim() : '';
   result.birthYear = Number.isInteger(result.birthYear) ? result.birthYear : null;

@@ -61,9 +61,10 @@ Andere Tags aus einer importierten Datei bleiben erhalten und erscheinen als zus
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
-| `sliders` | Liste | Welche Regler der tägliche Check-in zeigt, jeweils mit Skala 1 bis 5. Möglich: `energy`, `digestion`, `pain`, `sleep`. |
+| `sliders` | Liste | Welche Regler der tägliche Check-in zeigt, jeweils fünf Stufen. Möglich: `energy` (Energie), `digestion` (Verdauung), `pain` (Schmerz), `sleep` (Schlaf), `mood` (Stimmung, optional). |
 | `painSideToggle.enabled` | ja/nein | Zeigt einen zusätzlichen Schalter beim Schmerz. |
 | `painSideToggle.label` | Text | Beschriftung dieses Schalters, z. B. `rechtes Knie`. |
+| `cyclePhases` | Liste | Nur bei `cycleTracking`: Phasen für die Auswertung, je `{ "name", "from", "to" }` in Zyklustagen, `to` darf `null` sein. Fehlt die Liste, gilt: Periode 1 bis 5, Follikelphase 6 bis 13, Eisprungphase 14 bis 16, Lutealphase ab 17. |
 
 ### `meds` (nur in Profildateien)
 
@@ -104,7 +105,7 @@ Liste der Medikamente, Nahrungsergänzungen und Messungen. Nur für Import und E
 
 ### Welche Felder wirken schon?
 
-Die App nutzt heute `displayName`, alle Felder unter `training` und `reminders` sowie die Medikamente aus einer importierten Datei. Die übrigen Felder lesen die Module Check-in, Essen und Erinnerungen, sobald sie gebaut sind. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
+Die App nutzt heute `displayName`, `cycleTracking`, alle Felder unter `training`, `checkin` und `reminders` sowie die Medikamente aus einer importierten Datei. `diet` liest das Essensmodul, sobald es gebaut ist. Das Schema steht schon fest, alles lässt sich also jetzt eintragen.
 
 ## So richtest du die App für eine andere Person ein
 
