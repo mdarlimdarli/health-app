@@ -53,6 +53,11 @@ a {
   color: inherit;
 }
 
+/* hidden muss auch gegen display: flex oder grid gewinnen */
+[hidden] {
+  display: none !important;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-text);
   outline-offset: 2px;

@@ -4,7 +4,7 @@
   Bei jeder Änderung an Shell-Dateien VERSION erhöhen.
 */
 
-const VERSION = 'v2';
+const VERSION = 'v5';
 const CACHE = `shell-${VERSION}`;
 
 // Pfade relativ zum Scope, damit die App auch unter /health-app/ läuft
@@ -16,6 +16,14 @@ const SHELL = [
   './css/base.css',
   './css/components.css',
   './js/app.js',
+  './js/db.js',
+  './js/crypto.js',
+  './js/sync.js',
+  './js/ui.js',
+  './js/profile.js',
+  './js/vendor/idb.js',
+  './js/modules/settings.js',
+  './js/modules/profile-form.js',
   './assets/fonts/inter-latin-wght-normal.woff2',
   './assets/icons/icon-180.png',
   './assets/icons/icon-512.png',
@@ -45,11 +53,21 @@ self.addEventListener('fetch', (event) => {
   // Nur eigene GET-Requests bedienen, Sync (api.github.com) und alles Fremde geht direkt ins Netz
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Navigation: immer die gecachte Shell ausliefern, Routing läuft über den Hash
-  if (request.mode === 'navigate') {
+  // Navigation zur App: gecachte Shell ausliefern, Routing läuft über den Hash.
+  // Andere Seiten (z. B. die lokale test.html) gehen normal ins Netz.
+  const scopePath = new URL(self.registration.scope).pathname;
+  const isAppPage = url.pathname === scopePath || url.pathname === `${scopePath}index.html`;
+  if (request.mode === 'navigate' && isAppPage) {
     event.respondWith(
       caches.match('./index.html').then((cached) => cached || fetch(request))
     );
+    return;
+  }
+
+  // Inhaltsdateien (data/*.json, z. B. Übungen): Netz zuerst, damit Änderungen
+  // ohne neue SW-Version ankommen. Offline oder nach 3 Sekunden gilt der Cache.
+  if (url.pathname.startsWith(`${scopePath}data/`)) {
+    event.respondWith(networkFirst(request));
     return;
   }
 
@@ -58,3 +76,16 @@ self.addEventListener('fetch', (event) => {
     caches.match(request, { ignoreSearch: true }).then((cached) => cached || fetch(request))
   );
 });
+
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE);
+  try {
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Zeitüberschreitung')), 3000));
+    const response = await Promise.race([fetch(request, { cache: 'no-cache' }), timeout]);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
+  } catch {
+    const cached = await cache.match(request, { ignoreSearch: true });
+    return cached || Response.error();
+  }
+}

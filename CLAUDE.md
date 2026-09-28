@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Projekt
-Persönliche Health- und Fitness-App für eine einzelne Nutzerin. Läuft als PWA auf einem iPhone SE 2022 (Viewport 375 x 667 px, Touch ID, Safari). Wird über GitHub Pages ausgeliefert (Repo: health-app). Alle Daten bleiben lokal auf dem Gerät und werden zusätzlich verschlüsselt in ein privates GitHub-Repo (health-data) gesichert.
+Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persönliche Angaben stehen nur im Profil, siehe Personenneutralität). Läuft als PWA auf einem iPhone SE 2022 (Viewport 375 x 667 px, Touch ID, Safari). Wird über GitHub Pages ausgeliefert (Repo: health-app). Alle Daten bleiben lokal auf dem Gerät und werden zusätzlich verschlüsselt in ein privates GitHub-Repo (health-data) gesichert.
 
 ## Stack, bewusst einfach
 - Vanilla HTML, CSS, JavaScript (ES Modules). Kein Framework, kein Build-Schritt außer optionalem Minify.
@@ -17,9 +17,10 @@ Persönliche Health- und Fitness-App für eine einzelne Nutzerin. Läuft als PWA
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js
-/js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js
-/data/exercises.json, plans.json, meals.json (Inhalt, kein Code)
+/js/app.js (Router, Shell), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum)
+/js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten)
+/js/vendor/idb.js
+/data/exercises.json, plans.json, meals.json (Inhalt, kein Code), profile.example.json (neutrale Profilvorlage)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
 
 ## Design-System (verbindlich)
@@ -47,3 +48,13 @@ Persönliche Health- und Fitness-App für eine einzelne Nutzerin. Läuft als PWA
 - Keine externen Requests außer api.github.com (Sync) und youtube.com (Links, nur per Klick).
 - Kein Analytics, kein Tracking, keine Cookies.
 - Kommentare und Commit-Messages auf Deutsch.
+
+## Personenneutralität
+- Der Code enthält keine Namen, keine konkreten Medikamente, keine Zyklus-Annahmen, keine Trainingsregeln. All das steht im Profil.
+- Jede Funktion, die Verhalten personalisiert, liest aus dem Profil über js/profile.js (getProfile(), z.B. cycleTracking, training.avoidTags, diet). Medikamente liegen im Store meds.
+- Das aktive Profil lebt in IndexedDB (Store settings, key "profile") und ist Teil der verschlüsselten Sicherung im Repo health-data. Bei Gerätewechsel wandert es mit der Wiederherstellung mit.
+- data/profile.json wird nie committet (.gitignore) und nie deployt. Öffentlich ist nur data/profile.example.json (neutrale Vorlage). Eine lokale data/profile.json dient höchstens als Import-Datei.
+- Beim ersten Start ohne Profil zeigt die App ein Onboarding (#/willkommen): Name, Geburtsjahr, Zyklus-Tracking, Trainingstage pro Woche, Trainingslevel, Schonungs-Tags als Checkboxen mit verständlichen Labels, Unverträglichkeiten, Lieblingsküchen, Abneigungen. Medikamente werden nicht im Onboarding abgefragt, sondern im Medis-Tab angelegt.
+- In den Einstellungen: "Profil bearbeiten" (gleiche Felder), "Profil als Datei exportieren" und "Profil aus Datei importieren" (JSON). Ein Import ergänzt Medikamente mit neuer ID, bestehende werden nie überschrieben.
+- Manifest-Name und short_name sind fest "Health". App-Titel und Begrüßung in der App werden aus profile.displayName gebildet ("<displayName> Health").
+- Keine Profildaten in Tests, README, PROFILE.md, Beispielen oder Commits. Beispiele immer neutral.

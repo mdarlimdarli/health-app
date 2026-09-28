@@ -1,8 +1,13 @@
 /*
   App-Shell und Hash-Router.
-  Die Module unter js/modules/ werden später hier eingehängt,
-  bis dahin zeigt jede Route eine leere Platzhalter-Ansicht.
+  Routen mit load() rendern ihr Modul aus js/modules/,
+  alle anderen zeigen bis dahin eine leere Platzhalter-Ansicht.
+  Ohne Profil führt jede Route zum Onboarding, außer den Einstellungen
+  (dort lässt sich eine Sicherung mit Profil wiederherstellen).
 */
+
+import { initSync } from './sync.js';
+import { loadProfile, getProfile, hasProfile, appTitle, onProfileChange } from './profile.js';
 
 // Linien-Icons, 24er Raster, Strichstärke kommt aus CSS (1.5 px)
 const ICONS = {
@@ -21,7 +26,9 @@ const ROUTES = {
   medis: { title: 'Medis', tone: 'zitrone', tab: true },
   checkin: { title: 'Check-in', tone: 'himmel', tab: true },
   essen: { title: 'Essen', tone: 'salbei', tab: true },
-  einstellungen: { title: 'Einstellungen', tone: 'flieder', tab: false },
+  einstellungen: { title: 'Einstellungen', tone: 'flieder', tab: false, load: () => import('./modules/settings.js') },
+  profil: { title: 'Profil', tone: 'flieder', tab: false, load: () => import('./modules/profile-form.js') },
+  willkommen: { title: 'Willkommen', tone: 'sonne', tab: false, load: () => import('./modules/profile-form.js') },
 };
 
 const DEFAULT_ROUTE = 'heute';
@@ -35,7 +42,14 @@ function icon(name) {
 function todayParts() {
   const now = new Date();
   const fmt = (options) => new Intl.DateTimeFormat('de-DE', { timeZone: TIME_ZONE, ...options }).format(now);
-  return { day: fmt({ day: 'numeric' }), weekday: fmt({ weekday: 'long' }), month: fmt({ month: 'long' }) };
+  return { day: fmt({ day: 'numeric' }), weekday: fmt({ weekday: 'long' }), month: fmt({ month: 'long' }), hour: Number(fmt({ hour: 'numeric', hourCycle: 'h23' })) };
+}
+
+// Begrüßung nach Tageszeit, mit Namen aus dem Profil, falls vorhanden
+function greeting(hour) {
+  const phrase = hour >= 5 && hour < 11 ? 'Guten Morgen' : hour >= 11 && hour < 17 ? 'Hallo' : hour >= 17 && hour < 23 ? 'Guten Abend' : 'Gute Nacht';
+  const name = getProfile().displayName;
+  return name ? `${phrase}, ${name}` : phrase;
 }
 
 function renderShell(root) {
@@ -60,6 +74,7 @@ function renderPlaceholder(id, route) {
     return `
       <section class="placeholder">
         <div class="blob blob--${route.tone}"></div>
+        <h2 data-greeting></h2>
         <p class="label">${weekday}</p>
         <p class="number">${day}</p>
         <p class="secondary">${month}</p>
@@ -73,33 +88,54 @@ function renderPlaceholder(id, route) {
     </section>`;
 }
 
+// Routen, die auch ohne Profil erreichbar sind
+const WITHOUT_PROFILE = new Set(['willkommen', 'einstellungen']);
+
 function currentRoute() {
   const id = location.hash.replace(/^#\/?/, '').split('/')[0];
-  return ROUTES[id] ? id : DEFAULT_ROUTE;
+  const route = ROUTES[id] ? id : DEFAULT_ROUTE;
+  if (!hasProfile()) return WITHOUT_PROFILE.has(route) ? route : 'willkommen';
+  return route === 'willkommen' ? DEFAULT_ROUTE : route;
 }
 
-function navigate() {
+async function navigate() {
   const id = currentRoute();
   const route = ROUTES[id];
   const view = document.getElementById('view');
+  // Hash angleichen, wenn umgeleitet wurde (ohne neuen hashchange)
+  if (location.hash !== `#/${id}`) history.replaceState(null, '', `#/${id}`);
+  document.getElementById('app').classList.toggle('shell--onboarding', !hasProfile());
 
   document.getElementById('view-title').textContent = route.title;
-  document.title = `${route.title} · Health`;
+  document.title = `${route.title} · ${appTitle()}`;
 
   // Neu einsetzen, damit die Einblend-Animation jedes Mal läuft
   const fresh = view.cloneNode(false);
-  fresh.innerHTML = renderPlaceholder(id, route);
   view.replaceWith(fresh);
-
-  // Intensität per CSSOM setzen (Inline-Styles sind per CSP gesperrt)
-  fresh.querySelectorAll('.blob').forEach((blob) => blob.style.setProperty('--intensity', '0.6'));
 
   document.querySelectorAll('[data-route]').forEach((link) => {
     if (link.dataset.route === id) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
-
   window.scrollTo(0, 0);
+
+  if (route.load) {
+    try {
+      const module = await route.load();
+      await module.render(fresh, { route: id });
+    } catch (error) {
+      console.error('Ansicht konnte nicht geladen werden:', error.message);
+      fresh.textContent = 'Diese Ansicht konnte nicht geladen werden.';
+    }
+    return;
+  }
+
+  fresh.innerHTML = renderPlaceholder(id, route);
+  // Name aus dem Profil nur als Text einsetzen, nie als HTML
+  const greetingEl = fresh.querySelector('[data-greeting]');
+  if (greetingEl) greetingEl.textContent = greeting(todayParts().hour);
+  // Intensität per CSSOM setzen (Inline-Styles sind per CSP gesperrt)
+  fresh.querySelectorAll('.blob').forEach((blob) => blob.style.setProperty('--intensity', '0.6'));
 }
 
 function registerServiceWorker() {
@@ -109,12 +145,24 @@ function registerServiceWorker() {
   });
 }
 
-function start() {
+async function start() {
   renderShell(document.getElementById('app'));
+  // Profil vor der ersten Ansicht laden, Titel und Begrüßung hängen davon ab
+  try {
+    await loadProfile();
+  } catch (error) {
+    console.warn('Profil nicht geladen:', error.message);
+  }
   if (!location.hash) history.replaceState(null, '', `#/${DEFAULT_ROUTE}`);
   window.addEventListener('hashchange', navigate);
+  // Nach Import oder Wiederherstellung Titel und Umleitung neu bewerten
+  onProfileChange(() => {
+    document.title = `${ROUTES[currentRoute()].title} · ${appTitle()}`;
+    document.getElementById('app').classList.toggle('shell--onboarding', !hasProfile());
+  });
   navigate();
   registerServiceWorker();
+  initSync();
 }
 
 start();

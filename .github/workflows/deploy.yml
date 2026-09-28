@@ -28,13 +28,15 @@ jobs:
       - name: Pages konfigurieren
         uses: actions/configure-pages@v5
 
-      # Nur die ausgelieferten Dateien veröffentlichen, keine Doku oder Projektdateien
+      # Nur die ausgelieferten Dateien veröffentlichen, keine Doku oder Projektdateien.
+      # Ein Profil wird nie deployt, es lebt nur in IndexedDB auf dem Gerät.
       - name: Seite zusammenstellen
         run: |
           mkdir _site
           for item in index.html manifest.webmanifest sw.js css js data assets; do
             if [ -e "$item" ]; then cp -R "$item" _site/; fi
           done
+          rm -f _site/data/profile.json
 
       - name: Artefakt hochladen
         uses: actions/upload-pages-artifact@v3

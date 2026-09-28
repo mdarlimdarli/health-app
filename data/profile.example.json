@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "displayName": "Beispiel",
+  "language": "de",
+  "birthYear": null,
+  "cycleTracking": false,
+  "training": {
+    "daysPerWeek": 2,
+    "level": 1,
+    "goal": "allgemeine-fitness",
+    "focus": [],
+    "avoidTags": [],
+    "pullPushRatio": "1:1",
+    "startPhase": 1
+  },
+  "checkin": {
+    "sliders": ["energy", "digestion", "pain", "sleep"],
+    "painSideToggle": { "enabled": false, "label": "" }
+  },
+  "meds": [],
+  "diet": {
+    "intolerances": [],
+    "cuisines": [],
+    "dislikes": []
+  },
+  "reminders": {
+    "times": ["08:00", "20:00"],
+    "timezone": "Europe/Berlin"
+  }
+}

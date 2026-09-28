@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tests · Health</title>
+  <!-- Nur lokal: wird vom Deploy-Workflow nicht veröffentlicht -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <style>
+    body { padding: 20px; }
+    h1 { margin-bottom: 16px; }
+    ol { padding-left: 20px; display: grid; gap: 8px; }
+    .ok::marker { color: var(--salbei-to); }
+    .fail::marker, .fail { color: #C2334D; }
+    .summary { margin-top: 24px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Verschlüsselung: Roundtrip-Tests</h1>
+  <ol id="results"></ol>
+  <p class="summary" id="summary">Tests laufen, die Schlüsselableitung dauert etwas.</p>
+
+  <script type="module">
+    import * as vault from './js/crypto.js';
+    import { httpErrorMessage } from './js/sync.js';
+
+    const results = document.getElementById('results');
+    const tests = [];
+    const test = (name, fn) => tests.push({ name, fn });
+    const assert = (condition, message) => { if (!condition) throw new Error(message); };
+    const rejects = async (promise, message) => {
+      try { await promise; } catch { return; }
+      throw new Error(message);
+    };
+
+    const sample = {
+      version: 1,
+      exportedAt: '2026-09-28T12:00:00.000Z',
+      stores: {
+        checkins: [{ id: 'a1', date: '2026-09-28', cycleDay: null, energy: 4, pain: 2, painLeftSide: true, note: 'Rücken müde, Übelkeit weg. ÄÖÜß €' }],
+        settings: [{ key: 'reminderTimes', value: ['08:00', '20:30'] }],
+      },
+    };
+    const PASSWORD = 'richtig-langes Testpasswort 123';
+
+    test('Roundtrip mit Session-Schlüssel liefert identische Daten', async () => {
+      await vault.unlock(PASSWORD);
+      const payload = await vault.encrypt(sample);
+      const back = await vault.decrypt(payload);
+      assert(JSON.stringify(back) === JSON.stringify(sample), 'Daten weichen ab');
+    });
+
+    test('Format: salt 16 Byte, iv 12 Byte, 300.000 Iterationen, alles base64', async () => {
+      const payload = await vault.encrypt(sample);
+      assert(vault.fromBase64(payload.salt).length === 16, 'Salt-Länge falsch');
+      assert(vault.fromBase64(payload.iv).length === 12, 'IV-Länge falsch');
+      assert(payload.iterations === 300000, 'Iterationen falsch');
+      assert(/^[A-Za-z0-9+/]+=*$/.test(payload.ciphertext), 'Ciphertext ist kein base64');
+    });
+
+    test('Klartext ist im Ciphertext nicht erkennbar', async () => {
+      const payload = await vault.encrypt(sample);
+      const raw = new TextDecoder('latin1').decode(vault.fromBase64(payload.ciphertext));
+      assert(!raw.includes('Rücken') && !raw.includes('reminderTimes') && !JSON.stringify(payload).includes('checkins'), 'Klartext sichtbar');
+    });
+
+    test('Zwei Verschlüsselungen nutzen verschiedene IVs', async () => {
+      const a = await vault.encrypt(sample);
+      const b = await vault.encrypt(sample);
+      assert(a.iv !== b.iv && a.ciphertext !== b.ciphertext, 'IV wiederverwendet');
+    });
+
+    test('Entschlüsseln nur mit Passwort, ohne Session (anderes Gerät)', async () => {
+      const payload = await vault.encrypt(sample);
+      vault.lock();
+      const back = await vault.decrypt(payload, PASSWORD);
+      assert(back.stores.checkins[0].note === sample.stores.checkins[0].note, 'Umlaute oder Inhalt kaputt');
+    });
+
+    test('Falsches Passwort wird abgelehnt', async () => {
+      await vault.unlock(PASSWORD);
+      const payload = await vault.encrypt(sample);
+      await rejects(vault.decrypt(payload, 'falsches Passwort'), 'Falsches Passwort akzeptiert');
+    });
+
+    test('Manipulierter Ciphertext wird abgelehnt', async () => {
+      const payload = await vault.encrypt(sample);
+      const bytes = vault.fromBase64(payload.ciphertext);
+      bytes[5] ^= 0xff;
+      await rejects(vault.decrypt({ ...payload, ciphertext: vault.toBase64(bytes) }), 'Manipulation nicht erkannt');
+    });
+
+    test('Ohne Session und ohne Passwort gibt es keinen Zugriff', async () => {
+      const payload = await vault.encrypt(sample);
+      vault.lock();
+      await rejects(vault.encrypt(sample), 'Verschlüsseln ohne Schlüssel möglich');
+      await rejects(vault.decrypt(payload), 'Entschlüsseln ohne Schlüssel möglich');
+    });
+
+    test('Leeres Passwort wird abgelehnt', async () => {
+      await rejects(vault.deriveKey('', vault.randomBytes(16)), 'Leeres Passwort akzeptiert');
+    });
+
+    test('Große Daten (etwa 3 MB) überstehen den Roundtrip', async () => {
+      await vault.unlock(PASSWORD);
+      const big = { stores: { workouts: Array.from({ length: 20000 }, (_, i) => ({ id: `w${i}`, date: '2026-09-28', sets: [{ exerciseId: 'kniebeuge', setNo: 1, weight: 42.5, reps: 10, rpe: 7, note: 'gut' }] })) } };
+      const back = await vault.decrypt(await vault.encrypt(big));
+      assert(back.stores.workouts.length === 20000 && back.stores.workouts[19999].id === 'w19999', 'Große Daten beschädigt');
+    });
+
+    test('HTTP 401 und 403 ergeben die Token-Meldung', async () => {
+      assert(httpErrorMessage(401) === 'Token ungültig oder abgelaufen.', '401 falsch');
+      assert(httpErrorMessage(403) === 'Token ungültig oder abgelaufen.', '403 falsch');
+    });
+
+    let passed = 0;
+    for (const { name, fn } of tests) {
+      const item = document.createElement('li');
+      const started = performance.now();
+      try {
+        await fn();
+        passed++;
+        item.className = 'ok';
+        item.textContent = `${name} (${Math.round(performance.now() - started)} ms)`;
+      } catch (error) {
+        item.className = 'fail';
+        item.textContent = `${name}: ${error.message}`;
+      }
+      results.append(item);
+    }
+    vault.lock();
+    const summary = document.getElementById('summary');
+    summary.textContent = `${passed} von ${tests.length} Tests bestanden`;
+    summary.classList.toggle('fail', passed !== tests.length);
+    window.testResult = { passed, total: tests.length };
+  </script>
+</body>
+</html>
