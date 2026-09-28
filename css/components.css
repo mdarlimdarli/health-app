@@ -85,6 +85,19 @@
   transition: background-color var(--duration) var(--easing), box-shadow var(--duration) var(--easing);
 }
 
+.app-header h1 {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Zurück-Pfeil links, bündig mit dem Seitenrand wie das Einstellungs-Icon rechts */
+.icon-button--back {
+  margin: 0 var(--space-1) 0 -10px;
+}
+
 .app-header--scrolled {
   background: var(--color-bg);
   box-shadow: 0 var(--line-width) 0 var(--color-tabline);
@@ -804,6 +817,12 @@ a.button {
   gap: var(--space-2);
 }
 
+/* Dauer wie "75 s" nie umbrechen */
+.check-text .secondary {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .exercise-card {
   display: grid;
   gap: var(--space-2);
@@ -1029,6 +1048,11 @@ a.button {
 
 .rest-timer .button-row {
   width: 100%;
+}
+
+/* Solange der Timer steht, lässt sich der Inhalt bis über ihn scrollen */
+body:has(.rest-timer) .view {
+  padding-bottom: calc(var(--tabbar-height) + var(--safe-bottom) + 240px);
 }
 
 /* Dialoge im Training */
@@ -1723,6 +1747,13 @@ a.button {
   padding-bottom: 12px;
   color: var(--color-text);
   text-decoration: none;
+}
+
+/* Tap-Fläche seitlich auf 44 px erweitern, die Kreise bleiben bündig am Seitenrand */
+a.week-day::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc((var(--day-circle) - var(--tap-min)) / 2);
 }
 
 .week-day .label {

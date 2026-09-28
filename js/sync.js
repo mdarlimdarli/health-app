@@ -273,6 +273,11 @@ async function autoSync() {
   if (!creds.owner || !creds.token || !(await hasPassword())) return;
   if ((await db.pendingCount()) === 0) return;
   if (!vault.isUnlocked() && promptDeclined) return;
+  // Die Passwortabfrage unterbricht weder einen offenen Dialog noch eine laufende Einheit
+  if (!vault.isUnlocked() && (document.querySelector('dialog[open]') || location.hash.startsWith('#/training/einheit'))) {
+    scheduleSync();
+    return;
+  }
   try {
     await syncNow();
   } catch (error) {

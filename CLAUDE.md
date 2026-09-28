@@ -9,7 +9,8 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - Service Worker für Offline-Betrieb (App Shell cachen, Daten nie im SW-Cache).
 - Verschlüsselung: WebCrypto, AES-GCM, Schlüssel per PBKDF2 (mind. 300.000 Iterationen) aus einem Nutzerpasswort. Passwort wird nie gespeichert, nur der Schlüssel in der Session.
 - Sync: GitHub Contents API, eine Datei `data.json.enc` pro Sicherung plus `manifest.json` im Daten-Repo (settings syncRepo, Standard health-data, gilt für Sync und Push-Dateien). Token (fine-grained PAT) liegt in IndexedDB, wird nie geloggt.
-- Schrift: Inter, selbst gehostet als woff2 (Variable Font), Subsets Latin. Keine Google-Fonts-Verlinkung.
+- Schrift: Inter, selbst gehostet als woff2 (Variable Font), gesubsettet auf Latin, Gewichte 400 bis 900 und opsz (assets/fonts/inter-app.woff2, Befehle in der README). Keine Google-Fonts-Verlinkung.
+- Erstes Laden unter 300 KB ohne Schrift (übertragen, gzip).
 - Sprache der Oberfläche: Deutsch, Du-Form. Keine Gedankenstriche im UI-Text.
 
 ## Struktur
@@ -21,7 +22,7 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.example.json (neutraler Beispiel-Essensplan), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
-/scripts/generate-plans.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
+/scripts/generate-plans.mjs, generate-icons.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
 /push-worker/ (Vorlagen für die Push-Action im Repo health-data, wird nicht deployt)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
 
@@ -62,6 +63,8 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - Kein Radius unter 12 px irgendwo in der App. Mehrzeilige Felder bekommen den Kartenradius.
 
 ### Elemente
+- Kopfzeile: Titel links, Einstellungen oben rechts. Auf Unterseiten steht links ein Zurück-Pfeil zur übergeordneten Ansicht (im Standalone-Modus gibt es keine Browserleiste). Externe Links öffnen immer außerhalb der App in Safari (target _blank, rel noopener).
+- App-Icons 180 und 512 px: Creme mit einem Sonnenkreis im Verlauf, kein Text (scripts/generate-icons.mjs).
 - Tab-Bar: Creme mit 1 px Linie in Ink 12 Prozent, 5 Einträge (Heute, Training, Medis, Check-in, Essen). Aktives Icon mit 2 px Linie und Ink-Label, dahinter ein Kreis 36 px im base-Ton der Modulfarbe (Heute Rosé, Training Mandarine, Medis Butter, Check-in Periwinkle, Essen Salbei). Inaktiv Ink-2. Einstellungen über Icon oben rechts. Safe Areas (env(safe-area-inset-*)) beachten.
 - Diagramme: Linien im deep-Ton der Modulfarbe, keine Gitterlinien, Punkte und Markierungen in Koralle deep.
 - Raster: 8 px. Seitenrand 20 px.

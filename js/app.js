@@ -21,6 +21,7 @@ const ICONS = {
   checkin: '<path d="M3 12h4l2-5 4 10 2-5h6"/>',
   essen: '<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19 13 11"/>',
   einstellungen: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  zurueck: '<path d="M15 5 8 12l7 7"/>',
 };
 
 // Routen: Titel, Farbwelt des Verlaufs, Platz in der Tab-Bar
@@ -51,6 +52,7 @@ function renderShell(root) {
   root.innerHTML = `
     <div class="aura" id="aura" aria-hidden="true"></div>
     <header class="app-header">
+      <a class="icon-button icon-button--back" href="#/heute" data-back aria-label="Zurück" hidden>${icon('zurueck')}</a>
       <h1 id="view-title"></h1>
       <a class="icon-button" href="#/einstellungen" data-route="einstellungen" aria-label="Einstellungen">${icon('einstellungen')}</a>
     </header>
@@ -71,6 +73,34 @@ function renderPlaceholder(route) {
 // Routen, die auch ohne Profil erreichbar sind
 const WITHOUT_PROFILE = new Set(['willkommen', 'einstellungen']);
 
+/*
+  Eigene Zurück-Navigation, weil die App im Standalone-Modus keine Browserleiste hat.
+  Ziel ist immer die übergeordnete Ansicht, nicht der Browserverlauf, damit
+  der Pfeil auch nach einem Start direkt auf einer Unterseite funktioniert.
+  Unteransichten mit eigener Umschaltung (Auswertung, Lebensmittel) brauchen keinen Pfeil.
+*/
+let returnTo = `#/${DEFAULT_ROUTE}`;
+const isDay = (part) => /^\d{4}-\d{2}-\d{2}$/.test(part);
+
+function parentOf(id, sub) {
+  if (id === 'einstellungen') return hasProfile() ? returnTo : null;
+  if (id === 'profil') return '#/einstellungen';
+  if (id === 'training' && (sub === 'einheit' || sub === 'fortschritt')) return '#/training';
+  if (id === 'medis' && (sub === 'neu' || sub === 'bearbeiten')) return '#/medis/verwalten';
+  if (id === 'medis' && (sub === 'verwalten' || sub === 'uebersicht' || isDay(sub))) return '#/medis';
+  if ((id === 'checkin' || id === 'essen') && isDay(sub)) return `#/${id}`;
+  return null;
+}
+
+function updateBack(id, sub) {
+  const back = document.querySelector('[data-back]');
+  const target = parentOf(id, sub);
+  back.hidden = !target;
+  if (target) back.href = target;
+  // Rücksprung aus den Einstellungen: zuletzt besuchte Ansicht außerhalb von Einstellungen und Profil
+  if (id !== 'einstellungen' && id !== 'profil' && id !== 'willkommen') returnTo = location.hash || `#/${id}`;
+}
+
 function currentRoute() {
   const id = location.hash.replace(/^#\/?/, '').split('/')[0];
   const route = ROUTES[id] ? id : DEFAULT_ROUTE;
@@ -88,6 +118,7 @@ async function navigate() {
   document.getElementById('app').classList.toggle('shell--onboarding', !hasProfile());
 
   document.getElementById('view-title').textContent = route.title;
+  updateBack(id, location.hash.replace(/^#\/?/, '').split('/')[1] ?? '');
   // Aura des Moduls, Startseite und Check-in überschreiben sie mit ihren Werten
   setAura(auraForRoute(id, location.hash.replace(/^#\/?/, '').split('/')[1] ?? ''));
   document.title = `${route.title} · ${appTitle()}`;
@@ -134,6 +165,17 @@ async function updateBadge() {
   setAppBadge(count);
 }
 
+// Standalone: fremde Links nie im App-Fenster öffnen (dort gäbe es keinen Weg zurück), sondern in Safari
+function openExternalLinksOutside() {
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link || link.protocol === 'blob:' || link.hasAttribute('download')) return;
+    if (link.origin === location.origin) return;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+  });
+}
+
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
   navigator.serviceWorker.register('./sw.js').catch((error) => {
@@ -157,6 +199,7 @@ async function start() {
     document.getElementById('app').classList.toggle('shell--onboarding', !hasProfile());
   });
   navigate();
+  openExternalLinksOutside();
   registerServiceWorker();
   initSync();
 

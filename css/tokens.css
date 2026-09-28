@@ -1,10 +1,10 @@
 /* Design-Tokens: einzige Quelle für Farben, Typografie, Formen, Raster und Bewegung */
 
-/* Inter Variable mit Gewichts- (100 bis 900) und opsz-Achse, Latin */
+/* Inter Variable, auf Latin und die genutzten Gewichte (400 bis 900) und opsz gesubsettet, siehe README */
 @font-face {
   font-family: "Inter";
-  src: url("../assets/fonts/inter-latin-standard-normal.woff2") format("woff2");
-  font-weight: 100 900;
+  src: url("../assets/fonts/inter-app.woff2") format("woff2");
+  font-weight: 400 900;
   font-style: normal;
   font-display: swap;
 }

@@ -4,7 +4,7 @@ Persönliche Health- und Fitness-App als Progressive Web App, für eine Person p
 
 Die verbindlichen Regeln für Design und Code stehen in [CLAUDE.md](CLAUDE.md).
 
-Alles Persönliche (Name, Trainingsvorgaben, Ernährung) steht im Profil. Es lebt nur auf dem Gerät und in der verschlüsselten Sicherung, nie im Repo. Beim ersten Start richtest du es in der App ein. Die Felder und den Import beschreibt [PROFILE.md](PROFILE.md), die Einrichtung für eine andere Person [ONBOARDING.md](ONBOARDING.md).
+Alles Persönliche (Name, Trainingsvorgaben, Ernährung) steht im Profil. Es lebt nur auf dem Gerät und in der verschlüsselten Sicherung, nie im Repo. Beim ersten Start richtest du es in der App ein. Die Felder und den Import beschreibt [PROFILE.md](PROFILE.md). Die Einrichtung für die erste und eine zweite Person steht in [ONBOARDING.md](ONBOARDING.md), die Versionen in [CHANGELOG.md](CHANGELOG.md).
 
 ## Auf dem iPhone installieren
 
@@ -95,6 +95,24 @@ node scripts/test-food.mjs
 ```
 
 **Essensplan:** Der eigene Plan ist persönlich und liegt nie im Repo. Du importierst ihn in der App unter **Einstellungen > Essensplan aus Datei importieren**, danach lebt er auf dem Gerät und in der verschlüsselten Sicherung. Im Repo liegt nur der neutrale Beispielplan `data/meals.example.json`. Eine lokale Arbeitskopie `data/meals.json` ist in `.gitignore`. Das Schema: `foods` (id, name, category, fructose, lactose, histamine, gluten, note), `meals` (id, name, cuisine, slot, ingredients, tags, prepMinutes, histamineTest, recipe als kurzes Markdown, swaps) und `weekPlan` (weekday 1 bis 7 mit slots). Eine Ampel gehört nicht in die Datei, die App berechnet sie aus dem Profil. Beim Import prüft die App das Schema und zeigt die Version. Nach einer Überarbeitung `version` erhöhen und die Datei erneut importieren.
+
+App-Icons neu erzeugen (Creme mit Sonnenkreis, ohne Abhängigkeiten):
+
+```bash
+node scripts/generate-icons.mjs
+```
+
+**Schrift:** `assets/fonts/inter-app.woff2` ist Inter Variable, gesubsettet auf Latin, die genutzten Gewichte 400 bis 900 und die opsz-Achse. Neu erzeugen mit fonttools (`pip install fonttools brotli`) aus der Inter-Latin-Datei von Google Fonts:
+
+```bash
+pyftsubset inter-latin.woff2 --unicodes="U+0020-007E,U+00A0-00FF,U+0131,U+0152-0153,U+0160-0161,U+0178,U+017D-017E,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2039-203A,U+20AC,U+2212,U+2192" --layout-features="kern,tnum,calt,ccmp,locl,mark,mkmk" --flavor=woff2 --no-hinting --output-file=inter-sub.woff2
+```
+
+```bash
+fonttools varLib.instancer inter-sub.woff2 wght=400:900 -o assets/fonts/inter-app.woff2
+```
+
+**Ladegröße:** Die erste Ansicht braucht ohne Schrift rund 135 KB (47 KB mit gzip, so liefert GitHub Pages aus). Der Service Worker legt beim ersten Besuch die ganze App Shell samt Übungsgrafiken ab, zusammen rund 150 KB mit gzip, dazu 41 KB Schrift.
 
 Beispielpläne neu erzeugen (aus `data/profile.example.json` nach `data/plans.generated.json`):
 
