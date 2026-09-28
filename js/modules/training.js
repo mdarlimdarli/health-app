@@ -10,6 +10,7 @@ import * as db from '../db.js';
 import { getProfile } from '../profile.js';
 import { generatePlans, prescription, suggestProgression, shouldSuggestPhaseChange, estimate1RM, isAllowed, SESSIONS_PER_PHASE } from '../planner.js';
 import { toast, confirmDialog, todayISO, el } from '../ui.js';
+import { weekBar } from '../week-bar.js';
 
 const YOUTUBE_SEARCH = 'https://www.youtube.com/results?search_query=';
 const WEIGHT_STEP = 1.25;
@@ -264,7 +265,7 @@ function startRest(seconds) {
   const node = el('div', 'rest-timer');
   node.setAttribute('role', 'timer');
   node.setAttribute('aria-live', 'polite');
-  const blob = el('div', 'blob blob--sonne');
+  const blob = el('div', 'blob blob--mandarine');
   const label = el('p', 'label', 'Pause');
   const time = el('p', 'number rest-time');
   const actions = el('div', 'button-row');
@@ -292,7 +293,7 @@ function startRest(seconds) {
     rest.end = Math.max(rest.end, Date.now()) + 15000;
     if (node.classList.contains('rest-timer--done')) {
       node.classList.remove('rest-timer--done');
-      blob.className = 'blob blob--sonne';
+      blob.className = 'blob blob--mandarine';
       label.textContent = 'Pause';
       rest.interval = setInterval(tick, 250);
     }
@@ -331,7 +332,6 @@ document.addEventListener('visibilitychange', () => {
 const OVERVIEW = `
   <section class="stack training">
     <div class="card phase-card" data-phase-card hidden>
-      <div class="blob blob--sonne"></div>
       <p class="label">Vorschlag</p>
       <p data-phase-text></p>
       <div class="button-row">
@@ -347,12 +347,12 @@ const OVERVIEW = `
     </div>
 
     <div class="week">
-      <div class="blob blob--sonne" data-week-blob></div>
-      <p class="label">Diese Woche</p>
+      <p class="label on-aura">Diese Woche</p>
+      <div data-week-bar></div>
       <div class="ring">
         <svg viewBox="0 0 200 200" aria-hidden="true">
           <defs>
-            <linearGradient id="ring-sonne" x1="0" y1="0" x2="1" y2="1">
+            <linearGradient id="ring-mandarine" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" class="ring-stop-from"/>
               <stop offset="1" class="ring-stop-to"/>
             </linearGradient>
@@ -427,7 +427,9 @@ async function renderOverview(root, lib) {
   ring.setAttribute('stroke-dashoffset', (circumference * (1 - Math.min(1, doneThisWeek / goal))).toFixed(2));
   $('[data-week-done]').textContent = String(doneThisWeek);
   $('[data-week-goal]').textContent = `von ${goal} ${goal === 1 ? 'Einheit' : 'Einheiten'}`;
-  $('[data-week-blob]').style.setProperty('--intensity', String(Math.min(1, 0.25 + doneThisWeek / goal * 0.75)));
+  // Wochentags-Leiste: heute aktiv, Trainingstage mit Punkt
+  const trainedDays = new Set(finished.filter((workout) => workout.date >= monday).map((workout) => workout.date));
+  $('[data-week-bar]').replaceWith(weekBar({ date: todayISO(), today: todayISO(), tone: 'mandarine', marked: trainedDays, label: 'Trainingstage dieser Woche' }));
 
   // Laufende Einheit
   if (active) {
@@ -476,7 +478,6 @@ async function renderOverview(root, lib) {
       $('[data-phase-card]').hidden = true;
     });
   }
-  root.querySelectorAll('.phase-card .blob').forEach((blob) => blob.style.setProperty('--intensity', '0.5'));
 
   // Alle Pläne
   const allPlans = $('[data-all-plans]');

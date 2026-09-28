@@ -11,6 +11,7 @@ import { loadProfile, hasProfile, appTitle, onProfileChange } from './profile.js
 import { onChange } from './db.js';
 import { openItems } from './meds-store.js';
 import { setAppBadge } from './push.js';
+import { setAura, auraForRoute } from './aura.js';
 
 // Linien-Icons, 24er Raster, Strichstärke kommt aus CSS (1.5 px)
 const ICONS = {
@@ -24,14 +25,14 @@ const ICONS = {
 
 // Routen: Titel, Farbwelt des Verlaufs, Platz in der Tab-Bar
 const ROUTES = {
-  heute: { title: 'Heute', tone: 'sonne', tab: true, load: () => import('./modules/home.js') },
-  training: { title: 'Training', tone: 'sonne', tab: true, load: () => import('./modules/training.js') },
-  medis: { title: 'Medis', tone: 'zitrone', tab: true, load: () => import('./modules/meds.js') },
-  checkin: { title: 'Check-in', tone: 'himmel', tab: true, load: () => import('./modules/checkin.js') },
+  heute: { title: 'Heute', tone: 'mandarine', tab: true, load: () => import('./modules/home.js') },
+  training: { title: 'Training', tone: 'mandarine', tab: true, load: () => import('./modules/training.js') },
+  medis: { title: 'Medis', tone: 'butter', tab: true, load: () => import('./modules/meds.js') },
+  checkin: { title: 'Check-in', tone: 'periwinkle', tab: true, load: () => import('./modules/checkin.js') },
   essen: { title: 'Essen', tone: 'salbei', tab: true, load: () => import('./modules/food.js') },
-  einstellungen: { title: 'Einstellungen', tone: 'flieder', tab: false, load: () => import('./modules/settings.js') },
-  profil: { title: 'Profil', tone: 'flieder', tab: false, load: () => import('./modules/profile-form.js') },
-  willkommen: { title: 'Willkommen', tone: 'sonne', tab: false, load: () => import('./modules/profile-form.js') },
+  einstellungen: { title: 'Einstellungen', tone: 'rose', tab: false, load: () => import('./modules/settings.js') },
+  profil: { title: 'Profil', tone: 'rose', tab: false, load: () => import('./modules/profile-form.js') },
+  willkommen: { title: 'Willkommen', tone: 'mandarine', tab: false, load: () => import('./modules/profile-form.js') },
 };
 
 const DEFAULT_ROUTE = 'heute';
@@ -48,6 +49,7 @@ function renderShell(root) {
     .join('');
 
   root.innerHTML = `
+    <div class="aura" id="aura" aria-hidden="true"></div>
     <header class="app-header">
       <h1 id="view-title"></h1>
       <a class="icon-button" href="#/einstellungen" data-route="einstellungen" aria-label="Einstellungen">${icon('einstellungen')}</a>
@@ -86,6 +88,8 @@ async function navigate() {
   document.getElementById('app').classList.toggle('shell--onboarding', !hasProfile());
 
   document.getElementById('view-title').textContent = route.title;
+  // Aura des Moduls, Startseite und Check-in überschreiben sie mit ihren Werten
+  setAura(auraForRoute(id, location.hash.replace(/^#\/?/, '').split('/')[1] ?? ''));
   document.title = `${route.title} · ${appTitle()}`;
 
   // Neu einsetzen, damit die Einblend-Animation jedes Mal läuft
@@ -155,6 +159,12 @@ async function start() {
   navigate();
   registerServiceWorker();
   initSync();
+
+  // Kopfzeile liegt transparent über der Aura, beim Scrollen bekommt sie Creme
+  const header = document.querySelector('.app-header');
+  const onScroll = () => header.classList.toggle('app-header--scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
   updateBadge();
   onChange((store) => { if (store === 'medLog' || store === 'meds' || store === 'import') updateBadge(); });

@@ -5,3 +5,4 @@ node_modules/
 .claude/launch.json
 data/profile.json
 data/plans.local.json
+styleguide.html

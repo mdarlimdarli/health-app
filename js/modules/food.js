@@ -7,16 +7,11 @@
 import { INTOLERANCE_LABELS, MEAL_SLOTS, RATING_LABELS, foodRating, mealRating, candidates, resolveMeal, excludedBy } from '../food-rules.js';
 import { loadMeals, diet, weekdayOf, getSwaps, setSwap, getFeedback, saveFeedback } from '../food-data.js';
 import { todayISO, toast, el } from '../ui.js';
+import { weekBar } from '../week-bar.js';
 
-const WEEKDAY_SHORT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 const TOLERATED = [['gut', 'gut'], ['mittel', 'mittel'], ['schlecht', 'schlecht']];
 
 /* Hilfen */
-
-function addDays(iso, days) {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
-}
 
 function formatDay(iso) {
   const [y, m, d] = iso.split('-').map(Number);
@@ -111,10 +106,6 @@ function openSheet(build) {
 
 /* Woche */
 
-function weekStart(iso) {
-  return addDays(iso, 1 - weekdayOf(iso));
-}
-
 async function renderWeek(root, date) {
   const data = await loadMeals();
   const today = todayISO();
@@ -142,20 +133,8 @@ async function renderWeek(root, date) {
     return;
   }
 
-  // Tagesleiste der aktuellen Woche
-  const start = weekStart(date);
-  const bar = el('div', 'week-bar');
-  bar.setAttribute('role', 'tablist');
-  for (let i = 0; i < 7; i++) {
-    const day = addDays(start, i);
-    const link = el('a', `week-day${day === date ? ' week-day--active' : ''}${day === today ? ' week-day--today' : ''}`);
-    link.href = `#/essen/${day}`;
-    link.setAttribute('role', 'tab');
-    link.setAttribute('aria-selected', String(day === date));
-    link.setAttribute('aria-label', formatDay(day));
-    link.append(el('span', 'label', WEEKDAY_SHORT[i]), el('span', 'week-circle', String(Number(day.slice(8)))));
-    bar.append(link);
-  }
+  // Wochentags-Leiste der Woche des gewählten Tages
+  const bar = weekBar({ date, today, tone: 'salbei', href: (day) => `#/essen/${day}`, label: 'Tag wählen' });
   root.append(bar, el('h2', null, formatDay(date)));
 
   const swaps = await getSwaps();
@@ -209,7 +188,9 @@ async function mealCard({ data, date, slot, resolved, profileDiet, foodsById, re
     swaps.append(el('p', 'label', 'Austausch'));
     for (const swap of meal.swaps) {
       const row = el('p');
-      row.append(el('strong', null, `Statt ${foodsById.get(swap.ingredient)?.name ?? swap.ingredient}: `), document.createTextNode(`${swap.alternative}. ${swap.why ?? ''}`));
+      // alternative darf eine Lebensmittel-ID oder freier Text sein
+      const alternative = foodsById.get(swap.alternative)?.name ?? swap.alternative;
+      row.append(el('strong', null, `Statt ${foodsById.get(swap.ingredient)?.name ?? swap.ingredient}: `), document.createTextNode(`${alternative}. ${swap.why ?? ''}`));
       swaps.append(row);
     }
     recipe.append(swaps);
@@ -326,6 +307,16 @@ async function renderFoods(root) {
   if (!data?.foods.length) {
     root.append(el('p', 'secondary', 'Noch keine Lebensmittel. Die Inhalte kommen später über data/meals.json.'));
     return;
+  }
+
+  // Grundregeln aus dem Essensplan, falls vorhanden
+  if (data.notes?.length) {
+    const rules = el('details', 'details');
+    rules.append(el('summary', null, 'Grundregeln'));
+    const list = el('ul', 'hint-list');
+    data.notes.forEach((note) => list.append(el('li', null, note)));
+    rules.append(list);
+    root.append(rules);
   }
 
   const search = el('input', 'input');

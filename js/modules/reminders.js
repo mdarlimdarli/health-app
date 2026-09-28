@@ -130,8 +130,7 @@ export async function renderReminders(container) {
 
   // Hinweis iOS
   const note = el('div', 'card warning-card');
-  const blob = el('div', 'blob blob--zitrone');
-  note.append(blob, el('p', null, 'iOS stellt Web-Push nur zu, wenn die App über den Home-Bildschirm installiert ist (ab iOS 16.4). Mitteilungen können sich verspäten oder ausbleiben, und GitHub startet geplante Actions oft einige Minuten zu spät.'));
+  note.append(el('p', null, 'iOS stellt Web-Push nur zu, wenn die App über den Home-Bildschirm installiert ist (ab iOS 16.4). Mitteilungen können sich verspäten oder ausbleiben, und GitHub startet geplante Actions oft einige Minuten zu spät.'));
   note.append(el('p', null, critical.length
     ? `Stell für wichtige Einträge zusätzlich eine Erinnerung in der iOS-App Erinnerungen ein: ${critical.map((med) => med.name).join(', ')}.`
     : 'Stell für wichtige Einträge zusätzlich eine Erinnerung in der iOS-App Erinnerungen ein.'));

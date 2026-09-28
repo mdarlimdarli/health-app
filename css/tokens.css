@@ -1,62 +1,91 @@
-/* Design-Tokens: einzige Quelle für Farben, Typografie, Raster und Bewegung */
+/* Design-Tokens: einzige Quelle für Farben, Typografie, Formen, Raster und Bewegung */
 
+/* Inter Variable mit Gewichts- (100 bis 900) und opsz-Achse, Latin */
 @font-face {
   font-family: "Inter";
-  src: url("../assets/fonts/inter-latin-wght-normal.woff2") format("woff2");
+  src: url("../assets/fonts/inter-latin-standard-normal.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  /* Grundfarben */
-  --color-bg: #F6F2EC;
-  --color-text: #161616;
-  --color-text-secondary: #6F6A63;
-  --color-line: #E3DDD3;
+  /* Neutral: Creme überall als Grund, Sand für Karten */
+  --creme: #F4EFE6;
+  --sand: #EEE7DB;
+  --ink: #161616;
+  /* Ink-2 leicht dunkler als #6F6A63, damit auch auf Sand 4,5:1 erreicht wird */
+  --ink-2: #6C6761;
+  --line: #E1DACF;
+  /* Text im Aura-Bereich: Ink mit 78 % Deckkraft hält 4,5:1 auch auf den sattesten Stellen */
+  --ink-aura: rgba(22, 22, 22, 0.78);
 
-  /* Akzentverläufe: jeweils Start- und Endfarbe */
-  --sonne-from: #FFB347;
-  --sonne-to: #FF6A3D;
-  --zitrone-from: #F7E463;
-  --zitrone-to: #FFD23F;
-  --himmel-from: #8BB8FF;
-  --himmel-to: #5A8DEE;
-  --flieder-from: #C9B8FF;
-  --flieder-to: #9A8CFF;
-  --salbei-from: #B7D3A8;
-  --salbei-to: #7FA36A;
-  --rose-from: #FFB3C7;
-  --rose-to: #FF7A9E;
+  /* Semantische Namen, die die Komponenten nutzen */
+  --color-bg: var(--creme);
+  --color-card: var(--sand);
+  --color-text: var(--ink);
+  --color-text-secondary: var(--ink-2);
+  --color-line: var(--line);
+  --color-tabline: rgba(22, 22, 22, 0.12);
 
-  /* Fertige radiale Verläufe */
-  --gradient-sonne: radial-gradient(circle, var(--sonne-from) 0%, var(--sonne-to) 70%);
-  --gradient-zitrone: radial-gradient(circle, var(--zitrone-from) 0%, var(--zitrone-to) 70%);
-  --gradient-himmel: radial-gradient(circle, var(--himmel-from) 0%, var(--himmel-to) 70%);
-  --gradient-flieder: radial-gradient(circle, var(--flieder-from) 0%, var(--flieder-to) 70%);
-  --gradient-salbei: radial-gradient(circle, var(--salbei-from) 0%, var(--salbei-to) 70%);
-  --gradient-rose: radial-gradient(circle, var(--rose-from) 0%, var(--rose-to) 70%);
+  /*
+    Modulfarben in zwei Stufen.
+    base: Pastellton für Verläufe und Flächen.
+    deep: Kontrastakzent für Linien, aktive Elemente und Flächen mit weißer Schrift.
+    Die deep-Werte sind so abgedunkelt, dass weiße Schrift mindestens 4,5:1 erreicht.
+  */
+  --butter: #F5D96B;
+  --butter-deep: #8C7221;
+  --mandarine: #F49A5A;
+  --mandarine-deep: #C0561E;
+  --koralle: #F27A6B;
+  --koralle-deep: #C7392B;
+  --rose: #F3B8CB;
+  --rose-deep: #C54B7A;
+  --periwinkle: #A9B8F0;
+  --periwinkle-deep: #4A5FCC;
+  --salbei: #B9CFA6;
+  --salbei-deep: #598141;
 
-  /* Blur-Spanne für Verlaufsflecken (Intensität 0 bis 1 wird darauf abgebildet) */
-  --blur-min: 40px;
-  --blur-max: 80px;
+  /* Aura: weiche Verläufe von base zu transparent */
+  --aura-blur: 56px;
+  --aura-height: 460px;
+  --aura-fade: 400ms;
 
-  /* Typografie */
+  /* Typografie: Inter Variable */
   --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 
-  --font-size-number-min: 56px;
-  --font-size-number-max: 72px;
-  --font-weight-number: 500;
-  --letter-spacing-number: -0.02em;
+  /* Große Zahlen (Tageszahl, Werte, Streaks, Gewichte) */
+  --font-size-number: 72px;
+  --font-weight-number: 900;
+  --line-height-number: 0.9;
+  --letter-spacing-number: -0.05em;
 
-  --font-size-heading: 20px;
-  --font-weight-heading: 600;
+  /* Überschriften und Begrüßung */
+  --font-size-heading: 28px;
+  --font-weight-heading: 900;
+  --letter-spacing-heading: -0.03em;
 
-  --font-size-body: 15px;
-  --font-weight-body: 400;
+  /* Titel in Karten und Kopfzeile */
+  --font-size-title: 20px;
+  --font-weight-title: 800;
+
+  /* Monat neben der Tageszahl */
+  --font-size-month: 20px;
+  --font-weight-month: 700;
+
+  /* Kartenzahlen und Chips */
+  --font-size-card-number: 32px;
+  --font-weight-card-number: 800;
+
+  /* Fließtext und Hinweise */
+  --font-size-body: 16px;
+  --font-weight-body: 500;
   --line-height-body: 1.45;
 
+  /* Labels und Tab-Beschriftungen */
   --font-size-label: 12px;
+  --font-weight-label: 700;
   --letter-spacing-label: 0.08em;
 
   /* Raster (8 px) */
@@ -67,21 +96,31 @@
   --space-5: 40px;
   --space-6: 48px;
   --page-margin: 20px;
+  --card-gap: 12px;
 
-  /* Formen */
-  --radius-card: 20px;
-  --radius-control: 16px;
+  /* Formen: Karten Rechteck mit 24 px, alles Interaktive vollrund, nie unter 12 px */
+  --radius-card: 24px;
+  --radius-pill: 999px;
+  --radius-min: 12px;
+  --radius-control: var(--radius-pill);
   --line-width: 1px;
   --icon-stroke: 1.5;
 
-  /* Interaktion */
+  /* Größen interaktiver Elemente */
   --tap-min: 44px;
+  --button-height: 52px;
+  --chip-height: 32px;
+  --tap-circle: 52px;
+  --day-circle: 40px;
+  --dot: 12px;
+
+  /* Bewegung */
   --duration: 180ms;
   --easing: ease-out;
 
   /* Layout */
   --header-height: 56px;
-  --tabbar-height: 56px;
+  --tabbar-height: 64px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);

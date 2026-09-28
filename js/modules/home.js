@@ -1,13 +1,15 @@
 /*
   Startseite (Tab Heute): Begrüßung, Datum, Zyklustag (nur mit cycleTracking),
-  Tagesfläche aus den Check-in-Werten, fällige Medikamente (wichtige zuerst, direkt abhakbar),
+  Aura aus den Check-in-Werten (ohne Check-in ruhig in Butter, Rosé, Periwinkle),
+  fällige Medikamente (wichtige zuerst, direkt abhakbar),
   nächstes Training und die Gerichte des Tages, sofern ein Essensplan existiert.
 */
 
 import { getProfile } from '../profile.js';
 import { openItems, setTaken } from '../meds-store.js';
 import { isMeasurement, slotLabel } from '../meds-schedule.js';
-import { SLIDER_META, activeSliders, getCheckin, hasValues, cycleDayFor, renderAura } from '../checkin-core.js';
+import { SLIDER_META, activeSliders, getCheckin, hasValues, cycleDayFor, auraBlobs } from '../checkin-core.js';
+import { setAura, AURAS } from '../aura.js';
 import { todayISO, toast, el } from '../ui.js';
 
 const TIME_ZONE = 'Europe/Berlin';
@@ -33,7 +35,7 @@ function checkIcon() {
   return svg;
 }
 
-/* Tagesfläche mit Check-in */
+/* Tageswerte: die Aura des Screens wächst mit dem Check-in */
 
 async function renderDay(container) {
   const profile = getProfile();
@@ -41,12 +43,9 @@ async function renderDay(container) {
   const today = todayISO();
   const checkin = await getCheckin(today);
   const filled = hasValues(checkin, sliders);
+  setAura(filled ? auraBlobs(checkin, sliders) : AURAS.heute, { animate: false });
 
-  const card = el('div', 'day-card');
-  const aura = el('div');
-  renderAura(aura, checkin, sliders);
-  const content = el('div', 'day-card-content');
-
+  const content = el('div', 'stack-tight');
   if (profile.cycleTracking) {
     const cycleDay = await cycleDayFor(today);
     if (cycleDay) {
@@ -60,20 +59,22 @@ async function renderDay(container) {
     const values = el('div', 'day-values');
     for (const key of sliders) {
       if (!Number.isInteger(checkin[key])) continue;
-      const item = el('span', `day-value day-value--${SLIDER_META[key].tone}`);
-      item.append(el('span', 'label', SLIDER_META[key].label), el('span', 'card-number', String(checkin[key])));
+      const item = el('span', 'day-value');
+      item.append(el('span', 'label on-aura', SLIDER_META[key].label), el('span', 'card-number', String(checkin[key])));
       values.append(item);
     }
     const edit = el('a', 'button button--small', 'Check-in bearbeiten');
     edit.href = '#/checkin';
     content.append(values, edit);
   } else {
-    const start = el('a', 'button button--primary', 'Check-in starten');
+    // Aktions-Karte: Ink mit Creme-Text
+    const card = el('div', 'card card--action stack-tight');
+    const start = el('a', 'button', 'Check-in starten');
     start.href = '#/checkin';
-    content.append(el('p', 'secondary', 'Wie geht es dir heute? Mit deinem Check-in füllt sich diese Fläche.'), start);
+    card.append(el('p', 'label', 'Check-in'), el('h2', null, 'Wie geht es dir heute?'), el('p', 'secondary', 'Mit deinem Check-in füllt sich die Farbfläche oben.'), start);
+    content.append(card);
   }
-  card.append(aura, content);
-  container.replaceChildren(card);
+  container.replaceChildren(content);
 }
 
 /* Fällige Medikamente */
@@ -84,11 +85,9 @@ async function renderDue(container) {
   if (!items.length) return;
 
   const card = el('div', 'card due-card');
-  const blob = el('div', 'blob blob--zitrone');
-  blob.style.setProperty('--intensity', String(Math.min(1, 0.3 + items.length * 0.15)));
   const head = el('div', 'due-head');
   head.append(el('p', 'label', 'Jetzt fällig'), el('span', 'card-number', String(items.length)));
-  card.append(blob, head);
+  card.append(head);
 
   for (const item of items) {
     const row = el('div', `med-row${item.med.critical ? ' med-row--critical' : ''}`);
@@ -164,10 +163,11 @@ async function renderMeal(container) {
 export async function render(root) {
   const { day, weekday, month, hour } = todayParts();
   const section = el('section', 'stack home');
-  const intro = el('div', 'home-intro');
+  // Begrüßung direkt über der Tageszahl, Monat auf derselben Grundlinie
+  const intro = el('div', 'hero');
   const line = el('div', 'day-line');
   line.append(el('span', 'number', day), el('span', 'month', month));
-  intro.append(el('h2', null, greeting(hour)), el('p', 'label', weekday), line);
+  intro.append(el('p', 'label on-aura', weekday), el('h2', null, greeting(hour)), line);
 
   const dayArea = el('div');
   const due = el('div');

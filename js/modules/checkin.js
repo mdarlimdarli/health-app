@@ -6,7 +6,8 @@
 */
 
 import { getProfile } from '../profile.js';
-import { SLIDER_META, activeSliders, getCheckin, emptyCheckin, saveCheckin, allCheckins, cycleDayFor, phaseFor, renderAura } from '../checkin-core.js';
+import { SLIDER_META, activeSliders, getCheckin, emptyCheckin, saveCheckin, allCheckins, cycleDayFor, phaseFor, auraBlobs } from '../checkin-core.js';
+import { setAura } from '../aura.js';
 import { todayISO, toast, el } from '../ui.js';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -83,9 +84,8 @@ async function renderDay(root, date) {
   root.append(dateNav);
 
   // Tagesfläche wächst mit jedem gewählten Wert
-  const aura = el('div');
-  renderAura(aura, checkin, sliders);
-  root.append(aura);
+  // Die Aura baut sich mit jedem gewählten Wert dezent auf
+  setAura(auraBlobs(checkin, sliders, { subtle: true }));
 
   const status = el('p', 'hint save-status');
   const updateStatus = () => { status.textContent = saved ? 'Gespeichert. Du kannst jederzeit nachtragen.' : 'Noch nicht gespeichert. Jede Auswahl wird sofort gesichert.'; };
@@ -95,7 +95,7 @@ async function renderDay(root, date) {
     await saveCheckin(checkin);
     saved = true;
     updateStatus();
-    renderAura(aura, checkin, sliders);
+    setAura(auraBlobs(checkin, sliders, { subtle: true }), { animate: false });
     if (message) toast(message);
   };
 
@@ -149,8 +149,6 @@ async function renderDay(root, date) {
     const all = await allCheckins();
     let cycleDay = await cycleDayFor(date, all);
     const card = el('div', 'card cycle-card');
-    const blob = el('div', 'blob blob--flieder');
-    blob.style.setProperty('--intensity', '0.35');
     const line = el('div', 'day-line');
     const number = el('span', 'number');
     const suffix = el('span', 'month');
@@ -188,7 +186,7 @@ async function renderDay(root, date) {
       if (!current || current < date) await db.setSetting('cycleStartDate', date);
     });
 
-    card.append(blob, el('p', 'label', 'Zyklustag'), line, stepper, period);
+    card.append(el('p', 'label', 'Zyklustag'), line, stepper, period);
     if (checkin.periodStart) card.append(el('p', 'hint', 'An diesem Tag hat die Periode begonnen.'));
     root.append(card);
   }
@@ -211,7 +209,7 @@ async function renderDay(root, date) {
 
 /* Auswertung */
 
-const LINE_CLASS = { energy: 'line--sonne', sleep: 'line--himmel', digestion: 'line--salbei', pain: 'line--rose', mood: 'line--flieder' };
+const LINE_CLASS = { energy: 'line--mandarine', sleep: 'line--periwinkle', digestion: 'line--salbei', pain: 'line--koralle', mood: 'line--rose' };
 
 function trendChart(days, series, markers) {
   const width = 320;
@@ -270,8 +268,9 @@ async function renderAnalysis(root) {
     range.append(option);
   }
   const chartCard = el('div', 'card chart-card');
+  const calendarCard = el('div', 'card');
   const stats = el('div', 'stack-tight');
-  root.append(range, chartCard, stats);
+  root.append(range, chartCard, calendarCard, stats);
 
   const update = async () => {
     const days = [];
@@ -301,6 +300,26 @@ async function renderAnalysis(root) {
       if (profile.cycleTracking) legend.append(el('span', 'legend legend--period', 'Periode'));
       chartCard.append(axis, legend, el('p', 'hint', `${withData.length} von ${days.length} Tagen mit Check-in.`));
     }
+
+    // Kalenderpunkte: eine Zeile pro Woche, Montag zuerst
+    calendarCard.replaceChildren(el('p', 'label', 'Kalender'));
+    const head = el('div', 'dot-calendar-head');
+    ['M', 'D', 'M', 'D', 'F', 'S', 'S'].forEach((letter) => head.append(el('span', null, letter)));
+    const grid = el('div', 'dot-calendar');
+    const [y, m, d] = days[0].split('-').map(Number);
+    const offset = (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
+    for (let i = 0; i < offset; i++) grid.append(el('span', 'cal-dot cal-dot--empty'));
+    for (const day of days) {
+      const kind = markers.period.has(day) ? ' cal-dot--period' : markers.training.has(day) ? ' cal-dot--training' : '';
+      const dot = el('span', `cal-dot${kind}`);
+      dot.title = `${formatShort(day)}${markers.training.has(day) ? ', Training' : ''}${markers.period.has(day) ? ', Periode' : ''}`;
+      grid.append(dot);
+    }
+    const calLegend = el('div', 'chart-legend chart-legend--wrap');
+    calLegend.append(el('span', 'legend legend--cal-training', 'Training'));
+    if (profile.cycleTracking) calLegend.append(el('span', 'legend legend--cal-period', 'Periode'));
+    calLegend.append(el('span', 'legend legend--cal-none', 'ohne'));
+    calendarCard.append(head, grid, calLegend);
 
     // Kennzahlen, nur Zahlen
     stats.replaceChildren(el('h2', null, 'Kennzahlen'));
