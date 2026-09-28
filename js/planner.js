@@ -2,28 +2,35 @@
   Trainingsplaner: erzeugt Pläne aus profile.training und der Übungsbibliothek.
   Rein funktional, ohne DOM und ohne Speicher, damit er im Browser und in Node
   (scripts/generate-plans.mjs) gleich rechnet. Alle persönlichen Vorgaben
-  (Tage, Level, Fokus, avoidTags, Verhältnis Zug zu Druck, Phase) kommen aus dem Profil.
+  (Tage, Level, geschonte Regionen, vermiedene Bewegungen, Fokus, Verhältnis Zug zu Druck,
+  Phase) kommen aus dem Profil.
+  Übungen tragen Tags "belastet:<region>" und "bewegung:<id>", Mobility "mobilisiert:<region>".
+  Vokabular und Labels: js/training-options.js.
 */
+
+import { blockedTags, regionIds, regionLabel, movementLabel, focusLabel, REGION_IDS, MOVEMENT_IDS, FOCUS_IDS } from './training-options.js';
 
 // Nach so vielen Einheiten in Phase 1 wird der Wechsel vorgeschlagen, nie erzwungen
 export const SESSIONS_PER_PHASE = 16;
 
 const MOBILITY_SECONDS = 75;
 const MOBILITY_COUNT = 4;
+// Mit Fokus Beweglichkeit zwei Mobility-Übungen mehr
+const MOBILITY_EXTRA = 2;
 const MAX_EXERCISES = 7;
 
 // Fokus-Begriffe, die eine Muskelgruppe meinen: dort mindestens zwei Übungen pro Einheit
 const FOCUS_GROUPS = {
   'oberer-ruecken': 'ruecken',
-  ruecken: 'ruecken',
   beine: 'beine',
-  gesaess: 'beine',
-  brust: 'brust',
-  schultern: 'schultern',
-  arme: 'arme',
-  rumpf: 'core',
-  core: 'core',
+  'huefte-gesaess': 'beine',
+  'core-stabilitaet': 'core',
 };
+
+// Bonuspunkte: geloggte Übungen halten die Fortschrittskurve, bisherige den Plan ruhig
+const LOGGED_BONUS = 5;
+const PREVIOUS_BONUS = 3;
+const REPLACEMENT_BONUS = 2;
 
 const BODYWEIGHT = new Set(['koerpergewicht', 'matte']);
 
@@ -48,9 +55,36 @@ function formatKg(value) {
   return String(value).replace('.', ',');
 }
 
-export function isAllowed(exercise, avoidTags, prefs = {}) {
-  if (prefs[exercise.id]?.disliked) return false;
-  return !exercise.tags.some((tag) => avoidTags.includes(tag));
+// Gründe, warum eine Übung für dieses Profil wegfällt (leer heißt erlaubt)
+export function exclusionReasons(exercise, training, prefs = {}) {
+  const reasons = [];
+  if (prefs[exercise.id]?.disliked) reasons.push({ type: 'disliked' });
+  const blocked = new Set(blockedTags(training));
+  for (const tag of exercise.tags) {
+    if (!blocked.has(tag)) continue;
+    const [kind, id] = tag.split(':');
+    reasons.push({ type: kind === 'belastet' ? 'region' : 'movement', id });
+  }
+  return reasons;
+}
+
+export function isAllowed(exercise, training, prefs = {}) {
+  return exclusionReasons(exercise, training, prefs).length === 0;
+}
+
+// Grund, wenn ein Ausschluss wegfällt
+export function liftedText(reason) {
+  if (reason.type === 'disliked') return '„Mag ich nicht“ zurückgenommen';
+  if (reason.type === 'region') return `Schonung ${regionLabel(reason.id)} aufgehoben`;
+  if (reason.type === 'movement') return `${movementLabel(reason.id)} wieder erlaubt`;
+  return '';
+}
+
+export function reasonText(reason) {
+  if (reason.type === 'disliked') return 'als „Mag ich nicht“ markiert';
+  if (reason.type === 'region') return `Schonung ${regionLabel(reason.id)}`;
+  if (reason.type === 'movement') return movementLabel(reason.id);
+  return reason.text ?? '';
 }
 
 /* Belastungsvorgaben je Übung */
@@ -95,20 +129,36 @@ export function prescription(exercise, level, phase) {
 
 /* Auswahl */
 
-function createContext({ training, exercises, prefs = {}, phase }) {
+function planExerciseIds(plans = []) {
+  return new Set(plans.flatMap((plan) => [...(plan.exercises ?? []), ...(plan.mobility ?? [])].map((entry) => entry.exerciseId)));
+}
+
+function createContext({ training, exercises, prefs = {}, phase, history = [], previous = [] }) {
   const level = Math.min(2, Math.max(1, Number(training.level) || 1));
-  const avoidTags = Array.isArray(training.avoidTags) ? training.avoidTags : [];
   const focus = Array.isArray(training.focus) ? training.focus : [];
-  const pool = exercises.filter((exercise) => exercise.level <= level && isAllowed(exercise, avoidTags, prefs));
+  const regions = regionIds(training);
+  const pool = exercises.filter((exercise) => exercise.level <= level && isAllowed(exercise, training, prefs));
+  const allowed = new Set(pool.map((exercise) => exercise.id));
+  const byId = new Map(exercises.map((exercise) => [exercise.id, exercise]));
+  // Ausgeschlossene Übungen des bisherigen Plans: ihre Alternativen (gleiche Muskelgruppe) rücken nach
+  const previousIds = planExerciseIds(previous);
+  const replacements = new Set();
+  for (const id of previousIds) {
+    if (allowed.has(id)) continue;
+    for (const alt of byId.get(id)?.alternatives ?? []) replacements.add(alt);
+  }
   return {
     level,
     phase: phase === 2 ? 2 : 1,
-    avoidTags,
     focus,
+    regions,
     prefs,
+    logged: new Set(history),
+    previous: previousIds,
+    replacements,
     ratio: parseRatio(training.pullPushRatio),
     order: new Map(exercises.map((exercise, index) => [exercise.id, index])),
-    byId: new Map(exercises.map((exercise) => [exercise.id, exercise])),
+    byId,
     pool: pool.filter((exercise) => exercise.pattern !== 'mobilitaet'),
     mobility: pool.filter((exercise) => exercise.pattern === 'mobilitaet'),
     used: new Map(),
@@ -125,8 +175,10 @@ function score(exercise, ctx) {
   if (exercise.phase === ctx.phase) value += ctx.phase === 2 ? 6 : 4;
   if (exercise.level === ctx.level) value += 1;
   if (exercise.compound) value += 1;
-  // Übungen mit Belastungs-Tags nur, wenn nichts Gleichwertiges da ist
-  if (exercise.tags.length) value -= 2;
+  // Belastungs-Tags zählen nicht: ausgeschlossen wird nur, was das Profil schont oder vermeidet
+  if (ctx.logged.has(exercise.id)) value += LOGGED_BONUS;
+  if (ctx.previous.has(exercise.id)) value += PREVIOUS_BONUS;
+  if (ctx.replacements.has(exercise.id)) value += REPLACEMENT_BONUS;
   value -= 5 * (ctx.used.get(exercise.id) ?? 0);
   return value;
 }
@@ -249,15 +301,28 @@ function lowerBody(ctx) {
   return sortSession(session);
 }
 
-// Mobility-Block: vier Übungen à 75 Sekunden, je Plan versetzt
+const mobilises = (exercise, ctx) => ctx.regions.filter((region) => exercise.tags.includes(`mobilisiert:${region}`)).length;
+
+/*
+  Mobility-Block: vier Übungen à 75 Sekunden (mit Fokus Beweglichkeit sechs), je Plan versetzt.
+  Leichte Mobility für jede geschonte Region kommt zuerst.
+*/
 function mobilityBlock(ctx, variant) {
-  const ranked = [...ctx.mobility].sort((a, b) => focusMatches(b, ctx) - focusMatches(a, ctx) || ctx.order.get(a.id) - ctx.order.get(b.id));
-  if (!ranked.length) return [];
+  const size = MOBILITY_COUNT + (ctx.focus.includes('beweglichkeit') ? MOBILITY_EXTRA : 0);
+  const rank = (a, b) => focusMatches(b, ctx) - focusMatches(a, ctx) || ctx.order.get(a.id) - ctx.order.get(b.id);
   const block = [];
-  for (let i = 0; i < Math.min(MOBILITY_COUNT, ranked.length); i++) {
-    block.push(ranked[(variant * 2 + i) % ranked.length]);
+  // Je geschonte Region mindestens eine passende Übung, je Plan eine andere
+  for (const region of ctx.regions) {
+    const matching = ctx.mobility.filter((exercise) => exercise.tags.includes(`mobilisiert:${region}`) && !block.includes(exercise)).sort(rank);
+    if (matching.length && block.length < size) block.push(matching[variant % matching.length]);
   }
-  return [...new Set(block)].map((exercise) => ({ exerciseId: exercise.id, seconds: MOBILITY_SECONDS }));
+  const rest = ctx.mobility.filter((exercise) => !block.includes(exercise))
+    .sort((a, b) => mobilises(b, ctx) - mobilises(a, ctx) || rank(a, b));
+  for (let i = 0; rest.length && block.length < size && i < rest.length; i++) {
+    const exercise = rest[(variant * 2 + i) % rest.length];
+    if (!block.includes(exercise)) block.push(exercise);
+  }
+  return block.map((exercise) => ({ exerciseId: exercise.id, seconds: MOBILITY_SECONDS }));
 }
 
 function toEntries(ctx, session) {
@@ -271,9 +336,11 @@ function toEntries(ctx, session) {
   Erzeugt die Pläne.
   daysPerWeek bis 2: Plan A und B (Ganzkörper), 3: zusätzlich Plan C,
   ab 4: Oberkörper/Unterkörper-Split mit vier Plänen.
+  history: IDs von Übungen mit Trainingslog, sie bleiben bevorzugt im Plan.
+  previous: bisherige Pläne, damit ein Neuaufbau nur ändert, was sich ändern muss.
 */
-export function generatePlans({ training, exercises, prefs = {}, phase = 1, generatedAt = null }) {
-  const ctx = createContext({ training, exercises, prefs, phase });
+export function generatePlans({ training, exercises, prefs = {}, phase = 1, generatedAt = null, history = [], previous = [] }) {
+  const ctx = createContext({ training, exercises, prefs, phase, history, previous });
   const days = Math.max(1, Number(training.daysPerWeek) || 2);
   const plans = [];
 
@@ -333,6 +400,69 @@ export function suggestProgression(entry, lastSets) {
   return { weight, reps: min, text: rule.text ?? '' };
 }
 
+/*
+  Was sich zwischen zwei Planständen geändert hat, mit Grund.
+  before und after: { training, phase, prefs, plans }. Verglichen werden alle Übungen
+  aller Pläne samt Mobility, unabhängig davon, in welchem Plan sie stehen.
+*/
+export function diffPlans(before, after, exercises) {
+  const byId = new Map(exercises.map((exercise) => [exercise.id, exercise]));
+  const name = (id) => byId.get(id)?.name ?? id;
+  const oldIds = planExerciseIds(before.plans);
+  const newIds = planExerciseIds(after.plans);
+  const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+  // Ohne bekannten Vorher-Stand (z. B. aus alten Einheiten abgeleitet) nur allgemeine Gründe
+  const bt = before.training ?? null;
+  const at = after.training ?? {};
+
+  // Allgemeiner Grund, wenn eine Übung nicht ausgeschlossen ist, aber trotzdem wegfällt
+  const generalReason = () => {
+    if (before.phase && before.phase !== after.phase) return after.phase === 2 ? 'Phase 2 mit freien Gewichten' : 'zurück in Phase 1';
+    if (bt && Number(bt.daysPerWeek) !== Number(at.daysPerWeek)) return `neue Aufteilung auf ${at.daysPerWeek} ${Number(at.daysPerWeek) === 1 ? 'Tag' : 'Tage'}`;
+    if (bt && !same(bt.focus, at.focus)) return 'neuer Fokus';
+    return 'Plan neu zusammengestellt';
+  };
+
+  const newRegions = regionIds(at).filter((region) => !bt || !regionIds(bt).includes(region));
+  const isMobility = (id) => byId.get(id)?.pattern === 'mobilitaet';
+
+  const removed = [...oldIds].filter((id) => !newIds.has(id)).map((id) => {
+    const exercise = byId.get(id);
+    const reasons = exercise ? exclusionReasons(exercise, at, after.prefs) : [];
+    if (reasons.length) return { id, name: name(id), reason: reasons.map(reasonText).join(', '), excluded: true };
+    // Mobility einer nicht mehr geschonten Region, oder Platz für neu geschonte Regionen
+    const liftedRegion = isMobility(id) && bt ? regionIds(bt).find((r) => !regionIds(at).includes(r) && exercise?.tags.includes(`mobilisiert:${r}`)) : null;
+    let reason = generalReason();
+    if (liftedRegion) reason = `Schonung ${regionLabel(liftedRegion)} aufgehoben`;
+    else if (isMobility(id) && newRegions.length) reason = `Platz für Mobility für ${newRegions.map(regionLabel).join(', ')}`;
+    return { id, name: name(id), reason, excluded: false };
+  });
+
+  const added = [...newIds].filter((id) => !oldIds.has(id)).map((id) => {
+    const exercise = byId.get(id);
+    const region = exercise ? regionIds(at).find((r) => exercise.tags.includes(`mobilisiert:${r}`)) : null;
+    if (region && isMobility(id)) return { id, name: name(id), reason: `Mobility für ${regionLabel(region)}` };
+    // Vorher ausgeschlossen, jetzt wieder erlaubt
+    const lifted = exercise && bt ? exclusionReasons(exercise, bt, before.prefs) : [];
+    if (lifted.length) return { id, name: name(id), reason: lifted.map(liftedText).join(', '), lifted: true };
+    // Ersatz: Alternative derselben Muskelgruppe, sonst eine ausgeschlossene Übung mit gleichem Bewegungsmuster
+    const replaces = removed.find((entry) => exercise?.alternatives.includes(entry.id) || byId.get(entry.id)?.alternatives.includes(id))
+      ?? removed.find((entry) => entry.excluded && byId.get(entry.id)?.pattern === exercise?.pattern);
+    const focus = exercise ? (at.focus ?? []).find((item) => exercise.focus.includes(item) && !(bt?.focus ?? []).includes(item)) : null;
+    let reason = 'neu im Plan';
+    if (replaces) reason = `statt ${replaces.name}`;
+    else if (focus) reason = `Fokus ${focusLabel(focus)}`;
+    return { id, name: name(id), reason };
+  });
+
+  // Weggefallen ohne eigenen Ausschluss, weil wieder erlaubte Übungen den Platz brauchen
+  if (added.some((entry) => entry.lifted)) {
+    for (const entry of removed) if (!entry.excluded && entry.reason === 'Plan neu zusammengestellt') entry.reason = 'Platz für wieder erlaubte Übungen';
+  }
+
+  return { removed, added: added.map(({ lifted, ...entry }) => entry), changed: removed.length > 0 || added.length > 0 };
+}
+
 /* Prüfung der Übungsbibliothek (für Script und Tests) */
 
 const REQUIRED = ['id', 'name', 'muscleGroup', 'pattern', 'equipment', 'level', 'phase', 'tags', 'setupHints', 'cues', 'commonMistakes', 'alternatives', 'youtubeSearch', 'svg'];
@@ -352,6 +482,15 @@ export function validateLibrary(exercises) {
     if (exercise.cues.length < 3 || exercise.cues.length > 4) errors.push(`${exercise.id}: 3 bis 4 Cues erwartet.`);
     if (exercise.commonMistakes.length !== 2) errors.push(`${exercise.id}: 2 häufige Fehler erwartet.`);
     if (/watch\?v=|youtu\.be/.test(exercise.youtubeSearch)) errors.push(`${exercise.id}: youtubeSearch muss ein Suchbegriff sein, keine Video-ID.`);
+    for (const tag of exercise.tags) {
+      const [kind, id] = tag.split(':');
+      const known = kind === 'bewegung' ? MOVEMENT_IDS.includes(id) : (kind === 'belastet' || kind === 'mobilisiert') && REGION_IDS.includes(id);
+      if (!known) errors.push(`${exercise.id}: unbekannter Tag ${tag}.`);
+      if (kind === 'mobilisiert' && exercise.pattern !== 'mobilitaet') errors.push(`${exercise.id}: mobilisiert nur an Mobility-Übungen.`);
+    }
+    for (const item of exercise.focus ?? []) {
+      if (!FOCUS_IDS.includes(item)) errors.push(`${exercise.id}: unbekannter Fokus ${item}.`);
+    }
     for (const altId of exercise.alternatives) {
       const alt = byId.get(altId);
       if (!alt) errors.push(`${exercise.id}: Alternative ${altId} existiert nicht.`);

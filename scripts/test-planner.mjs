@@ -9,20 +9,24 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { generatePlans, validateLibrary, parseRatio, estimate1RM, suggestProgression, shouldSuggestPhaseChange } from '../js/planner.js';
+import { generatePlans, validateLibrary, parseRatio, estimate1RM, suggestProgression, shouldSuggestPhaseChange, isAllowed, exclusionReasons, diffPlans } from '../js/planner.js';
+import { normalizeTraining, expiredRegions, blockedTags, REGION_IDS } from '../js/training-options.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { exercises } = JSON.parse(await readFile(path.join(root, 'data', 'exercises.json'), 'utf8'));
 const byId = new Map(exercises.map((e) => [e.id, e]));
-const ALL_TAGS = ['last-hinter-kopf', 'nackendruecken', 'bauchdruck', 'crunches', 'schweres-kreuzheben'];
+// Alle alten Schonungs-Tags aus Profil Version 1, zum Testen der Migration
+const LEGACY_TAGS = ['last-hinter-kopf', 'nackendruecken', 'bauchdruck', 'crunches', 'schweres-kreuzheben'];
 
-const base = { daysPerWeek: 2, level: 1, goal: '', focus: [], avoidTags: [], pullPushRatio: '1:1', startPhase: 1 };
+const base = normalizeTraining({ daysPerWeek: 2, level: 1, goal: '', pullPushRatio: '1:1', startPhase: 1 });
+// fullSlots: Knie, Hüfte, Zug horizontal und vertikal müssen in jeder Ganzkörpereinheit möglich sein
 const profiles = {
-  neutral: { ...base },
-  eingeschraenkt: { ...base, avoidTags: ALL_TAGS, focus: ['oberer-ruecken', 'schultergürtel', 'knochendichte'], pullPushRatio: '2:1' },
-  fortgeschritten: { ...base, level: 2, pullPushRatio: '3:2', focus: ['gesaess'] },
-  dreiTage: { ...base, daysPerWeek: 3 },
-  vierTage: { ...base, daysPerWeek: 4, pullPushRatio: '2:1' },
+  neutral: { training: base, fullSlots: true },
+  eingeschraenkt: { training: normalizeTraining({ ...base, avoidTags: LEGACY_TAGS, focus: ['oberer-ruecken', 'schultergürtel', 'knochendichte'], pullPushRatio: '2:1' }), fullSlots: true },
+  fortgeschritten: { training: { ...base, level: 2, pullPushRatio: '3:2', focus: ['huefte-gesaess'] }, fullSlots: true },
+  dreiTage: { training: { ...base, daysPerWeek: 3 }, fullSlots: true },
+  vierTage: { training: { ...base, daysPerWeek: 4, pullPushRatio: '2:1' }, fullSlots: true },
+  knieUndUeberkopf: { training: { ...base, protectRegions: [{ region: 'knie', until: '2026-10-31' }, { region: 'handgelenk', until: null }], avoidMovements: ['ueberkopf', 'einbeinig'], focus: ['beweglichkeit', 'core-stabilitaet'] }, fullSlots: false },
 };
 
 let passed = 0;
@@ -48,14 +52,20 @@ test('Alle Pflichtübungen der Vorgabe sind vorhanden', () => {
   const missing = required.filter((id) => !byId.has(id));
   assert.deepEqual(missing, []);
 });
-test('Tags der Vorgabe sitzen an den richtigen Übungen', () => {
-  assert.ok(byId.get('langhantel-kniebeuge').tags.includes('bauchdruck') && byId.get('langhantel-kniebeuge').phase === 2);
-  assert.deepEqual([...byId.get('kreuzheben-langhantel').tags].sort(), ['bauchdruck', 'schweres-kreuzheben']);
-  assert.ok(byId.get('latzug-nacken').tags.includes('last-hinter-kopf'));
-  assert.ok(byId.get('lh-schulterdruecken').tags.includes('nackendruecken'));
-  assert.ok(byId.get('crunch').tags.includes('crunches'));
-  assert.deepEqual([...byId.get('beinheben-haengend').tags].sort(), ['bauchdruck', 'crunches']);
+test('Regionen- und Bewegungs-Tags sitzen an den richtigen Übungen', () => {
+  const has = (id, ...tags) => tags.every((tag) => byId.get(id).tags.includes(tag));
+  assert.ok(has('langhantel-kniebeuge', 'belastet:bauchraum', 'belastet:knie', 'bewegung:tiefe-kniebeuge') && byId.get('langhantel-kniebeuge').phase === 2);
+  assert.ok(has('kreuzheben-langhantel', 'belastet:lws', 'belastet:bauchraum', 'bewegung:wirbelsaeule-beugen'));
+  assert.ok(has('latzug-nacken', 'bewegung:last-hinter-kopf', 'bewegung:ueberkopf', 'belastet:nacken', 'belastet:schulter'));
+  assert.ok(has('lh-schulterdruecken', 'belastet:schulter', 'belastet:nacken', 'bewegung:ueberkopf'));
+  assert.ok(has('crunch', 'bewegung:bauchpressen', 'belastet:bauchraum'));
+  assert.ok(has('beinheben-haengend', 'bewegung:bauchpressen', 'bewegung:haengen', 'belastet:bauchraum'));
+  assert.ok(has('klimmzug-unterstuetzt', 'bewegung:haengen', 'bewegung:ueberkopf'));
   assert.equal(byId.get('lh-bankdruecken').phase, 2);
+});
+test('Für jede Region gibt es leichte Mobility', () => {
+  const missing = REGION_IDS.filter((region) => !exercises.some((e) => e.pattern === 'mobilitaet' && e.tags.includes(`mobilisiert:${region}`)));
+  assert.deepEqual(missing, []);
 });
 test('Jede SVG-Datei existiert', () => {
   const missing = exercises.filter((e) => !existsSync(path.join(root, 'assets', 'exercises', e.svg))).map((e) => e.svg);
@@ -63,7 +73,7 @@ test('Jede SVG-Datei existiert', () => {
 });
 
 console.log('Planer');
-for (const [name, training] of Object.entries(profiles)) {
+for (const [name, { training, fullSlots }] of Object.entries(profiles)) {
   for (const phase of [1, 2]) {
     const result = generatePlans({ training, exercises, phase });
     const label = `${name}, Phase ${phase}`;
@@ -73,24 +83,34 @@ for (const [name, training] of Object.entries(profiles)) {
       assert.equal(result.plans.length, expected);
     });
 
-    test(`${label}: keine Übung mit einem avoidTag, keine über dem Level`, () => {
+    test(`${label}: keine Übung aus geschonter Region oder vermiedener Bewegung, keine über dem Level`, () => {
+      const blocked = blockedTags(training);
       for (const plan of result.plans) {
         for (const e of [...exerciseList(plan), ...plan.mobility.map((m) => byId.get(m.exerciseId))]) {
-          assert.ok(!e.tags.some((t) => training.avoidTags.includes(t)), `${e.id} in ${plan.id}`);
+          assert.ok(!e.tags.some((t) => blocked.includes(t)), `${e.id} in ${plan.id}`);
           assert.ok(e.level <= Math.min(2, training.level), `${e.id} Level ${e.level}`);
         }
       }
     });
 
-    test(`${label}: 6 bis 7 Übungen und 5 Minuten Mobility`, () => {
+    test(`${label}: 5 bis 7 Übungen und 5 Minuten Mobility, mit Fokus Beweglichkeit mehr`, () => {
+      const seconds = training.focus.includes('beweglichkeit') ? 450 : 300;
       for (const plan of result.plans) {
-        assert.ok(plan.exercises.length >= 6 && plan.exercises.length <= 7, `${plan.id}: ${plan.exercises.length}`);
-        assert.equal(plan.mobility.reduce((sum, m) => sum + m.seconds, 0), 300);
+        assert.ok(plan.exercises.length >= (fullSlots ? 6 : 5) && plan.exercises.length <= 7, `${plan.id}: ${plan.exercises.length}`);
+        assert.equal(plan.mobility.reduce((sum, m) => sum + m.seconds, 0), seconds);
+      }
+    });
+
+    test(`${label}: jede geschonte Region bekommt Mobility`, () => {
+      for (const plan of result.plans) {
+        for (const { region } of training.protectRegions) {
+          assert.ok(plan.mobility.some((m) => byId.get(m.exerciseId).tags.includes(`mobilisiert:${region}`)), `${plan.id} ${region}`);
+        }
       }
     });
 
     if (training.daysPerWeek < 4) {
-      test(`${label}: jede Einheit hat Knie, Hüfte, Zug horizontal und vertikal, Druck und Core`, () => {
+      if (fullSlots) test(`${label}: jede Einheit hat Knie, Hüfte, Zug horizontal und vertikal, Druck und Core`, () => {
         for (const plan of result.plans) {
           const list = exerciseList(plan);
           assert.ok(list.some((e) => e.pattern === 'kniedominant' && e.compound), `${plan.id} kniedominant`);
@@ -129,7 +149,7 @@ for (const [name, training] of Object.entries(profiles)) {
 }
 
 test('Fokus oberer Rücken: zwei Rückenübungen pro Einheit', () => {
-  const result = generatePlans({ training: profiles.eingeschraenkt, exercises, phase: 1 });
+  const result = generatePlans({ training: profiles.eingeschraenkt.training, exercises, phase: 1 });
   for (const plan of result.plans) assert.ok(exerciseList(plan).filter((e) => e.muscleGroup === 'ruecken').length >= 2, plan.id);
 });
 
@@ -146,9 +166,72 @@ test('Abgelehnte Übungen werden nie gewählt, dauerhafte Alternativen ersetzen'
 });
 
 test('Pläne sind deterministisch', () => {
-  const a = generatePlans({ training: profiles.eingeschraenkt, exercises, phase: 1 });
-  const b = generatePlans({ training: profiles.eingeschraenkt, exercises, phase: 1 });
+  const a = generatePlans({ training: profiles.eingeschraenkt.training, exercises, phase: 1 });
+  const b = generatePlans({ training: profiles.eingeschraenkt.training, exercises, phase: 1 });
   assert.deepEqual(a, b);
+});
+
+console.log('Anpassung');
+test('Migration: alte Schonungs-Tags werden Regionen und Bewegungen, Fokus neues Vokabular', () => {
+  const migrated = normalizeTraining({ daysPerWeek: 2, avoidTags: LEGACY_TAGS, focus: ['oberer-ruecken', 'schultergürtel', 'knochendichte', 'rumpf'] });
+  assert.deepEqual(migrated.protectRegions.map((r) => r.region).sort(), ['bauchraum', 'nacken', 'schulter']);
+  assert.deepEqual([...migrated.avoidMovements].sort(), ['bauchpressen', 'last-hinter-kopf', 'wirbelsaeule-beugen']);
+  assert.deepEqual(migrated.focus, ['oberer-ruecken', 'schulterguertel', 'knochendichte', 'core-stabilitaet']);
+  assert.equal('avoidTags' in migrated, false);
+  assert.equal(migrated.guidance, '');
+});
+
+test('Regionen mit Enddatum: abgelaufen erst nach dem Tag, nichts wird entfernt', () => {
+  const training = normalizeTraining({ protectRegions: [{ region: 'knie', until: '2026-10-01' }, 'nacken', { region: 'knie', until: null }] });
+  assert.equal(training.protectRegions.length, 2);
+  assert.deepEqual(expiredRegions(training, '2026-10-01'), []);
+  assert.deepEqual(expiredRegions(training, '2026-10-02').map((r) => r.region), ['knie']);
+  assert.ok(blockedTags(training).includes('belastet:knie'));
+});
+
+test('Gründe für einen Ausschluss', () => {
+  const training = { ...base, protectRegions: [{ region: 'nacken', until: null }], avoidMovements: ['last-hinter-kopf'] };
+  const reasons = exclusionReasons(byId.get('latzug-nacken'), training, {});
+  assert.deepEqual(reasons.map((r) => `${r.type}:${r.id}`).sort(), ['movement:last-hinter-kopf', 'region:nacken']);
+  assert.equal(isAllowed(byId.get('latzug-brust'), training, {}), true);
+});
+
+test('Geloggte Übungen bleiben bevorzugt im Plan', () => {
+  const plain = generatePlans({ training: base, exercises, phase: 1 });
+  const used = new Set(plain.plans.flatMap((p) => p.exercises.map((e) => e.exerciseId)));
+  const knee = plain.plans[0].exercises.map((e) => byId.get(e.exerciseId)).find((e) => e.pattern === 'kniedominant' && e.compound);
+  const logged = knee.alternatives.find((id) => !used.has(id) && byId.get(id).phase === 1 && byId.get(id).compound);
+  assert.ok(logged, 'Testvoraussetzung: ungenutzte Alternative');
+  const withHistory = generatePlans({ training: base, exercises, phase: 1, history: [logged] });
+  assert.ok(withHistory.plans.some((p) => p.exercises.some((e) => e.exerciseId === logged)), `${logged} fehlt`);
+});
+
+test('Neuaufbau ändert nur, was ausgeschlossen ist, und ersetzt durch dieselbe Muskelgruppe', () => {
+  const before = generatePlans({ training: profiles.eingeschraenkt.training, exercises, phase: 1 });
+  const training = { ...profiles.eingeschraenkt.training, avoidMovements: [...profiles.eingeschraenkt.training.avoidMovements, 'ueberkopf'] };
+  const after = generatePlans({ training, exercises, phase: 1, previous: before.plans });
+  const diff = diffPlans({ training: profiles.eingeschraenkt.training, phase: 1, prefs: {}, plans: before.plans }, { training, phase: 1, prefs: {}, plans: after.plans }, exercises);
+  assert.ok(diff.removed.length > 0, 'etwas muss wegfallen');
+  assert.ok(diff.removed.every((r) => r.excluded && r.reason === 'Überkopf drücken oder ziehen'), JSON.stringify(diff.removed));
+  for (const removed of diff.removed) {
+    const group = byId.get(removed.id).muscleGroup;
+    assert.ok(after.plans.some((p) => p.exercises.some((e) => byId.get(e.exerciseId).muscleGroup === group)), `${group} fehlt`);
+  }
+  assert.ok(diff.added.length <= diff.removed.length + 2, `zu viele neue Übungen: ${diff.added.map((a) => a.id)}`);
+});
+
+test('Änderungsübersicht nennt den Grund', () => {
+  const before = { training: base, phase: 1, prefs: {}, plans: [{ id: 'A', exercises: [{ exerciseId: 'latzug-nacken' }, { exerciseId: 'rudern-maschine' }], mobility: [] }] };
+  const training = { ...base, avoidMovements: ['last-hinter-kopf'] };
+  const after = generatePlans({ training, exercises, phase: 1, previous: before.plans });
+  const diff = diffPlans(before, { training, phase: 1, prefs: {}, plans: after.plans }, exercises);
+  const removed = diff.removed.find((r) => r.id === 'latzug-nacken');
+  assert.equal(`${removed.name} entfernt, weil ${removed.reason}`, 'Latzug in den Nacken entfernt, weil Last hinter dem Kopf');
+  assert.ok(diff.added.some((a) => a.reason === 'statt Latzug in den Nacken'), JSON.stringify(diff.added));
+  const back = diffPlans({ training, phase: 1, prefs: {}, plans: after.plans }, { training: base, phase: 1, prefs: {}, plans: before.plans }, exercises);
+  assert.ok(back.added.some((a) => a.id === 'latzug-nacken' && a.reason === 'Last hinter dem Kopf wieder erlaubt'), JSON.stringify(back.added));
+  const phaseDiff = diffPlans({ ...before, training: base }, { training: base, phase: 2, prefs: {}, plans: generatePlans({ training: base, exercises, phase: 2 }).plans }, exercises);
+  assert.ok(phaseDiff.removed.some((r) => r.reason === 'Phase 2 mit freien Gewichten'));
 });
 
 console.log('Hilfen');

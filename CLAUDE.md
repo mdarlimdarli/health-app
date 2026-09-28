@@ -18,8 +18,8 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), aura.js (Aura je Screen), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne, rein funktional), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
-/js/modules/home.js, training.js, meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
+/js/app.js (Router, Shell), aura.js (Aura je Screen), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne und Änderungsübersicht, rein funktional), training-options.js (Vokabular Regionen, Bewegungen, Fokus, Migration, rein funktional), training-data.js (gespeicherte Pläne, Neuaufbau), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
+/js/modules/home.js, training.js, training-adjust.js (Anpassen), training-fields.js (Felder der drei Ebenen), meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.example.json (neutraler Beispiel-Essensplan), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
 /scripts/generate-plans.mjs, generate-icons.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
@@ -82,7 +82,7 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 
 ## Personenneutralität
 - Der Code enthält keine Namen, keine konkreten Medikamente, keine Zyklus-Annahmen, keine Trainingsregeln. All das steht im Profil.
-- Jede Funktion, die Verhalten personalisiert, liest aus dem Profil über js/profile.js (getProfile(), z.B. cycleTracking, training.avoidTags, diet). Medikamente liegen im Store meds.
+- Jede Funktion, die Verhalten personalisiert, liest aus dem Profil über js/profile.js (getProfile(), z.B. cycleTracking, training.protectRegions, training.avoidMovements, diet). Medikamente liegen im Store meds.
 - Das aktive Profil lebt in IndexedDB (Store settings, key "profile") und ist Teil der verschlüsselten Sicherung im Repo health-data. Bei Gerätewechsel wandert es mit der Wiederherstellung mit.
 - data/profile.json wird nie committet (.gitignore) und nie deployt. Öffentlich ist nur data/profile.example.json (neutrale Vorlage). Eine lokale data/profile.json dient höchstens als Import-Datei.
 - Beim ersten Start ohne Profil zeigt die App ein Onboarding (#/willkommen): Name, Geburtsjahr, Zyklus-Tracking, Trainingstage pro Woche, Trainingslevel, Schonungs-Tags als Checkboxen mit verständlichen Labels, Unverträglichkeiten, Lieblingsküchen, Abneigungen. Medikamente werden nicht im Onboarding abgefragt, sondern im Medis-Tab angelegt.
@@ -91,7 +91,11 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - Keine Profildaten in Tests, README, PROFILE.md, Beispielen oder Commits. Beispiele immer neutral.
 
 ## Training
-- Übungsbibliothek data/exercises.json ist allgemein. Persönliche Einschränkungen nur über profile.training.avoidTags, nie im Code und nie in der Bibliothek.
+- Übungsbibliothek data/exercises.json ist allgemein. Jede Übung trägt Tags für belastete Regionen ("belastet:<region>") und Bewegungsmuster ("bewegung:<id>"), Mobility zusätzlich "mobilisiert:<region>". Das Vokabular steht in js/training-options.js und wird von validateLibrary geprüft.
+- Persönliche Einschränkungen nur im Profil, in drei Ebenen: training.protectRegions (Regionen schonen, je optional mit until), training.avoidMovements (Bewegungen vermeiden), training.focus (Aufbauen). Dazu training.guidance als Freitext ohne Logik ("Meine Vorgaben"). Nie im Code und nie in der Bibliothek.
+- Geschonte Regionen aktivieren leichte Mobility für diese Region. Abgelaufene Schonungen fragt die Startseite ab, nichts wird automatisch entfernt.
+- Pläne liegen in settings trainingPlans mit Signatur der Eingaben und werden nur bei geänderten Vorgaben neu gebaut. Übungen mit Trainingslog und aus dem bisherigen Plan bleiben bevorzugt, Ausgeschlossenes ersetzen Alternativen derselben Muskelgruppe. Nach jedem Neuaufbau zeigt der Trainings-Tab "Was sich geändert hat" mit Grund (settings trainingPlanChanges, bis zur Bestätigung).
+- "Anpassen" im Trainings-Tab (#/training/anpassen) ändert Regionen, Bewegungen, Fokus, Tage und Phase direkt. Während einer laufenden Einheit ist es gesperrt, Änderungen gelten ab der nächsten.
 - Pläne erzeugt js/planner.js zur Laufzeit aus profile.training, exercisePrefs (disliked, replacedBy) und der Phase (settings trainingPhase). data/plans.json überschreibt sie, falls vorhanden (öffentlich, keine persönlichen Vorgaben).
 - data/plans.generated.json wird nur aus profile.example.json erzeugt. Pläne aus dem eigenen Profil gehen nach data/plans.local.json (ignoriert).
 - Phasenwechsel nach 16 Einheiten nur vorschlagen, nie erzwingen.

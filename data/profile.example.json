@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "displayName": "Beispiel",
   "language": "de",
   "birthYear": null,
@@ -8,8 +8,10 @@
     "daysPerWeek": 2,
     "level": 1,
     "goal": "allgemeine-fitness",
+    "protectRegions": [],
+    "avoidMovements": [],
     "focus": [],
-    "avoidTags": [],
+    "guidance": "",
     "pullPushRatio": "1:1",
     "startPhase": 1
   },

@@ -85,7 +85,7 @@ const isDay = (part) => /^\d{4}-\d{2}-\d{2}$/.test(part);
 function parentOf(id, sub) {
   if (id === 'einstellungen') return hasProfile() ? returnTo : null;
   if (id === 'profil') return '#/einstellungen';
-  if (id === 'training' && (sub === 'einheit' || sub === 'fortschritt')) return '#/training';
+  if (id === 'training' && (sub === 'einheit' || sub === 'fortschritt' || sub === 'anpassen')) return '#/training';
   if (id === 'medis' && (sub === 'neu' || sub === 'bearbeiten')) return '#/medis/verwalten';
   if (id === 'medis' && (sub === 'verwalten' || sub === 'uebersicht' || isDay(sub))) return '#/medis';
   if ((id === 'checkin' || id === 'essen') && isDay(sub)) return `#/${id}`;

@@ -27,7 +27,7 @@ Beim Export landen die aktuellen Medikamente wieder in der Datei.
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
-| `version` | Zahl | Version des Profil-Schemas. Aktuell `1`. |
+| `version` | Zahl | Version des Profil-Schemas. Aktuell `2`. Profile mit Version `1` (Feld `avoidTags`) werden beim Laden und Importieren automatisch migriert. |
 | `displayName` | Text | Name der Person. Erscheint in der App als Titel („Beispiel“ ergibt „Beispiel Health“) und in der Begrüßung. Das Manifest heißt immer „Health“. |
 | `language` | Text | Sprache der Oberfläche, aktuell nur `de`. |
 | `birthYear` | Zahl oder `null` | Geburtsjahr, optional. Für altersabhängige Hinweise, z. B. im Training. |
@@ -40,22 +40,26 @@ Beim Export landen die aktuellen Medikamente wieder in der Datei.
 | `daysPerWeek` | Zahl | Geplante Trainingstage pro Woche, 1 bis 6. |
 | `level` | Zahl | 1 Einstieg, 2 etwas Erfahrung, 3 erfahren. |
 | `goal` | Text | Trainingsziel als Schlagwort, z. B. `allgemeine-fitness` oder `kraft`. |
-| `focus` | Liste | Schwerpunkte als Schlagworte, z. B. `haltung`. Übungen mit passenden Tags werden bevorzugt. |
-| `avoidTags` | Liste | Übungen mit einem dieser Tags schlägt die App nie vor. Die Tags stehen an den Übungen in `data/exercises.json`. |
+| `protectRegions` | Liste | Körperregionen schonen, je `{ "region": "knie", "until": "2026-12-31" }`. `until` ist optional (`null` heißt unbefristet). Übungen mit dem Tag `belastet:<region>` fallen weg, Mobility mit `mobilisiert:<region>` kommt bevorzugt in den Aufwärmblock. Nach Ablauf fragt die Startseite, ob weiter geschont oder aufgehoben wird, entfernt wird nichts automatisch. |
+| `avoidMovements` | Liste | Bewegungen vermeiden. Übungen mit dem Tag `bewegung:<id>` fallen weg. |
+| `focus` | Liste | Aufbauen: Übungen mit passendem Schwerpunkt werden bevorzugt. |
+| `guidance` | Text | Vorgaben von Arzt, Physio oder Osteopath als Freitext. Steht im Trainings-Tab unter „Meine Vorgaben“, ohne Logik. |
 | `pullPushRatio` | Text | Verhältnis von Zug- zu Druckübungen, z. B. `1:1`. |
 | `startPhase` | Zahl | Phase des Trainingsplans, mit der die App beginnt. |
 
-In der Einrichtung stehen für `avoidTags` diese Schonungen zur Wahl:
+Das Vokabular steht in `js/training-options.js`, die Tags an den Übungen in `data/exercises.json`.
 
-| Tag | Anzeige |
-|---|---|
-| `bauchdruck` | Bauchraum schonen |
-| `last-hinter-kopf` | Nichts hinter dem Kopf |
-| `schweres-kreuzheben` | Kein schweres Kreuzheben |
-| `crunches` | Keine Crunches |
-| `nackendruecken` | Kein Nackendrücken |
+**Regionen** (`protectRegions`): `nacken` Nacken, `schulter` Schulter, `lws` Lendenwirbelsäule, `bws` Brustwirbelsäule, `huefte` Hüfte, `knie` Knie, `handgelenk` Handgelenk, `ellbogen` Ellbogen, `bauchraum` Bauchraum.
 
-Andere Tags aus einer importierten Datei bleiben erhalten und erscheinen als zusätzliche Option.
+**Bewegungen** (`avoidMovements`): `ueberkopf` Überkopf drücken oder ziehen, `last-hinter-kopf` Last hinter dem Kopf, `wirbelsaeule-beugen` Wirbelsäule unter Last beugen (Kreuzheben, Good Mornings), `wirbelsaeule-rotieren` Wirbelsäule unter Last rotieren, `bauchpressen` Bauchpressen (Crunches, Sit-ups), `tiefe-kniebeuge` tiefe Kniebeuge, `spruenge` Sprünge und Stöße, `einbeinig` einbeinige Stabilität, `haengen` Hängen am Griff.
+
+**Aufbauen** (`focus`): `oberer-ruecken` Oberer Rücken, `schulterguertel` Schultergürtel, `core-stabilitaet` Core-Stabilität, `huefte-gesaess` Hüfte und Gesäß, `beine` Beine, `knochendichte` Knochendichte, `beweglichkeit` Beweglichkeit (längerer Mobility-Block), `allgemeine-kraft` Allgemeine Kraft.
+
+Andere Werte aus einer importierten Datei bleiben erhalten und erscheinen als zusätzliche Option.
+
+**Migration aus Version 1:** `bauchdruck` wird Region Bauchraum, `nackendruecken` Regionen Nacken und Schulter, `last-hinter-kopf`, `crunches` und `schweres-kreuzheben` werden die Bewegungen Last hinter dem Kopf, Bauchpressen und Wirbelsäule unter Last beugen. Alte Fokus-Begriffe wie `schultergürtel`, `rumpf` und `gesaess` werden auf das neue Vokabular umgeschrieben.
+
+Alles davon lässt sich auch direkt im Trainings-Tab unter **Anpassen** ändern, zusammen mit Tagen pro Woche und Phase.
 
 ### `checkin`
 

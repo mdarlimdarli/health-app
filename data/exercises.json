@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "exercises": [
     {
       "id": "beinpresse",
@@ -12,9 +12,13 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:knie"
+      ],
       "focus": [
-        "knochendichte"
+        "knochendichte",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Rückenlehne so einstellen, dass die Knie etwa 90 Grad gebeugt sind.",
@@ -51,8 +55,12 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "belastet:knie"
+      ],
+      "focus": [
+        "beine"
+      ],
       "setupHints": [
         "Drehachse der Maschine auf Höhe des Kniegelenks ausrichten.",
         "Fußpolster knapp über dem Sprunggelenk."
@@ -86,8 +94,13 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "belastet:knie"
+      ],
+      "focus": [
+        "beine",
+        "huefte-gesaess"
+      ],
       "setupHints": [
         "Knie auf Höhe der Drehachse.",
         "Fersenpolster knapp über den Fersen."
@@ -121,9 +134,13 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:huefte"
+      ],
       "focus": [
-        "gesaess"
+        "huefte-gesaess",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Schulterblätter an die Lehne, Polster über dem Hüftknochen.",
@@ -160,7 +177,9 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "gesaess"
+        "huefte-gesaess",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Rückenlage, Füße hüftbreit aufstellen.",
@@ -195,9 +214,14 @@
       "level": 1,
       "phase": 2,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:knie",
+        "bewegung:tiefe-kniebeuge"
+      ],
       "focus": [
-        "knochendichte"
+        "knochendichte",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Kurzhantel senkrecht vor der Brust halten.",
@@ -234,10 +258,16 @@
       "phase": 2,
       "unit": "reps",
       "tags": [
-        "bauchdruck"
+        "belastet:knie",
+        "belastet:lws",
+        "belastet:bauchraum",
+        "belastet:nacken",
+        "bewegung:tiefe-kniebeuge"
       ],
       "focus": [
-        "knochendichte"
+        "knochendichte",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Stange im Rack knapp unter Schulterhöhe einhängen.",
@@ -272,10 +302,15 @@
       "level": 1,
       "phase": 2,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:lws",
+        "bewegung:wirbelsaeule-beugen"
+      ],
       "focus": [
-        "gesaess",
-        "knochendichte"
+        "huefte-gesaess",
+        "knochendichte",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Aufrecht stehen, Kurzhanteln vor den Oberschenkeln.",
@@ -312,11 +347,15 @@
       "phase": 2,
       "unit": "reps",
       "tags": [
-        "schweres-kreuzheben",
-        "bauchdruck"
+        "belastet:lws",
+        "belastet:bauchraum",
+        "bewegung:wirbelsaeule-beugen"
       ],
       "focus": [
-        "knochendichte"
+        "knochendichte",
+        "beine",
+        "huefte-gesaess",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Stange über der Fußmitte, Füße hüftbreit.",
@@ -350,10 +389,15 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:knie",
+        "bewegung:einbeinig"
+      ],
       "focus": [
         "knochendichte",
-        "gesaess"
+        "huefte-gesaess",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Aufrecht stehen, Hände an der Hüfte.",
@@ -391,7 +435,8 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "knochendichte"
+        "knochendichte",
+        "beine"
       ],
       "setupHints": [
         "Fußballen auf die Kante stellen.",
@@ -426,10 +471,15 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:knie",
+        "bewegung:einbeinig"
+      ],
       "focus": [
         "knochendichte",
-        "gesaess"
+        "huefte-gesaess",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Stabile Box oder Bank auf Kniehöhe.",
@@ -464,9 +514,13 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:lws"
+      ],
       "focus": [
-        "gesaess"
+        "huefte-gesaess",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Seilgriff am unteren Kabel, mit dem Rücken zum Turm stellen.",
@@ -501,10 +555,16 @@
       "level": 2,
       "phase": 2,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:knie",
+        "bewegung:einbeinig",
+        "bewegung:tiefe-kniebeuge"
+      ],
       "focus": [
-        "gesaess",
-        "knochendichte"
+        "huefte-gesaess",
+        "knochendichte",
+        "beine",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Hinteren Fuß mit dem Spann auf eine Bank legen.",
@@ -540,7 +600,7 @@
       "tags": [],
       "focus": [
         "oberer-ruecken",
-        "haltung"
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Füße auf die Stützen, Knie leicht gebeugt.",
@@ -576,9 +636,12 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "bewegung:ueberkopf"
+      ],
       "focus": [
-        "oberer-ruecken"
+        "oberer-ruecken",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Knie unter die Polster klemmen.",
@@ -615,10 +678,14 @@
       "phase": 1,
       "unit": "reps",
       "tags": [
-        "last-hinter-kopf"
+        "belastet:nacken",
+        "belastet:schulter",
+        "bewegung:ueberkopf",
+        "bewegung:last-hinter-kopf"
       ],
       "focus": [
-        "oberer-ruecken"
+        "oberer-ruecken",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Knie unter die Polster klemmen.",
@@ -656,7 +723,7 @@
       "tags": [],
       "focus": [
         "oberer-ruecken",
-        "haltung"
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Brustpolster so einstellen, dass du die Griffe gerade noch erreichst.",
@@ -694,8 +761,7 @@
       "tags": [],
       "focus": [
         "oberer-ruecken",
-        "schultergürtel",
-        "haltung"
+        "schulterguertel"
       ],
       "setupHints": [
         "Seilgriff auf Stirnhöhe einhängen.",
@@ -731,11 +797,12 @@
       "level": 1,
       "phase": 2,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:lws"
+      ],
       "focus": [
         "oberer-ruecken",
-        "schultergürtel",
-        "haltung"
+        "schulterguertel"
       ],
       "setupHints": [
         "Leichte Kurzhanteln wählen.",
@@ -772,7 +839,8 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "oberer-ruecken"
+        "oberer-ruecken",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Hand und Knie auf einer Bank abstützen.",
@@ -809,7 +877,7 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "schultergürtel"
+        "schulterguertel"
       ],
       "setupHints": [
         "Kabel auf Ellbogenhöhe.",
@@ -844,9 +912,13 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "bewegung:ueberkopf",
+        "bewegung:haengen"
+      ],
       "focus": [
-        "oberer-ruecken"
+        "oberer-ruecken",
+        "allgemeine-kraft"
       ],
       "setupHints": [
         "Mehr Gegengewicht bedeutet mehr Hilfe.",
@@ -882,7 +954,9 @@
       "phase": 1,
       "unit": "reps",
       "tags": [],
-      "focus": [],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Sitzhöhe so, dass die Griffe auf Brusthöhe sind.",
         "Rücken und Kopf an die Lehne."
@@ -917,7 +991,9 @@
       "phase": 2,
       "unit": "reps",
       "tags": [],
-      "focus": [],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Mit den Hanteln auf den Oberschenkeln hinsetzen und zurückrollen.",
         "Füße fest am Boden."
@@ -951,8 +1027,13 @@
       "level": 2,
       "phase": 2,
       "unit": "reps",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "belastet:schulter",
+        "belastet:handgelenk"
+      ],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Augen unter der Stange, Füße fest am Boden.",
         "Sicherheitsablagen oder Spotter nutzen."
@@ -983,8 +1064,12 @@
       "level": 2,
       "phase": 2,
       "unit": "reps",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "belastet:schulter"
+      ],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Bank auf etwa 30 Grad stellen.",
         "Hanteln auf den Oberschenkeln, dann zurücklegen."
@@ -1015,8 +1100,12 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "belastet:handgelenk"
+      ],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Hände schulterbreit auf eine stabile Bank oder Kante.",
         "Je höher die Kante, desto leichter."
@@ -1120,8 +1209,13 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "belastet:schulter",
+        "bewegung:ueberkopf"
+      ],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Sitzhöhe: Griffe starten auf Schulterhöhe.",
         "Neutraler Griff, Handflächen zeigen zueinander."
@@ -1153,9 +1247,14 @@
       "phase": 2,
       "unit": "reps",
       "tags": [
-        "nackendruecken"
+        "belastet:schulter",
+        "belastet:nacken",
+        "belastet:lws",
+        "bewegung:ueberkopf"
       ],
-      "focus": [],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Stange auf Schulterhöhe aus dem Rack nehmen.",
         "Griff knapp schulterbreit."
@@ -1186,8 +1285,13 @@
       "level": 2,
       "phase": 2,
       "unit": "reps",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "belastet:schulter",
+        "bewegung:ueberkopf"
+      ],
+      "focus": [
+        "allgemeine-kraft"
+      ],
       "setupHints": [
         "Bank fast senkrecht stellen.",
         "Hanteln auf Schulterhöhe, Handflächen nach vorne oder zueinander."
@@ -1220,7 +1324,7 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "schultergürtel"
+        "schulterguertel"
       ],
       "setupHints": [
         "Leichte Kurzhanteln wählen.",
@@ -1252,7 +1356,9 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:ellbogen"
+      ],
       "focus": [],
       "setupHints": [
         "Aufrecht stehen, Hanteln neben dem Körper.",
@@ -1286,7 +1392,9 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:ellbogen"
+      ],
       "focus": [],
       "setupHints": [
         "Hanteln neben dem Körper, Handflächen zueinander."
@@ -1319,7 +1427,9 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:ellbogen"
+      ],
       "focus": [],
       "setupHints": [
         "Seil oder Stange am oberen Kabel.",
@@ -1353,7 +1463,11 @@
       "level": 1,
       "phase": 1,
       "unit": "reps",
-      "tags": [],
+      "tags": [
+        "belastet:schulter",
+        "belastet:ellbogen",
+        "belastet:handgelenk"
+      ],
       "focus": [],
       "setupHints": [
         "Gegengewicht wählen, mehr Gewicht bedeutet mehr Hilfe.",
@@ -1389,7 +1503,7 @@
       "unit": "seconds",
       "tags": [],
       "focus": [
-        "rumpf"
+        "core-stabilitaet"
       ],
       "setupHints": [
         "Unterarme unter den Schultern.",
@@ -1426,7 +1540,7 @@
       "unit": "seconds",
       "tags": [],
       "focus": [
-        "rumpf"
+        "core-stabilitaet"
       ],
       "setupHints": [
         "Seitlich liegen, Unterarm unter der Schulter.",
@@ -1463,7 +1577,7 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "rumpf"
+        "core-stabilitaet"
       ],
       "setupHints": [
         "Kabel auf Brusthöhe, seitlich zum Turm stellen.",
@@ -1500,8 +1614,7 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "rumpf",
-        "haltung"
+        "core-stabilitaet"
       ],
       "setupHints": [
         "Rückenlage, Arme zur Decke.",
@@ -1538,9 +1651,9 @@
       "unit": "seconds",
       "tags": [],
       "focus": [
-        "rumpf",
+        "core-stabilitaet",
         "knochendichte",
-        "schultergürtel"
+        "schulterguertel"
       ],
       "setupHints": [
         "Zwei schwere Kurzhanteln oder Kettlebells.",
@@ -1575,9 +1688,11 @@
       "level": 2,
       "phase": 2,
       "unit": "seconds",
-      "tags": [],
+      "tags": [
+        "belastet:lws"
+      ],
       "focus": [
-        "rumpf",
+        "core-stabilitaet",
         "knochendichte"
       ],
       "setupHints": [
@@ -1611,9 +1726,13 @@
       "phase": 1,
       "unit": "reps",
       "tags": [
-        "crunches"
+        "belastet:bauchraum",
+        "belastet:nacken",
+        "bewegung:bauchpressen"
       ],
-      "focus": [],
+      "focus": [
+        "core-stabilitaet"
+      ],
       "setupHints": [
         "Rückenlage, Füße aufgestellt.",
         "Hände an die Schläfen."
@@ -1648,10 +1767,15 @@
       "phase": 2,
       "unit": "reps",
       "tags": [
-        "crunches",
-        "bauchdruck"
+        "belastet:bauchraum",
+        "belastet:schulter",
+        "belastet:lws",
+        "bewegung:bauchpressen",
+        "bewegung:haengen"
       ],
-      "focus": [],
+      "focus": [
+        "core-stabilitaet"
+      ],
       "setupHints": [
         "An einer Stange hängen, Schultern aktiv.",
         "Einsteiger: Knie angewinkelt heben."
@@ -1684,8 +1808,7 @@
       "unit": "reps",
       "tags": [],
       "focus": [
-        "rumpf",
-        "haltung"
+        "core-stabilitaet"
       ],
       "setupHints": [
         "Vierfüßlerstand, Hände unter den Schultern.",
@@ -1720,10 +1843,12 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
+      "tags": [
+        "mobilisiert:bws"
+      ],
       "focus": [
         "oberer-ruecken",
-        "haltung"
+        "beweglichkeit"
       ],
       "setupHints": [
         "Vierfüßlerstand oder Seitlage mit angewinkelten Knien."
@@ -1757,9 +1882,12 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
+      "tags": [
+        "mobilisiert:bws",
+        "mobilisiert:lws"
+      ],
       "focus": [
-        "haltung"
+        "beweglichkeit"
       ],
       "setupHints": [
         "Vierfüßlerstand, Hände unter den Schultern."
@@ -1793,10 +1921,12 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
+      "tags": [
+        "mobilisiert:schulter"
+      ],
       "focus": [
-        "schultergürtel",
-        "haltung"
+        "schulterguertel",
+        "beweglichkeit"
       ],
       "setupHints": [
         "Unterarm in Schulterhöhe an den Türrahmen legen."
@@ -1830,9 +1960,13 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
+      "tags": [
+        "mobilisiert:schulter",
+        "mobilisiert:nacken"
+      ],
       "focus": [
-        "schultergürtel"
+        "schulterguertel",
+        "beweglichkeit"
       ],
       "setupHints": [
         "Aufrecht stehen, Arme locker."
@@ -1866,8 +2000,12 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "mobilisiert:nacken"
+      ],
+      "focus": [
+        "beweglichkeit"
+      ],
       "setupHints": [
         "Aufrecht sitzen oder stehen."
       ],
@@ -1900,9 +2038,12 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
+      "tags": [
+        "mobilisiert:bws"
+      ],
       "focus": [
-        "oberer-ruecken"
+        "oberer-ruecken",
+        "beweglichkeit"
       ],
       "setupHints": [
         "Rolle quer unter die Schulterblätter.",
@@ -1937,8 +2078,13 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "mobilisiert:huefte",
+        "mobilisiert:lws"
+      ],
+      "focus": [
+        "beweglichkeit"
+      ],
       "setupHints": [
         "Halbkniestand, hinteres Knie auf einer Matte."
       ],
@@ -1971,8 +2117,12 @@
       "level": 1,
       "phase": 1,
       "unit": "seconds",
-      "tags": [],
-      "focus": [],
+      "tags": [
+        "mobilisiert:huefte"
+      ],
+      "focus": [
+        "beweglichkeit"
+      ],
       "setupHints": [
         "Im Sitzen beide Beine im 90 Grad Winkel ablegen."
       ],
@@ -1993,6 +2143,126 @@
       ],
       "youtubeSearch": "90/90 Hüftmobilität richtige Ausführung",
       "svg": "hueft-mobilitaet-90-90.svg"
+    },
+    {
+      "id": "handgelenk-mobilisation",
+      "name": "Handgelenke mobilisieren",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "mobilisiert:handgelenk",
+        "mobilisiert:ellbogen"
+      ],
+      "focus": [
+        "beweglichkeit"
+      ],
+      "setupHints": [
+        "Aufrecht stehen oder sitzen, Arme locker nach vorne strecken.",
+        "Schultern bleiben entspannt unten."
+      ],
+      "cues": [
+        "Hände langsam nach oben und unten beugen.",
+        "Danach Kreise in beide Richtungen.",
+        "Nur so weit, wie es angenehm ist."
+      ],
+      "commonMistakes": [
+        "Mit Schwung statt langsam bewegen.",
+        "Die Schultern ziehen zu den Ohren."
+      ],
+      "alternatives": [
+        "schulterkreise",
+        "tuerrahmen-dehnung",
+        "katze-kuh",
+        "bws-rotation"
+      ],
+      "youtubeSearch": "Handgelenk Mobilisation Übung",
+      "svg": "handgelenk-mobilisation.svg"
+    },
+    {
+      "id": "fersenrutschen",
+      "name": "Fersenrutschen",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "mobilisiert:knie"
+      ],
+      "focus": [
+        "beweglichkeit"
+      ],
+      "setupHints": [
+        "Auf den Rücken legen, Beine lang.",
+        "Die Ferse liegt auf der Matte, gern auf einem Tuch."
+      ],
+      "cues": [
+        "Ferse langsam Richtung Gesäß ziehen.",
+        "Knie beugen, bis es angenehm dehnt.",
+        "Ruhig wieder ausstrecken, Seite wechseln."
+      ],
+      "commonMistakes": [
+        "Die Ferse hebt von der Matte ab.",
+        "Das Becken kippt mit."
+      ],
+      "alternatives": [
+        "hueft-mobilitaet-90-90",
+        "hueftbeuger-dehnung",
+        "katze-kuh",
+        "bauchatmung"
+      ],
+      "youtubeSearch": "Fersenrutschen Knie Mobilisation",
+      "svg": "fersenrutschen.svg"
+    },
+    {
+      "id": "bauchatmung",
+      "name": "Bauchatmung in Rückenlage",
+      "muscleGroup": "mobility",
+      "pattern": "mobilitaet",
+      "plane": null,
+      "compound": false,
+      "equipment": "matte",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "mobilisiert:bauchraum",
+        "mobilisiert:lws"
+      ],
+      "focus": [
+        "beweglichkeit",
+        "core-stabilitaet"
+      ],
+      "setupHints": [
+        "Auf den Rücken legen, Knie aufgestellt.",
+        "Eine Hand liegt auf dem Bauch."
+      ],
+      "cues": [
+        "Durch die Nase einatmen, der Bauch hebt sich.",
+        "Langsam ausatmen, der Bauch sinkt.",
+        "Schultern und Nacken bleiben locker."
+      ],
+      "commonMistakes": [
+        "Nur in die Brust atmen.",
+        "Beim Ausatmen pressen."
+      ],
+      "alternatives": [
+        "katze-kuh",
+        "hueftbeuger-dehnung",
+        "fersenrutschen",
+        "bws-rotation"
+      ],
+      "youtubeSearch": "Bauchatmung Rückenlage Zwerchfell",
+      "svg": "bauchatmung.svg"
     }
   ]
 }

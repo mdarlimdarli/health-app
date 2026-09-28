@@ -1,14 +1,17 @@
 /*
-  Trainingsmodul: Übersicht (#/training), laufende Einheit (#/training/einheit)
-  und Fortschritt (#/training/fortschritt).
-  Pläne erzeugt js/planner.js aus profile.training, die Übungen stehen in data/exercises.json.
+  Trainingsmodul: Übersicht (#/training), laufende Einheit (#/training/einheit),
+  Fortschritt (#/training/fortschritt) und Anpassen (#/training/anpassen).
+  Pläne erzeugt js/planner.js aus profile.training, gespeichert über js/training-data.js,
+  die Übungen stehen in data/exercises.json.
   Eine laufende Einheit liegt als workouts-Datensatz ohne finishedAt in IndexedDB,
   jeder geloggte Satz wird sofort gespeichert.
 */
 
 import * as db from '../db.js';
 import { getProfile } from '../profile.js';
-import { generatePlans, prescription, suggestProgression, shouldSuggestPhaseChange, estimate1RM, isAllowed, SESSIONS_PER_PHASE } from '../planner.js';
+import { prescription, suggestProgression, shouldSuggestPhaseChange, estimate1RM, isAllowed, SESSIONS_PER_PHASE } from '../planner.js';
+import { loadLibrary, loadPrefs, savePref, currentPhase, setPhase, loadPlans, loadWorkouts, finishedOf, activeOf, planChanges, dismissPlanChanges } from '../training-data.js';
+import { changesCard } from './training-adjust.js';
 import { toast, confirmDialog, todayISO, el } from '../ui.js';
 import { weekBar } from '../week-bar.js';
 
@@ -16,57 +19,6 @@ const YOUTUBE_SEARCH = 'https://www.youtube.com/results?search_query=';
 const WEIGHT_STEP = 1.25;
 const SNOOZE_SESSIONS = 8;
 const BODYWEIGHT = new Set(['koerpergewicht', 'matte']);
-
-let library = null;
-
-/* Daten */
-
-async function loadLibrary() {
-  if (!library) {
-    const response = await fetch('./data/exercises.json');
-    const data = await response.json();
-    library = new Map(data.exercises.map((exercise) => [exercise.id, exercise]));
-  }
-  return library;
-}
-
-async function loadPrefs() {
-  const list = await db.getAll('exercisePrefs');
-  return Object.fromEntries(list.map((pref) => [pref.exerciseId, pref]));
-}
-
-async function savePref(exerciseId, changes) {
-  const current = (await db.get('exercisePrefs', exerciseId)) ?? { exerciseId, disliked: false, replacedBy: null, lastWeight: null, lastReps: null };
-  return db.put('exercisePrefs', { ...current, ...changes });
-}
-
-async function currentPhase() {
-  const stored = await db.getSetting('trainingPhase');
-  return stored ?? (getProfile().training.startPhase === 2 ? 2 : 1);
-}
-
-// Handgeschriebene data/plans.json hat Vorrang, sonst aus dem Profil erzeugen
-async function loadPlans(lib) {
-  try {
-    const response = await fetch('./data/plans.json', { cache: 'no-cache' });
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data.plans) && data.plans.length) return { ...data, source: 'datei' };
-    }
-  } catch {
-    // keine Überschreibung vorhanden
-  }
-  const result = generatePlans({ training: getProfile().training, exercises: [...lib.values()], prefs: await loadPrefs(), phase: await currentPhase() });
-  return { ...result, source: 'profil' };
-}
-
-async function loadWorkouts() {
-  const list = await db.getAll('workouts');
-  return list.sort((a, b) => (a.startedAt < b.startedAt ? -1 : 1));
-}
-
-const finishedOf = (list) => list.filter((workout) => workout.finishedAt);
-const activeOf = (list) => list.filter((workout) => !workout.finishedAt).at(-1) ?? null;
 
 /* Datum und Zahlen */
 
@@ -102,6 +54,7 @@ function repLabel(exercise, [min, max]) {
 }
 
 const isWeighted = (exercise) => !BODYWEIGHT.has(exercise.equipment);
+const riskTags = (exercise) => exercise.tags.filter((tag) => /^(belastet|bewegung):/.test(tag)).length;
 
 // Letzte Sätze einer Übung aus der jüngsten abgeschlossenen Einheit
 function lastSetsFor(exerciseId, finished) {
@@ -367,12 +320,24 @@ const OVERVIEW = `
       </div>
     </div>
 
+    <div data-changes></div>
+
     <div class="card next-card">
-      <p class="label">Nächste Einheit</p>
+      <div class="card-head">
+        <p class="label">Nächste Einheit</p>
+        <a class="button button--small" href="#/training/anpassen" data-adjust>Anpassen</a>
+      </div>
       <h2 data-next-name></h2>
       <p class="secondary" data-next-meta></p>
       <ol class="plan-list" data-next-list></ol>
       <button class="button button--primary button--large" type="button" data-action="start">Einheit starten</button>
+      <p class="hint" data-adjust-locked hidden>Anpassen ist gesperrt, solange eine Einheit läuft. Änderungen gelten ab der nächsten.</p>
+    </div>
+
+    <div class="card guidance-card" data-guidance hidden>
+      <p class="label">Meine Vorgaben</p>
+      <p class="guidance-text" data-guidance-text></p>
+      <a class="button button--small" href="#/profil">Bearbeiten</a>
     </div>
 
     <div class="card" data-last hidden>
@@ -431,10 +396,33 @@ async function renderOverview(root, lib) {
   const trainedDays = new Set(finished.filter((workout) => workout.date >= monday).map((workout) => workout.date));
   $('[data-week-bar]').replaceWith(weekBar({ date: todayISO(), today: todayISO(), tone: 'mandarine', marked: trainedDays, label: 'Trainingstage dieser Woche' }));
 
-  // Laufende Einheit
+  // Laufende Einheit: Anpassen gesperrt, Änderungen gelten ab der nächsten
   if (active) {
     $('[data-active]').hidden = false;
     $('[data-active-name]').textContent = active.planName ?? `Plan ${active.planId}`;
+    const locked = el('button', 'button button--small', 'Anpassen');
+    locked.type = 'button';
+    locked.disabled = true;
+    $('[data-adjust]').replaceWith(locked);
+    $('[data-adjust-locked]').hidden = false;
+  }
+
+  // Was sich beim letzten Neuaufbau geändert hat, bis zur Bestätigung
+  const changes = await planChanges();
+  if (changes && plansData.source === 'profil') {
+    $('[data-changes]').replaceWith(changesCard(changes, {
+      onDismiss: async (card) => {
+        await dismissPlanChanges();
+        card.remove();
+      },
+    }));
+  }
+
+  // Vorgaben von Arzt, Physio oder Osteopath zum Nachlesen im Studio
+  const guidance = getProfile().training.guidance;
+  if (guidance) {
+    $('[data-guidance]').hidden = false;
+    $('[data-guidance-text]').textContent = guidance;
   }
 
   // Nächster Plan
@@ -468,8 +456,7 @@ async function renderOverview(root, lib) {
     $('[data-phase-card]').hidden = false;
     $('[data-phase-text]').textContent = `Du hast ${inPhase} Einheiten in Phase 1 geschafft. Bereit für Phase 2 mit freien Gewichten? Dein Plan wird dann neu zusammengestellt.`;
     $('[data-action="phase-up"]').addEventListener('click', async () => {
-      await db.setSetting('trainingPhase', 2);
-      await db.setSetting('trainingPhaseSince', todayISO());
+      await setPhase(2);
       toast('Phase 2 aktiv');
       renderOverview(root, lib);
     });
@@ -653,8 +640,8 @@ function exerciseCard(ctx) {
   // Erlaubte Alternativen, ohne Belastungs-Tags und aus der aktuellen Phase zuerst
   const allowedAlternatives = () => exercise.alternatives
     .map((id) => lib.get(id))
-    .filter((alt) => alt && isAllowed(alt, training.avoidTags ?? [], prefs) && !workout.entries.some((other) => other.exerciseId === alt.id))
-    .sort((a, b) => (a.tags.length > 0) - (b.tags.length > 0) || (a.phase > phase) - (b.phase > phase));
+    .filter((alt) => alt && isAllowed(alt, training, prefs) && !workout.entries.some((other) => other.exerciseId === alt.id))
+    .sort((a, b) => riskTags(a) - riskTags(b) || (a.phase > phase) - (b.phase > phase));
 
   const swap = async (altId) => {
     const alt = lib.get(altId);
@@ -957,6 +944,7 @@ export async function render(root) {
   if (sub === 'einheit') return renderSession(root, lib);
   releaseScreen();
   stopRest();
+  if (sub === 'anpassen') return (await import('./training-adjust.js')).renderAdjust(root, lib);
   if (sub === 'fortschritt') return renderProgress(root, lib);
   return renderOverview(root, lib);
 }

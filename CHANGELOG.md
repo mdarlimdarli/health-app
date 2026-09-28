@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1 (28.09.2026): flexible Trainingsanpassung
+
+- **Drei Ebenen statt fester Schonungen:** Körperregionen schonen (Nacken, Schulter, Lendenwirbelsäule, Brustwirbelsäule, Hüfte, Knie, Handgelenk, Ellbogen, Bauchraum), Bewegungen vermeiden (Überkopf, Last hinter dem Kopf, Wirbelsäule unter Last beugen oder rotieren, Bauchpressen, tiefe Kniebeuge, Sprünge und Stöße, einbeinige Stabilität, Hängen am Griff) und Aufbauen (oberer Rücken, Schultergürtel, Core-Stabilität, Hüfte und Gesäß, Beine, Knochendichte, Beweglichkeit, allgemeine Kraft).
+- **Übungsbibliothek:** jede Übung mit Tags für belastete Regionen (`belastet:<region>`) und Bewegungsmuster (`bewegung:<id>`), Mobility mit `mobilisiert:<region>`. Drei neue Mobility-Übungen mit Grafik: Handgelenke mobilisieren, Fersenrutschen, Bauchatmung in Rückenlage. Für jede Region gibt es jetzt leichte Mobility.
+- **Planer:** filtert nach Regionen und Bewegungen, nimmt für jede geschonte Region Mobility in den Aufwärmblock, mit Fokus Beweglichkeit sechs statt vier Übungen. Geloggte und bisherige Übungen bleiben bevorzugt, Ausgeschlossenes ersetzen Alternativen derselben Muskelgruppe.
+- **Anpassen im Trainings-Tab:** Regionen, Bewegungen, Fokus, Tage pro Woche und Phase direkt ändern, jede Änderung speichert ins Profil und baut die Pläne sofort neu. Gesperrt während einer laufenden Einheit.
+- **Was sich geändert hat:** nach jedem Neuaufbau eine Übersicht mit entfernten und neuen Übungen samt Grund, zum Beispiel „Latzug in den Nacken entfernt, weil Last hinter dem Kopf“. Mehrere Schritte werden zusammengefasst, bis du sie bestätigst.
+- **Befristete Schonung:** optionales Datum „bis“ je Region. Danach fragt die Startseite „weiter schonen oder aufheben?“, entfernt wird nichts automatisch.
+- **Meine Vorgaben:** Freitext für Vorgaben von Arzt, Physio oder Osteopath, im Trainings-Tab zum Nachlesen im Studio, ohne Logik. Der Auszug für die Beratung nennt Regionen, Bewegungen, Fokus und Vorgaben.
+- **Profil Version 2:** `training.avoidTags` ist ersetzt durch `protectRegions`, `avoidMovements`, `focus` und `guidance`. Alte Profile werden beim Laden und Importieren automatisch migriert und migriert zurückgespeichert.
+- Pläne werden gespeichert und nur bei geänderten Vorgaben neu gebaut. Service Worker v14.
+
 ## v1.0 (28.09.2026)
 
 Erste vollständige Fassung als PWA für das iPhone (375 x 667 px, Safari, Home-Bildschirm).
@@ -33,6 +45,7 @@ Erste vollständige Fassung als PWA für das iPhone (375 x 667 px, Safari, Home-
 - **Essensplan in der App bearbeiten:** Gerichte und Wochenplan direkt ändern statt über eine Datei, mit Export für die Beratung.
 - **Einkaufsliste** aus dem Wochenplan, gruppiert nach Kategorie, offline abhakbar.
 - **Trainingsplan-Editor:** Übungen, Sätze und Reihenfolge je Plan von Hand festlegen, ohne `data/plans.json`.
+- **Mehr Übungen für eingeschränkte Profile:** zum Beispiel knieschonende Beinübungen und Varianten ohne Überkopf, damit auch bei mehreren Schonungen jede Einheit vollständig bleibt.
 - **Messwerte-Diagramme** über Wochen und Monate, Export als CSV.
 - **Wochenrückblick** am Sonntag: Einheiten, Einnahmen, Check-ins als Zahlen, weiterhin ohne Interpretation.
 - **Konflikte zusammenführen:** bei einer fremden Sicherung auf GitHub Einträge zusammenführen statt nur wiederherstellen oder überschreiben.

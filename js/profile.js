@@ -8,8 +8,10 @@
 
 import * as db from './db.js';
 import { todayISO } from './ui.js';
+import { normalizeTraining } from './training-options.js';
 
-export const PROFILE_VERSION = 1;
+// Version 2: training.avoidTags ersetzt durch protectRegions, avoidMovements, focus und guidance
+export const PROFILE_VERSION = 2;
 
 // Neutrale Standardwerte für fehlende Felder
 const DEFAULTS = {
@@ -18,7 +20,7 @@ const DEFAULTS = {
   language: 'de',
   birthYear: null,
   cycleTracking: false,
-  training: { daysPerWeek: 2, level: 1, goal: '', focus: [], avoidTags: [], pullPushRatio: '1:1', startPhase: 1 },
+  training: { daysPerWeek: 2, level: 1, goal: '', protectRegions: [], avoidMovements: [], focus: [], guidance: '', pullPushRatio: '1:1', startPhase: 1 },
   checkin: {
     sliders: ['energy', 'digestion', 'pain', 'sleep'],
     painSideToggle: { enabled: false, label: '' },
@@ -59,8 +61,8 @@ function normalize(raw) {
   result.displayName = typeof result.displayName === 'string' ? result.displayName.trim() : '';
   result.birthYear = Number.isInteger(result.birthYear) ? result.birthYear : null;
   result.cycleTracking = result.cycleTracking === true;
-  result.training.avoidTags = stringList(result.training.avoidTags);
-  result.training.focus = stringList(result.training.focus);
+  // Migriert alte Schonungs-Tags (Version 1) auf Regionen und Bewegungen
+  result.training = normalizeTraining(isObject(source.training) ? { ...DEFAULTS.training, ...source.training } : DEFAULTS.training);
   result.diet.intolerances = stringList(result.diet.intolerances);
   result.diet.cuisines = stringList(result.diet.cuisines);
   result.diet.dislikes = stringList(result.diet.dislikes);
@@ -82,6 +84,8 @@ export function onProfileChange(listener) {
 
 export async function loadProfile() {
   const stored = await db.getSetting('profile');
+  // Älteres Schema einmalig migriert zurückschreiben, damit auch die Sicherung das neue enthält
+  if (stored && Number(stored.version) < PROFILE_VERSION) return saveProfile(stored);
   profile = stored ? normalize(stored) : null;
   emitChange();
   return profile;

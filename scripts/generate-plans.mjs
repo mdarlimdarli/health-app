@@ -14,6 +14,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { generatePlans, validateLibrary } from '../js/planner.js';
+import { normalizeTraining } from '../js/training-options.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -33,7 +34,8 @@ if (errors.length) {
 }
 
 const profile = JSON.parse(await readFile(profilePath, 'utf8'));
-const training = profile.training ?? {};
+// Auch Profile im alten Schema (avoidTags) werden migriert
+const training = normalizeTraining(profile.training ?? {});
 const result = generatePlans({
   training,
   exercises: library.exercises,

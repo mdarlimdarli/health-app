@@ -2,6 +2,7 @@
   Startseite (Tab Heute): Begrüßung, Datum, Zyklustag (nur mit cycleTracking),
   Aura aus den Check-in-Werten (ohne Check-in ruhig in Butter, Rosé, Periwinkle),
   fällige Medikamente (wichtige zuerst, direkt abhakbar),
+  abgelaufene Schonungen (nie automatisch entfernt, die Person entscheidet),
   nächstes Training und die Gerichte des Tages, sofern ein Essensplan existiert.
 */
 
@@ -11,6 +12,7 @@ import { isMeasurement, slotLabel } from '../meds-schedule.js';
 import { SLIDER_META, activeSliders, getCheckin, hasValues, cycleDayFor, auraBlobs } from '../checkin-core.js';
 import { setAura, AURAS } from '../aura.js';
 import { todayISO, toast, el } from '../ui.js';
+import { expiredRegions, regionLabel } from '../training-options.js';
 
 const TIME_ZONE = 'Europe/Berlin';
 
@@ -118,6 +120,35 @@ async function renderDue(container) {
   container.append(card);
 }
 
+/* Abgelaufene Schonung: weiter schonen (ohne Enddatum) oder aufheben */
+
+async function renderProtection(container) {
+  const training = getProfile().training;
+  const expired = expiredRegions(training, todayISO());
+  container.replaceChildren();
+  for (const entry of expired) {
+    const card = el('div', 'card stack-tight');
+    const label = regionLabel(entry.region);
+    card.append(el('p', 'label', 'Schonung'), el('p', null, `Schonung ${label} ist abgelaufen, weiter schonen oder aufheben?`));
+    const keep = el('button', 'button', 'Weiter schonen');
+    const lift = el('button', 'button button--primary', 'Aufheben');
+    keep.type = 'button';
+    lift.type = 'button';
+    const update = async (next, message) => {
+      const { saveTraining } = await import('../training-data.js');
+      await saveTraining({ protectRegions: next });
+      toast(message);
+      renderProtection(container);
+    };
+    keep.addEventListener('click', () => update(getProfile().training.protectRegions.map((item) => (item.region === entry.region ? { ...item, until: null } : item)), `${label} wird weiter geschont`));
+    lift.addEventListener('click', () => update(getProfile().training.protectRegions.filter((item) => item.region !== entry.region), `Schonung ${label} aufgehoben, der Plan wird neu aufgebaut`));
+    const actions = el('div', 'button-row');
+    actions.append(keep, lift);
+    card.append(actions);
+    container.append(card);
+  }
+}
+
 /* Nächstes Training */
 
 async function renderTraining(container) {
@@ -170,10 +201,11 @@ export async function render(root) {
   intro.append(el('p', 'label on-aura', weekday), el('h2', null, greeting(hour)), line);
 
   const dayArea = el('div');
+  const protection = el('div', 'stack-tight');
   const due = el('div');
   const training = el('div');
   const meal = el('div');
-  section.append(intro, dayArea, due, training, meal);
+  section.append(intro, dayArea, due, protection, training, meal);
   root.replaceChildren(section);
-  await Promise.all([renderDay(dayArea), renderDue(due), renderTraining(training), renderMeal(meal)]);
+  await Promise.all([renderDay(dayArea), renderProtection(protection), renderDue(due), renderTraining(training), renderMeal(meal)]);
 }

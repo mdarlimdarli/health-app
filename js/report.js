@@ -11,6 +11,7 @@ import { todayISO } from './ui.js';
 import { SLIDER_META, activeSliders, cycleDayFor } from './checkin-core.js';
 import { adherence, isMeasurement, describeSchedule } from './meds-schedule.js';
 import { estimate1RM } from './planner.js';
+import { regionLabel, movementLabel, focusLabel } from './training-options.js';
 import { INTOLERANCE_LABELS } from './food-rules.js';
 
 function addDays(iso, days) {
@@ -58,7 +59,10 @@ export async function buildReport({ weeks = 4, anonymize = true } = {}) {
     profile.birthYear ? `Geburtsjahr: ${profile.birthYear}` : null,
     `Zyklus-Tracking: ${profile.cycleTracking ? 'ja' : 'nein'}`,
     `Training: ${t.daysPerWeek} Tage pro Woche, Level ${t.level}, Phase ${(await db.getSetting('trainingPhase')) ?? t.startPhase}`,
-    t.avoidTags.length ? `Schonungen: ${t.avoidTags.map(tagText).join(', ')}` : null,
+    t.protectRegions.length ? `Regionen schonen: ${t.protectRegions.map((entry) => `${regionLabel(entry.region)}${entry.until ? ` (bis ${german(entry.until)})` : ''}`).join(', ')}` : null,
+    t.avoidMovements.length ? `Bewegungen vermeiden: ${t.avoidMovements.map(movementLabel).join(', ')}` : null,
+    t.focus.length ? `Aufbauen: ${t.focus.map(focusLabel).join(', ')}` : null,
+    t.guidance ? `Vorgaben von Arzt, Physio oder Osteopath: ${t.guidance.replace(/\s+/g, ' ')}` : null,
     d.intolerances.length ? `Unverträglichkeiten: ${d.intolerances.map((k) => INTOLERANCE_LABELS[k] ?? k).join(', ')}` : null,
     d.dislikes.length ? `Abneigungen: ${d.dislikes.map(tagText).join(', ')}` : null,
     drugs.length ? `Medikamente: ${drugs.filter((m) => m.active !== false).map((m) => `${medName(m)}${anonymize ? '' : m.dosage ? ` (${m.dosage})` : ''}, ${describeSchedule(m)}`).join('; ')}` : null,

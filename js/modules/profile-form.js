@@ -7,15 +7,7 @@
 
 import { getProfile, saveProfile, parseProfileFile, importProfile } from '../profile.js';
 import { toast, el } from '../ui.js';
-
-// Schonungs-Tags: Übungen mit diesen Tags schlägt die App nie vor
-const AVOID_OPTIONS = [
-  ['bauchdruck', 'Bauchraum schonen'],
-  ['last-hinter-kopf', 'Nichts hinter dem Kopf'],
-  ['schweres-kreuzheben', 'Kein schweres Kreuzheben'],
-  ['crunches', 'Keine Crunches'],
-  ['nackendruecken', 'Kein Nackendrücken'],
-];
+import { trainingFields } from './training-fields.js';
 
 const INTOLERANCE_OPTIONS = [
   ['fructose', 'Fruktose'],
@@ -101,6 +93,7 @@ const TEMPLATE = `
 
     <section class="stack-tight">
       <h2>Training</h2>
+      <p class="secondary">Diese Angaben ersetzen keine Beratung. Trag hier ein, was dir Physio, Osteopath oder Arzt gesagt haben.</p>
       <div class="range-block card">
         <div class="blob blob--mandarine" data-blob="daysPerWeek"></div>
         <span class="label">Tage pro Woche</span>
@@ -114,10 +107,7 @@ const TEMPLATE = `
         <p class="secondary" data-level-name></p>
         <input class="range" name="level" type="range" min="1" max="3" step="1" aria-label="Trainingslevel">
       </div>
-      <fieldset class="fieldset">
-        <legend class="label">Schonen</legend>
-        <div class="check-list" data-group="avoidTags"></div>
-      </fieldset>
+      <div data-training-fields></div>
     </section>
 
     <section class="stack-tight">
@@ -168,7 +158,8 @@ export async function render(root, { route } = {}) {
   form.daysPerWeek.value = String(profile.training.daysPerWeek);
   form.level.value = String(profile.training.level);
   form.dislikes.value = profile.diet.dislikes.map(tagLabel).join(', ');
-  choiceGroup($('[data-group="avoidTags"]'), 'avoidTags', AVOID_OPTIONS, profile.training.avoidTags, 'check-row');
+  const fields = trainingFields(profile.training, { guidance: true });
+  $('[data-training-fields]').replaceWith(fields.node);
   choiceGroup($('[data-group="intolerances"]'), 'intolerances', INTOLERANCE_OPTIONS, profile.diet.intolerances, 'chip chip--salbei');
   choiceGroup($('[data-group="cuisines"]'), 'cuisines', CUISINE_OPTIONS, profile.diet.cuisines, 'chip chip--salbei');
 
@@ -210,7 +201,7 @@ export async function render(root, { route } = {}) {
     next.cycleTracking = form.cycleTracking.checked;
     next.training.daysPerWeek = Number(form.daysPerWeek.value);
     next.training.level = Number(form.level.value);
-    next.training.avoidTags = checkedValues(form, 'avoidTags');
+    Object.assign(next.training, fields.value());
     next.diet.intolerances = checkedValues(form, 'intolerances');
     next.diet.cuisines = checkedValues(form, 'cuisines');
     next.diet.dislikes = [...new Set(form.dislikes.value.split(',').map(slugify).filter(Boolean))];
