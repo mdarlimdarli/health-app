@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updatedAt": "2026-09-28",
-  "note": "Beispieldatei mit Platzhalter-Inhalten. Die echten Inhalte kommen später von außen. Angaben ohne Gewähr.",
+  "note": "Feste Testdatei für scripts/test-food.mjs. Nicht die echte data/meals.json.",
   "foods": [
     { "id": "haferflocken", "name": "Haferflocken", "category": "Getreide", "fructose": "niedrig", "lactose": false, "histamine": "niedrig", "gluten": true, "note": "Glutenfrei nur mit entsprechender Kennzeichnung." },
     { "id": "blaubeeren", "name": "Blaubeeren", "category": "Obst", "fructose": "niedrig", "lactose": false, "histamine": "niedrig", "gluten": false, "note": "" },

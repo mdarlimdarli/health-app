@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /*
-  Tests für Ampel, Ausschlüsse und Vorschläge. Synthetische Profile, dazu die Beispieldatei.
+  Tests für Ampel, Ausschlüsse und Vorschläge. Synthetische Profile und eine feste Testdatei
+  (scripts/fixtures/meals.example.json). Der echte Plan data/meals.json wird nur auf das Schema geprüft,
+  denn sein Inhalt kommt von außen und ändert sich.
   Aufruf: node scripts/test-food.mjs
 */
 
@@ -11,7 +13,8 @@ import assert from 'node:assert/strict';
 import { foodRating, mealRating, isExcluded, candidates, resolveMeal, validateMeals } from '../js/food-rules.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const data = JSON.parse(await readFile(path.join(root, 'data', 'meals.json'), 'utf8'));
+const data = JSON.parse(await readFile(path.join(root, 'scripts', 'fixtures', 'meals.example.json'), 'utf8'));
+const live = JSON.parse(await readFile(path.join(root, 'data', 'meals.json'), 'utf8'));
 const foods = new Map(data.foods.map((f) => [f.id, f]));
 
 let passed = 0;
@@ -26,11 +29,17 @@ function test(name, fn) {
   }
 }
 
-test('Beispieldatei: 3 Gerichte, 12 Lebensmittel, gültig', () => {
+test('Testdatei: 3 Gerichte, 12 Lebensmittel, gültig', () => {
   assert.equal(data.meals.length, 3);
   assert.equal(data.foods.length, 12);
   assert.deepEqual(validateMeals(data), []);
-  assert.ok(data.foods.every((f) => !('ampel' in f) && !('rating' in f)), 'Ampel darf nicht in der Datei stehen');
+});
+
+test('Echter Plan data/meals.json: Schema gültig, keine Ampel in der Datei', () => {
+  assert.deepEqual(validateMeals(live), []);
+  assert.ok(live.foods.every((f) => !('ampel' in f) && !('rating' in f)), 'Ampel darf nicht in der Datei stehen');
+  const ids = new Set(live.foods.map((f) => f.id));
+  for (const meal of live.meals) for (const swap of meal.swaps ?? []) assert.ok(ids.has(swap.ingredient), `${meal.id}: Swap-Zutat ${swap.ingredient} fehlt`);
 });
 
 test('Ampel ohne Unverträglichkeiten ist neutral', () => {

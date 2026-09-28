@@ -16,7 +16,8 @@ export async function loadMeals({ fresh = false } = {}) {
     const response = await fetch('./data/meals.json', { cache: fresh ? 'reload' : 'no-cache' });
     if (!response.ok) return cache;
     const data = await response.json();
-    cache = { version: data.version ?? 0, updatedAt: data.updatedAt ?? null, foods: data.foods ?? [], meals: data.meals ?? [], weekPlan: data.weekPlan ?? [] };
+    const notes = Array.isArray(data.notes) ? data.notes : data.note ? [data.note] : [];
+    cache = { version: data.version ?? 0, updatedAt: data.updatedAt ?? null, notes, foods: data.foods ?? [], meals: data.meals ?? [], weekPlan: data.weekPlan ?? [] };
   } catch {
     // offline ohne Cache: bisheriger Stand bleibt
   }
