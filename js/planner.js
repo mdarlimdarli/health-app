@@ -5,6 +5,8 @@
   (Tage, Level, geschonte Regionen, vermiedene Bewegungen, Fokus, Verhältnis Zug zu Druck,
   Phase) kommen aus dem Profil.
   Übungen tragen Tags "belastet:<region>" und "bewegung:<id>", Mobility "mobilisiert:<region>".
+  Übungen mit "fokus:<id>" (z. B. Gleichgewicht) kommen nur mit diesem Fokus in den Plan,
+  je Einheit eine im Aufwärmblock, geschonte Regionen und vermiedene Bewegungen gelten auch dort.
   Vokabular und Labels: js/training-options.js.
 */
 
@@ -17,6 +19,8 @@ const MOBILITY_SECONDS = 75;
 const MOBILITY_COUNT = 4;
 // Mit Fokus Beweglichkeit zwei Mobility-Übungen mehr
 const MOBILITY_EXTRA = 2;
+// Fokus-Übungen im Aufwärmblock, z. B. Gleichgewicht je Seite
+const FOCUS_EXTRA_SECONDS = 90;
 const MAX_EXERCISES = 7;
 
 // Fokus-Begriffe, die eine Muskelgruppe meinen: dort mindestens zwei Übungen pro Einheit
@@ -129,6 +133,8 @@ export function prescription(exercise, level, phase) {
 
 /* Auswahl */
 
+const focusTagsOf = (exercise) => exercise.tags.filter((tag) => tag.startsWith('fokus:')).map((tag) => tag.slice(6));
+
 function planExerciseIds(plans = []) {
   return new Set(plans.flatMap((plan) => [...(plan.exercises ?? []), ...(plan.mobility ?? [])].map((entry) => entry.exerciseId)));
 }
@@ -159,8 +165,10 @@ function createContext({ training, exercises, prefs = {}, phase, history = [], p
     ratio: parseRatio(training.pullPushRatio),
     order: new Map(exercises.map((exercise, index) => [exercise.id, index])),
     byId,
-    pool: pool.filter((exercise) => exercise.pattern !== 'mobilitaet'),
+    pool: pool.filter((exercise) => exercise.pattern !== 'mobilitaet' && !focusTagsOf(exercise).length),
     mobility: pool.filter((exercise) => exercise.pattern === 'mobilitaet'),
+    // Übungen, die nur ein bestimmter Fokus holt, je Fokus-ID
+    focusExtras: Object.fromEntries(focus.map((item) => [item, pool.filter((exercise) => focusTagsOf(exercise).includes(item))])),
     used: new Map(),
   };
 }
@@ -322,7 +330,13 @@ function mobilityBlock(ctx, variant) {
     const exercise = rest[(variant * 2 + i) % rest.length];
     if (!block.includes(exercise)) block.push(exercise);
   }
-  return block.map((exercise) => ({ exerciseId: exercise.id, seconds: MOBILITY_SECONDS }));
+  const entries = block.map((exercise) => ({ exerciseId: exercise.id, seconds: MOBILITY_SECONDS }));
+  // Je Fokus mit eigenen Übungen eine davon, je Plan eine andere
+  for (const list of Object.values(ctx.focusExtras)) {
+    const ranked = [...list].sort((a, b) => ctx.order.get(a.id) - ctx.order.get(b.id));
+    if (ranked.length) entries.push({ exerciseId: ranked[variant % ranked.length].id, seconds: FOCUS_EXTRA_SECONDS });
+  }
+  return entries;
 }
 
 function toEntries(ctx, session) {
@@ -466,7 +480,7 @@ export function diffPlans(before, after, exercises) {
 /* Prüfung der Übungsbibliothek (für Script und Tests) */
 
 const REQUIRED = ['id', 'name', 'muscleGroup', 'pattern', 'equipment', 'level', 'phase', 'tags', 'setupHints', 'cues', 'commonMistakes', 'alternatives', 'youtubeSearch', 'svg'];
-const GROUPS = ['beine', 'ruecken', 'brust', 'schultern', 'arme', 'core', 'mobility'];
+const GROUPS = ['beine', 'ruecken', 'brust', 'schultern', 'arme', 'core', 'mobility', 'gleichgewicht'];
 
 export function validateLibrary(exercises) {
   const errors = [];
@@ -484,7 +498,9 @@ export function validateLibrary(exercises) {
     if (/watch\?v=|youtu\.be/.test(exercise.youtubeSearch)) errors.push(`${exercise.id}: youtubeSearch muss ein Suchbegriff sein, keine Video-ID.`);
     for (const tag of exercise.tags) {
       const [kind, id] = tag.split(':');
-      const known = kind === 'bewegung' ? MOVEMENT_IDS.includes(id) : (kind === 'belastet' || kind === 'mobilisiert') && REGION_IDS.includes(id);
+      const known = kind === 'bewegung' ? MOVEMENT_IDS.includes(id)
+        : kind === 'fokus' ? FOCUS_IDS.includes(id)
+          : (kind === 'belastet' || kind === 'mobilisiert') && REGION_IDS.includes(id);
       if (!known) errors.push(`${exercise.id}: unbekannter Tag ${tag}.`);
       if (kind === 'mobilisiert' && exercise.pattern !== 'mobilitaet') errors.push(`${exercise.id}: mobilisiert nur an Mobility-Übungen.`);
     }

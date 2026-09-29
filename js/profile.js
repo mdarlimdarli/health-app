@@ -14,7 +14,8 @@ import { DEFAULT_SYMPTOMS, SYMPTOM_KEYS } from './cycle-symptoms.js';
 export const SEX_OPTIONS = ['weiblich', 'maennlich', 'divers'];
 
 // Version 2: training.avoidTags ersetzt durch protectRegions, avoidMovements, focus und guidance
-export const PROFILE_VERSION = 2;
+// Version 3: Geschlecht, Standardliste der Zyklus-Symptome, Bewegung "einbeinig" entfällt
+export const PROFILE_VERSION = 3;
 
 // Neutrale Standardwerte für fehlende Felder
 const DEFAULTS = {

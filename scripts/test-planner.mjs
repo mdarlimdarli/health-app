@@ -26,7 +26,8 @@ const profiles = {
   fortgeschritten: { training: { ...base, level: 2, pullPushRatio: '3:2', focus: ['huefte-gesaess'] }, fullSlots: true },
   dreiTage: { training: { ...base, daysPerWeek: 3 }, fullSlots: true },
   vierTage: { training: { ...base, daysPerWeek: 4, pullPushRatio: '2:1' }, fullSlots: true },
-  knieUndUeberkopf: { training: { ...base, protectRegions: [{ region: 'knie', until: '2026-10-31' }, { region: 'handgelenk', until: null }], avoidMovements: ['ueberkopf', 'einbeinig'], focus: ['beweglichkeit', 'core-stabilitaet'] }, fullSlots: false },
+  knieUndUeberkopf: { training: { ...base, protectRegions: [{ region: 'knie', until: '2026-10-31' }, { region: 'handgelenk', until: null }], avoidMovements: ['ueberkopf', 'haengen'], focus: ['beweglichkeit', 'core-stabilitaet'] }, fullSlots: false },
+  gleichgewicht: { training: { ...base, focus: ['gleichgewicht', 'oberer-ruecken'] }, fullSlots: true },
 };
 
 let passed = 0;
@@ -93,8 +94,8 @@ for (const [name, { training, fullSlots }] of Object.entries(profiles)) {
       }
     });
 
-    test(`${label}: 5 bis 7 Übungen und 5 Minuten Mobility, mit Fokus Beweglichkeit mehr`, () => {
-      const seconds = training.focus.includes('beweglichkeit') ? 450 : 300;
+    test(`${label}: 5 bis 7 Übungen und 5 Minuten Mobility, mit Fokus Beweglichkeit und Gleichgewicht mehr`, () => {
+      const seconds = (training.focus.includes('beweglichkeit') ? 450 : 300) + (training.focus.includes('gleichgewicht') ? 90 : 0);
       for (const plan of result.plans) {
         assert.ok(plan.exercises.length >= (fullSlots ? 6 : 5) && plan.exercises.length <= 7, `${plan.id}: ${plan.exercises.length}`);
         assert.equal(plan.mobility.reduce((sum, m) => sum + m.seconds, 0), seconds);
@@ -232,6 +233,38 @@ test('Änderungsübersicht nennt den Grund', () => {
   assert.ok(back.added.some((a) => a.id === 'latzug-nacken' && a.reason === 'Last hinter dem Kopf wieder erlaubt'), JSON.stringify(back.added));
   const phaseDiff = diffPlans({ ...before, training: base }, { training: base, phase: 2, prefs: {}, plans: generatePlans({ training: base, exercises, phase: 2 }).plans }, exercises);
   assert.ok(phaseDiff.removed.some((r) => r.reason === 'Phase 2 mit freien Gewichten'));
+});
+
+test('Fokus Gleichgewicht: je Einheit eine Übung mit Stütze im Aufwärmblock, ab Phase 1', () => {
+  const training = { ...base, focus: ['gleichgewicht'] };
+  const balance = (plan) => plan.mobility.map((m) => byId.get(m.exerciseId)).filter((e) => e.tags.includes('fokus:gleichgewicht'));
+  const result = generatePlans({ training, exercises, phase: 1 });
+  for (const plan of result.plans) {
+    assert.equal(balance(plan).length, 1, plan.id);
+    assert.equal(balance(plan)[0].phase, 1);
+    assert.ok(plan.exercises.every((e) => !byId.get(e.exerciseId).tags.includes('fokus:gleichgewicht')), 'nicht im Hauptteil');
+  }
+  assert.notEqual(balance(result.plans[0])[0].id, balance(result.plans[1])[0].id, 'je Plan eine andere');
+  const without = generatePlans({ training: base, exercises, phase: 1 });
+  assert.ok(without.plans.every((plan) => balance(plan).length === 0), 'ohne Fokus keine');
+});
+
+test('Gleichgewicht: 8 Übungen, alle mit Stütze und Phase 1, Schonungen gelten auch hier', () => {
+  const list = exercises.filter((e) => e.tags.includes('fokus:gleichgewicht'));
+  assert.equal(list.length, 8);
+  assert.ok(list.every((e) => e.level === 1 && e.phase === 1));
+  assert.ok(list.every((e) => /Stütze|stützt|Wand|Stange|Gerät|Stuhl/.test(e.setupHints.join(' '))), 'Stützmöglichkeit im Setup');
+  const knee = { ...base, focus: ['gleichgewicht'], protectRegions: [{ region: 'knie', until: null }], avoidMovements: [] };
+  const result = generatePlans({ training: knee, exercises, phase: 1 });
+  for (const plan of result.plans) {
+    for (const m of plan.mobility) assert.ok(!byId.get(m.exerciseId).tags.includes('belastet:knie'), m.exerciseId);
+  }
+});
+
+test('Einbeinige Stabilität ist gestrichen, auch aus alten Profilen', () => {
+  assert.ok(exercises.every((e) => !e.tags.includes('bewegung:einbeinig')));
+  assert.deepEqual(normalizeTraining({ avoidMovements: ['einbeinig', 'haengen'] }).avoidMovements, ['haengen']);
+  assert.deepEqual(validateLibrary([...exercises.slice(0, 44), { ...exercises[0], id: 'x', tags: ['fokus:unbekannt'] }]).filter((e) => e.includes('unbekannter Tag')), ['x: unbekannter Tag fokus:unbekannt.']);
 });
 
 console.log('Hilfen');

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-28T21:35:34.814Z",
+  "generatedAt": "2026-09-29T19:52:57.444Z",
   "phase": 1,
   "daysPerWeek": 2,
   "sessionsPerPhase": 16,
@@ -48,18 +48,19 @@
           "name": "Beinpresse"
         },
         {
-          "exerciseId": "glute-bridge",
-          "sets": 2,
+          "exerciseId": "hip-thrust-maschine",
+          "sets": 3,
           "repRange": [
             8,
-            15
+            12
           ],
-          "restSeconds": 60,
+          "restSeconds": 90,
           "progressionRule": {
-            "type": "wiederholungen",
-            "text": "Schaffst du in allen Sätzen 15 Wiederholungen, wähle eine schwerere Variante."
+            "type": "doppelprogression",
+            "stepKg": 2.5,
+            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 2,5 kg."
           },
-          "name": "Glute Bridge"
+          "name": "Hip Thrust Maschine"
         },
         {
           "exerciseId": "rudern-kabel-sitzend",
@@ -180,19 +181,18 @@
           "name": "Ausfallschritte"
         },
         {
-          "exerciseId": "hip-thrust-maschine",
-          "sets": 3,
+          "exerciseId": "glute-bridge",
+          "sets": 2,
           "repRange": [
             8,
-            12
+            15
           ],
-          "restSeconds": 90,
+          "restSeconds": 60,
           "progressionRule": {
-            "type": "doppelprogression",
-            "stepKg": 2.5,
-            "text": "Schaffst du in allen Sätzen 12 Wiederholungen, erhöhe um 2,5 kg."
+            "type": "wiederholungen",
+            "text": "Schaffst du in allen Sätzen 15 Wiederholungen, wähle eine schwerere Variante."
           },
-          "name": "Hip Thrust Maschine"
+          "name": "Glute Bridge"
         },
         {
           "exerciseId": "rudern-maschine",

@@ -23,7 +23,7 @@ Jede Person hat ihr eigenes iPhone und ihr eigenes privates Daten-Repo für die 
 5. **Einrichtung.** Beim ersten Start erscheint die Einrichtung: Name, Geburtsjahr, Zyklus, Training, Unverträglichkeiten, Lieblingsküchen, Abneigungen. Das Training hat drei Ebenen:
    - **Körperregionen schonen** (Nacken, Schulter, Lendenwirbelsäule, Brustwirbelsäule, Hüfte, Knie, Handgelenk, Ellbogen, Bauchraum), je optional mit Datum „bis“. Übungen, die die Region belasten, fallen weg, dazu kommt leichte Mobility für diese Region.
    - **Bewegungen vermeiden**, zum Beispiel Überkopf, Last hinter dem Kopf oder Bauchpressen.
-   - **Aufbauen**, zum Beispiel oberer Rücken, Core-Stabilität oder Knochendichte.
+   - **Aufbauen**, zum Beispiel oberer Rücken, Core-Stabilität, Knochendichte oder Gleichgewicht und Standsicherheit (dann kommt je Einheit eine Gleichgewichtsübung mit Stütze in den Aufwärmblock).
 
    Dazu ein Freitextfeld für **Vorgaben von Arzt, Physio oder Osteopath**. Es steht im Trainings-Tab unter „Meine Vorgaben“ zum Nachlesen im Studio, die App wertet es nicht aus. Die Angaben ersetzen keine Beratung, trag ein, was dir gesagt wurde. Alles lässt sich später unter **Einstellungen > Profil bearbeiten** oder direkt im Trainings-Tab unter **Anpassen** ändern.
 

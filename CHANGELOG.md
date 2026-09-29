@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2 (29.09.2026): Gleichgewicht, Zyklus-Symptome, Dashboard
+
+- **Fokus Gleichgewicht und Standsicherheit:** acht neue Übungen mit Grafik, alle mit Stützmöglichkeit und ab Phase 1 (Step-up auf niedrige Stufe, Einbeinstand mit Handstütze, Tandemstand, Farmer's Carry einseitig, seitliches Beinheben am Kabelzug, Hip Airplane mit Stütze, Wadenheben einbeinig mit Stütze, Sit-to-Stand ohne Hände). Mit diesem Fokus kommt je Einheit eine davon in den Aufwärmblock, je Plan eine andere.
+- **Bewegungen vermeiden als Chips**, Beispiele stehen im Hinweis darunter. „Einbeinige Stabilität“ ist gestrichen, gespeicherte Profile verlieren den Wert beim Laden (Profil Version 3).
+- **Zyklus-Symptome:** eigener Screen mit Kalenderstreifen, Blutungsstärke, Symptomen mit Stärke 1 bis 3, Standardliste, die sich selbst ergänzt, und Muster der letzten drei Zyklen. Geschlecht im Onboarding mit Vorauswahl für das Zyklus-Tracking.
+- **Startseite als Dashboard** mit Abschnitten für Medikamente, Check-in, Zyklus, Training und Essen, Live-Uhrzeit und Begrüßung nach lokaler Stunde.
+- **Design:** Kontur-Karten, Buttons und große Zahlen in der Modulfarbe, Tab-Bar nur mit Icons.
+- Service Worker v19.
+
 ## v1.1 (28.09.2026): flexible Trainingsanpassung
 
 - **Drei Ebenen statt fester Schonungen:** Körperregionen schonen (Nacken, Schulter, Lendenwirbelsäule, Brustwirbelsäule, Hüfte, Knie, Handgelenk, Ellbogen, Bauchraum), Bewegungen vermeiden (Überkopf, Last hinter dem Kopf, Wirbelsäule unter Last beugen oder rotieren, Bauchpressen, tiefe Kniebeuge, Sprünge und Stöße, einbeinige Stabilität, Hängen am Griff) und Aufbauen (oberer Rücken, Schultergürtel, Core-Stabilität, Hüfte und Gesäß, Beine, Knochendichte, Beweglichkeit, allgemeine Kraft).
@@ -46,6 +55,7 @@ Erste vollständige Fassung als PWA für das iPhone (375 x 667 px, Safari, Home-
 - **Einkaufsliste** aus dem Wochenplan, gruppiert nach Kategorie, offline abhakbar.
 - **Trainingsplan-Editor:** Übungen, Sätze und Reihenfolge je Plan von Hand festlegen, ohne `data/plans.json`.
 - **Mehr Übungen für eingeschränkte Profile:** zum Beispiel knieschonende Beinübungen und Varianten ohne Überkopf, damit auch bei mehreren Schonungen jede Einheit vollständig bleibt.
+- **Blutung und Periodenbeginn verknüpfen:** bei starker Blutung nach längerer Pause fragen, ob die Periode begonnen hat.
 - **Messwerte-Diagramme** über Wochen und Monate, Export als CSV.
 - **Wochenrückblick** am Sonntag: Einheiten, Einnahmen, Check-ins als Zahlen, weiterhin ohne Interpretation.
 - **Konflikte zusammenführen:** bei einer fremden Sicherung auf GitHub Einträge zusammenführen statt nur wiederherstellen oder überschreiben.

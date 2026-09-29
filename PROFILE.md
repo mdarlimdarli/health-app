@@ -27,7 +27,7 @@ Beim Export landen die aktuellen Medikamente wieder in der Datei.
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
-| `version` | Zahl | Version des Profil-Schemas. Aktuell `2`. Profile mit Version `1` (Feld `avoidTags`) werden beim Laden und Importieren automatisch migriert. |
+| `version` | Zahl | Version des Profil-Schemas. Aktuell `3`. Ältere Profile werden beim Laden und Importieren automatisch migriert (Version 1: `avoidTags`, Version 2: Bewegung `einbeinig`). |
 | `displayName` | Text | Name der Person. Erscheint in der App als Titel („Beispiel“ ergibt „Beispiel Health“) und in der Begrüßung. Das Manifest heißt immer „Health“. |
 | `language` | Text | Sprache der Oberfläche, aktuell nur `de`. |
 | `birthYear` | Zahl oder `null` | Geburtsjahr, optional. Für altersabhängige Hinweise, z. B. im Training. |
@@ -53,9 +53,9 @@ Das Vokabular steht in `js/training-options.js`, die Tags an den Übungen in `da
 
 **Regionen** (`protectRegions`): `nacken` Nacken, `schulter` Schulter, `lws` Lendenwirbelsäule, `bws` Brustwirbelsäule, `huefte` Hüfte, `knie` Knie, `handgelenk` Handgelenk, `ellbogen` Ellbogen, `bauchraum` Bauchraum.
 
-**Bewegungen** (`avoidMovements`): `ueberkopf` Überkopf drücken oder ziehen, `last-hinter-kopf` Last hinter dem Kopf, `wirbelsaeule-beugen` Wirbelsäule unter Last beugen (Kreuzheben, Good Mornings), `wirbelsaeule-rotieren` Wirbelsäule unter Last rotieren, `bauchpressen` Bauchpressen (Crunches, Sit-ups), `tiefe-kniebeuge` tiefe Kniebeuge, `spruenge` Sprünge und Stöße, `einbeinig` einbeinige Stabilität, `haengen` Hängen am Griff.
+**Bewegungen** (`avoidMovements`): `ueberkopf` Überkopf drücken oder ziehen, `last-hinter-kopf` Last hinter dem Kopf, `wirbelsaeule-beugen` Wirbelsäule unter Last beugen (Kreuzheben, Good Mornings), `wirbelsaeule-rotieren` Wirbelsäule unter Last rotieren, `bauchpressen` Bauchpressen (Crunches, Sit-ups), `tiefe-kniebeuge` tiefe Kniebeuge, `spruenge` Sprünge und Stöße, `haengen` Hängen am Griff. Der frühere Wert `einbeinig` entfällt und wird beim Laden entfernt.
 
-**Aufbauen** (`focus`): `oberer-ruecken` Oberer Rücken, `schulterguertel` Schultergürtel, `core-stabilitaet` Core-Stabilität, `huefte-gesaess` Hüfte und Gesäß, `beine` Beine, `knochendichte` Knochendichte, `beweglichkeit` Beweglichkeit (längerer Mobility-Block), `allgemeine-kraft` Allgemeine Kraft.
+**Aufbauen** (`focus`): `oberer-ruecken` Oberer Rücken, `schulterguertel` Schultergürtel, `core-stabilitaet` Core-Stabilität, `huefte-gesaess` Hüfte und Gesäß, `beine` Beine, `knochendichte` Knochendichte, `beweglichkeit` Beweglichkeit (längerer Mobility-Block), `gleichgewicht` Gleichgewicht und Standsicherheit (je Einheit eine Gleichgewichtsübung mit Stütze im Aufwärmblock), `allgemeine-kraft` Allgemeine Kraft.
 
 Andere Werte aus einer importierten Datei bleiben erhalten und erscheinen als zusätzliche Option.
 

@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "exercises": [
     {
       "id": "beinpresse",
@@ -390,8 +390,7 @@
       "phase": 1,
       "unit": "reps",
       "tags": [
-        "belastet:knie",
-        "bewegung:einbeinig"
+        "belastet:knie"
       ],
       "focus": [
         "knochendichte",
@@ -472,8 +471,7 @@
       "phase": 1,
       "unit": "reps",
       "tags": [
-        "belastet:knie",
-        "bewegung:einbeinig"
+        "belastet:knie"
       ],
       "focus": [
         "knochendichte",
@@ -557,7 +555,6 @@
       "unit": "reps",
       "tags": [
         "belastet:knie",
-        "bewegung:einbeinig",
         "bewegung:tiefe-kniebeuge"
       ],
       "focus": [
@@ -2263,6 +2260,331 @@
       ],
       "youtubeSearch": "Bauchatmung Rückenlage Zwerchfell",
       "svg": "bauchatmung.svg"
+    },
+    {
+      "id": "step-up-niedrig",
+      "name": "Step-up auf niedrige Stufe",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "belastet:knie",
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht",
+        "beine"
+      ],
+      "setupHints": [
+        "Niedrige Stufe oder Aerobic-Step, etwa 15 bis 20 cm.",
+        "Neben eine Wand oder Stange stellen, eine Hand stützt leicht."
+      ],
+      "cues": [
+        "Ganzen Fuß auf die Stufe setzen.",
+        "Aus dem vorderen Bein hochdrücken, langsam wieder runter.",
+        "Knie zeigt über die Zehen."
+      ],
+      "commonMistakes": [
+        "Vom hinteren Bein abstoßen.",
+        "Mit der Hand hochziehen statt nur zu stützen."
+      ],
+      "alternatives": [
+        "einbeinstand-stuetze",
+        "tandemstand",
+        "farmers-carry-einseitig",
+        "beinheben-seitlich-kabel"
+      ],
+      "youtubeSearch": "Step up niedrige Stufe Gleichgewicht Senioren",
+      "svg": "step-up-niedrig.svg"
+    },
+    {
+      "id": "einbeinstand-stuetze",
+      "name": "Einbeinstand mit Handstütze",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht"
+      ],
+      "setupHints": [
+        "Seitlich an eine Stange, Stuhllehne oder Wand stellen.",
+        "Die Hand liegt locker auf, je Seite gleich lang."
+      ],
+      "cues": [
+        "Ein Knie langsam bis Hüfthöhe anheben.",
+        "Standbein leicht gebeugt, Blick nach vorne.",
+        "Stütze nur so viel wie nötig."
+      ],
+      "commonMistakes": [
+        "Das Becken kippt zur Seite.",
+        "Die Hand trägt das Gewicht."
+      ],
+      "alternatives": [
+        "step-up-niedrig",
+        "tandemstand",
+        "farmers-carry-einseitig",
+        "beinheben-seitlich-kabel"
+      ],
+      "youtubeSearch": "Einbeinstand Übung Gleichgewicht mit Stütze",
+      "svg": "einbeinstand-stuetze.svg"
+    },
+    {
+      "id": "tandemstand",
+      "name": "Tandemstand",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht"
+      ],
+      "setupHints": [
+        "Neben einer Wand oder Stange stehen, damit du jederzeit greifen kannst.",
+        "Einen Fuß direkt vor den anderen setzen, Ferse an Zehen."
+      ],
+      "cues": [
+        "Aufrecht stehen, Blick auf einen festen Punkt.",
+        "Erst mit Hand an der Stütze, dann frei halten.",
+        "Nach der Hälfte der Zeit die Füße tauschen."
+      ],
+      "commonMistakes": [
+        "Die Füße stehen versetzt statt in einer Linie.",
+        "Den Atem anhalten."
+      ],
+      "alternatives": [
+        "step-up-niedrig",
+        "einbeinstand-stuetze",
+        "farmers-carry-einseitig",
+        "beinheben-seitlich-kabel"
+      ],
+      "youtubeSearch": "Tandemstand Gleichgewichtsübung",
+      "svg": "tandemstand.svg"
+    },
+    {
+      "id": "farmers-carry-einseitig",
+      "name": "Farmer's Carry einseitig",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "kurzhantel",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "belastet:lws",
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht",
+        "core-stabilitaet",
+        "knochendichte"
+      ],
+      "setupHints": [
+        "Eine leichte Kurzhantel in einer Hand.",
+        "Entlang einer Wand gehen, die freie Hand kann sich jederzeit abstützen."
+      ],
+      "cues": [
+        "Aufrecht gehen, nicht zur Gewichtsseite kippen.",
+        "Schultern bleiben gleich hoch.",
+        "Nach jeder Strecke die Hand wechseln."
+      ],
+      "commonMistakes": [
+        "Der Oberkörper neigt sich zur Seite.",
+        "Zu schnell und mit großen Schritten."
+      ],
+      "alternatives": [
+        "step-up-niedrig",
+        "einbeinstand-stuetze",
+        "tandemstand",
+        "beinheben-seitlich-kabel"
+      ],
+      "youtubeSearch": "Suitcase Carry leicht Anfänger",
+      "svg": "farmers-carry-einseitig.svg"
+    },
+    {
+      "id": "beinheben-seitlich-kabel",
+      "name": "Seitliches Beinheben am Kabelzug",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "kabelzug",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "belastet:huefte",
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht",
+        "huefte-gesaess"
+      ],
+      "setupHints": [
+        "Fußschlaufe am äußeren Bein, Kabel unten.",
+        "Mit der anderen Hand am Gerät festhalten."
+      ],
+      "cues": [
+        "Bein gestreckt seitlich anheben.",
+        "Oberkörper bleibt aufrecht.",
+        "Langsam zurück, das Gewicht nicht ablegen."
+      ],
+      "commonMistakes": [
+        "Der Oberkörper kippt zur Gegenseite.",
+        "Mit Schwung arbeiten."
+      ],
+      "alternatives": [
+        "step-up-niedrig",
+        "einbeinstand-stuetze",
+        "tandemstand",
+        "farmers-carry-einseitig"
+      ],
+      "youtubeSearch": "Seitliches Beinheben Kabelzug Abduktion",
+      "svg": "beinheben-seitlich-kabel.svg"
+    },
+    {
+      "id": "hip-airplane-stuetze",
+      "name": "Hip Airplane mit Stütze",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "belastet:huefte",
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht",
+        "huefte-gesaess"
+      ],
+      "setupHints": [
+        "Vor eine Stange oder Stuhllehne stellen, beide Hände stützen.",
+        "Auf einem Bein stehen, das andere Bein gestreckt nach hinten."
+      ],
+      "cues": [
+        "Aus der Hüfte nach vorne beugen, Rücken lang.",
+        "Becken langsam zur Seite öffnen und wieder schließen.",
+        "Standbein leicht gebeugt."
+      ],
+      "commonMistakes": [
+        "Der Rücken rundet sich.",
+        "Die Bewegung kommt aus den Schultern statt aus der Hüfte."
+      ],
+      "alternatives": [
+        "step-up-niedrig",
+        "einbeinstand-stuetze",
+        "tandemstand",
+        "farmers-carry-einseitig"
+      ],
+      "youtubeSearch": "Hip Airplane Übung mit Stütze",
+      "svg": "hip-airplane-stuetze.svg"
+    },
+    {
+      "id": "wadenheben-einbeinig-stuetze",
+      "name": "Wadenheben einbeinig mit Stütze",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht",
+        "beine"
+      ],
+      "setupHints": [
+        "Neben eine Wand oder Stange stellen, eine Hand stützt.",
+        "Das andere Bein angewinkelt nach hinten."
+      ],
+      "cues": [
+        "Langsam auf die Zehenspitzen drücken.",
+        "Oben kurz halten.",
+        "Kontrolliert absenken, Seite wechseln."
+      ],
+      "commonMistakes": [
+        "Das Knie des Standbeins knickt ein.",
+        "Mit Schwung wippen."
+      ],
+      "alternatives": [
+        "step-up-niedrig",
+        "einbeinstand-stuetze",
+        "tandemstand",
+        "farmers-carry-einseitig"
+      ],
+      "youtubeSearch": "Wadenheben einbeinig Gleichgewicht",
+      "svg": "wadenheben-einbeinig-stuetze.svg"
+    },
+    {
+      "id": "sit-to-stand",
+      "name": "Sit-to-Stand ohne Hände",
+      "muscleGroup": "gleichgewicht",
+      "pattern": "gleichgewicht",
+      "plane": null,
+      "compound": false,
+      "equipment": "koerpergewicht",
+      "level": 1,
+      "phase": 1,
+      "unit": "seconds",
+      "tags": [
+        "belastet:knie",
+        "fokus:gleichgewicht"
+      ],
+      "focus": [
+        "gleichgewicht",
+        "beine",
+        "allgemeine-kraft"
+      ],
+      "setupHints": [
+        "Stabiler Stuhl mit Lehne an der Wand, Sitzhöhe etwa Kniehöhe.",
+        "Arme vor der Brust kreuzen. Wenn nötig, Hände auf die Oberschenkel als Stütze."
+      ],
+      "cues": [
+        "Füße hüftbreit, leicht zurückgesetzt.",
+        "Nach vorne lehnen und ohne Schwung aufstehen.",
+        "Langsam wieder hinsetzen."
+      ],
+      "commonMistakes": [
+        "Mit Schwung nach hinten und vorne wippen.",
+        "Die Knie fallen nach innen."
+      ],
+      "alternatives": [
+        "step-up-niedrig",
+        "einbeinstand-stuetze",
+        "tandemstand",
+        "farmers-carry-einseitig"
+      ],
+      "youtubeSearch": "Sit to Stand Übung ohne Hände",
+      "svg": "sit-to-stand.svg"
     }
   ]
 }

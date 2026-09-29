@@ -3,7 +3,7 @@
   Rein funktional (ohne DOM und Speicher), damit Planer, Formulare und Node-Tests
   dieselben Werte nutzen. Welche Werte gelten, steht nur im Profil.
 
-  Drei Ebenen:
+  Drei Ebenen (dazu Tags "fokus:<id>" an Übungen, die ein Fokus eigens in den Plan holt):
   - protectRegions: Körperregionen schonen. Übungen mit Tag "belastet:<region>" fallen weg,
     Mobility mit "mobilisiert:<region>" kommt bevorzugt in den Aufwärmblock.
     Jede Region kann ein Enddatum "until" haben, danach fragt die Startseite nach.
@@ -32,7 +32,6 @@ export const MOVEMENTS = [
   ['bauchpressen', 'Bauchpressen', 'Crunches, Sit-ups'],
   ['tiefe-kniebeuge', 'Tiefe Kniebeuge', ''],
   ['spruenge', 'Sprünge und Stöße', ''],
-  ['einbeinig', 'Einbeinige Stabilität', ''],
   ['haengen', 'Hängen am Griff', ''],
 ];
 
@@ -44,8 +43,12 @@ export const FOCUS = [
   ['beine', 'Beine'],
   ['knochendichte', 'Knochendichte'],
   ['beweglichkeit', 'Beweglichkeit'],
+  ['gleichgewicht', 'Gleichgewicht und Standsicherheit'],
   ['allgemeine-kraft', 'Allgemeine Kraft'],
 ];
+
+// Aus dem Vokabular gestrichen, gespeicherte Profile verlieren diese Werte beim Laden
+const REMOVED_MOVEMENTS = new Set(['einbeinig']);
 
 export const REGION_IDS = REGIONS.map(([id]) => id);
 export const MOVEMENT_IDS = MOVEMENTS.map(([id]) => id);
@@ -135,7 +138,7 @@ export function normalizeTraining(raw = {}) {
     startPhase: 1,
     ...rest,
     protectRegions: regions,
-    avoidMovements: unique(movements),
+    avoidMovements: unique(movements).filter((movement) => !REMOVED_MOVEMENTS.has(movement)),
     focus: unique(stringList(source.focus).map((item) => LEGACY_FOCUS[item] ?? item)),
     guidance: typeof source.guidance === 'string' ? source.guidance.trim() : '',
   };

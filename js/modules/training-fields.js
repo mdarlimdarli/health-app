@@ -72,18 +72,12 @@ export function trainingFields(training, { guidance = false, onChange = () => {}
   regionBlock.append(regionChips, untilList);
   node.append(fieldset('Körperregionen schonen', 'Übungen, die diese Regionen belasten, fallen weg. Dazu kommt leichte Mobility. Mit Datum gilt die Schonung nur bis dahin.', regionBlock));
 
-  // b) Bewegungen vermeiden
-  const movementList = el('div', 'check-list');
+  // b) Bewegungen vermeiden, als Chips wie Regionen und Aufbauen; Beispiele stehen im Hinweis darunter
   const avoided = training.avoidMovements ?? [];
-  for (const [value, label, example] of withExtras(MOVEMENTS, avoided, movementLabel)) {
-    const row = el('label', 'check-row');
-    const text = el('span', 'check-label');
-    text.append(el('span', null, label));
-    if (example) text.append(el('span', 'secondary', example));
-    row.append(checkbox('avoidMovements', value, avoided.includes(value)), text);
-    movementList.append(row);
-  }
-  node.append(fieldset('Bewegungen vermeiden', null, movementList));
+  const movementOptions = withExtras(MOVEMENTS, avoided, movementLabel);
+  const movementList = chipGroup('avoidMovements', movementOptions, avoided, 'koralle');
+  const examples = movementOptions.filter(([, , example]) => example).map(([, label, example]) => `${label}: z. B. ${example}`).join('. ');
+  node.append(fieldset('Bewegungen vermeiden', examples ? `${examples}.` : null, movementList));
 
   // c) Aufbauen
   const focus = training.focus ?? [];
