@@ -451,6 +451,7 @@ async function renderForm(root, id) {
   const end = input('endDate', schedule.endDate ?? '', 'date');
   const dates = el('div', 'date-row');
   dates.append(field('Start', start), field('Ende, optional', end));
+  const datesHint = el('p', 'hint', 'Ohne Ende läuft der Eintrag mit seinen Erinnerungen weiter, bis du ihn pausierst oder löschst.');
 
   const notes = el('textarea', 'input textarea');
   notes.name = 'notes';
@@ -469,7 +470,7 @@ async function renderForm(root, id) {
   const cancel = el('a', 'button', 'Abbrechen');
   cancel.href = '#/medis/verwalten';
 
-  form.append(field('Name', name), kind, dosageField, critical, field('Rhythmus', typeSelect), nField, weekdayField, monthsField, slotsField, dates, field('Notiz, optional', notes), active, save, cancel);
+  form.append(field('Name', name), kind, dosageField, critical, field('Rhythmus', typeSelect), nField, weekdayField, monthsField, slotsField, dates, datesHint, field('Notiz, optional', notes), active, save, cancel);
 
   if (existing) {
     const remove = el('button', 'button button--danger', 'Eintrag löschen');

@@ -19,7 +19,7 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /sw.js
 /css/tokens.css, base.css, components.css
 /js/app.js (Router, Shell), aura.js (Aura je Screen), clock.js (Begrüßung, Datum, Uhrzeit, rein funktional), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne und Änderungsübersicht, rein funktional), training-options.js (Vokabular Regionen, Bewegungen, Fokus, Migration, rein funktional), training-data.js (gespeicherte Pläne, Neuaufbau), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), cycle.js (Zykluslänge und Phase in Worten, rein funktional), cycle-symptoms.js (Symptomliste, Blutung, Muster, rein funktional), cycle-store.js (Store cycleSymptoms), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
-/js/modules/home.js, cycle.js (Zyklus-Screen), training.js, training-adjust.js (Anpassen), training-fields.js (Felder der drei Ebenen), meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
+/js/modules/home.js, cycle.js (Zyklus-Screen), training.js, training-adjust.js (Anpassen), training-fields.js (Felder der drei Ebenen), meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug), reset-section.js (Einstellungen Zurücksetzen)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.example.json (neutraler Beispiel-Essensplan), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
 /scripts/generate-plans.mjs, generate-icons.mjs, test-home.mjs, test-cycle.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
@@ -90,6 +90,7 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - data/profile.json wird nie committet (.gitignore) und nie deployt. Öffentlich ist nur data/profile.example.json (neutrale Vorlage). Eine lokale data/profile.json dient höchstens als Import-Datei.
 - Beim ersten Start ohne Profil zeigt die App ein Onboarding (#/willkommen): Name, direkt darunter Geschlecht (weiblich, männlich, divers als Pillen, profile.sex) und "Zyklus tracken?" (Vorauswahl an bei weiblich, aus bei männlich, bei divers unverändert), Geburtsjahr, Trainingstage pro Woche, Trainingslevel, Regionen schonen, Bewegungen vermeiden und Aufbauen als Chips mit verständlichen Labels, Unverträglichkeiten, Lieblingsküchen, Abneigungen. Medikamente werden nicht im Onboarding abgefragt, sondern im Medis-Tab angelegt.
 - In den Einstellungen: "Profil bearbeiten" (gleiche Felder), "Profil als Datei exportieren" und "Profil aus Datei importieren" (JSON). Ein Import ergänzt Medikamente mit neuer ID, bestehende werden nie überschrieben.
+- Ganz unten "Zurücksetzen": "Alle Daten auf diesem Gerät löschen" (Koralle deep), dann das Wort LÖSCHEN eingeben und ein zweiter Button. Löscht IndexedDB komplett (Profil, alle Stores, Token, Sync-Stand), meldet den Service Worker ab, leert den Cache und startet im Onboarding. Die Sicherung auf GitHub bleibt unangetastet.
 - Manifest-Name und short_name sind fest "Health". App-Titel und Begrüßung in der App werden aus profile.displayName gebildet ("<displayName> Health").
 - Keine Profildaten in Tests, README, PROFILE.md, Beispielen oder Commits. Beispiele immer neutral.
 
@@ -109,7 +110,9 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - Keine Medikamente im Code. Einträge liegen im Store meds, Einnahmen in medLog mit ID Datum|medId|Slot.
 - Schedule-Typen daily, everyNDays (ab startDate, sonst erstem Log), weekly (1 Montag bis 7 Sonntag), seasonal (months), jeweils mit optionalem startDate und endDate. type "measurement" speichert values (systolic, diastolic, pulse).
 - critical steht auf der Startseite immer oben, Streak nur für critical.
-- Push-Nachrichten sind allgemein und nennen nie Medikamente. reminders.json und subscriptions.json in health-data sind unverschlüsselt und enthalten nur Uhrzeiten und Push-Adressen.
+- Erinnerungen laufen ohne Ende, bis der Eintrag pausiert oder gelöscht wird. endDate ist optional und standardmäßig leer, nur ein ausdrückliches Enddatum beendet einen Eintrag.
+- Push-Nachrichten sind allgemein und nennen nie Medikamente. reminders.json (Uhrzeiten, Nachhak-Zeit), subscriptions.json (Push-Adressen) und status.json in health-data sind unverschlüsselt. status.json enthält nur {date, openCount}, keine Namen; die App schreibt sie nur mit aktivem Push, bei jedem Abhaken (gebündelt) und beim Start.
+- Nachhaken (profile.reminders.nudgeTime, Standard 22:00): Push nur, wenn status.json von heute ist und openCount über 0 liegt, Text "Du hast heute noch etwas offen" mit Anzahl. In der App ist ab dieser Uhrzeit der Abschnitt Medikamente auf der Startseite in Koralle markiert, solange etwas offen ist.
 - Nach Änderungen an den Zeitplan-Regeln: node scripts/test-meds.mjs.
 
 ## Check-in und Startseite

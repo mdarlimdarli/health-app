@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /*
   Verschickt Push-Erinnerungen. Läuft als GitHub Action im privaten Repo health-data.
-  Liest reminders.json (Uhrzeiten, Zeitzone) und subscriptions.json (Push-Adressen),
-  die die App dort ablegt. Jede Uhrzeit wird höchstens einmal pro Tag verschickt,
-  auch wenn die Action mehrfach oder verspätet läuft (Zustand in reminders-state.json).
-  Die Nachricht ist allgemein und enthält keine Gesundheitsdaten.
+  Liest reminders.json (Uhrzeiten, Nachhak-Zeit, Zeitzone), subscriptions.json (Push-Adressen)
+  und status.json ({ date, openCount }), die die App dort ablegt. Jede Uhrzeit wird höchstens
+  einmal pro Tag verschickt, auch wenn die Action mehrfach oder verspätet läuft
+  (Zustand in reminders-state.json). Nachhaken nur, wenn status.json von heute ist und
+  etwas offen steht. Die Nachrichten nennen keine Medikamente, höchstens die Anzahl.
 */
 
 import { readFile, writeFile } from 'node:fs/promises';
@@ -29,7 +30,8 @@ async function readJSON(file, fallback) {
 }
 
 const reminders = await readJSON('reminders.json', null);
-if (!reminders || !Array.isArray(reminders.times) || !reminders.times.length) {
+const nudgeTime = /^\d{2}:\d{2}$/.test(reminders?.nudgeTime ?? '') ? reminders.nudgeTime : null;
+if (!reminders || ((!Array.isArray(reminders.times) || !reminders.times.length) && !nudgeTime)) {
   console.log('Keine Erinnerungszeiten in reminders.json.');
   process.exit(0);
 }
@@ -47,22 +49,43 @@ const minutesOf = (time) => {
   return h * 60 + m;
 };
 
-const due = reminders.times.filter((time) => {
+const isDue = (time, key) => {
   const diff = nowMinutes - minutesOf(time);
-  return diff >= 0 && diff <= LATE_LIMIT_MINUTES && state.lastSent?.[time] !== localDate;
-});
+  return diff >= 0 && diff <= LATE_LIMIT_MINUTES && state.lastSent?.[key] !== localDate;
+};
+const due = (reminders.times ?? []).filter((time) => time !== nudgeTime && isDue(time, time));
 
-if (!due.length) {
-  console.log(`Nichts fällig (${localDate}, ${get('hour')}:${get('minute')} ${timezone}).`);
-  process.exit(0);
+// Nachhaken: nur mit Status von heute und mindestens einem offenen Eintrag
+const nudgeDue = nudgeTime && isDue(nudgeTime, 'nachhaken');
+const status = nudgeDue ? await readJSON('status.json', null) : null;
+const openCount = status?.date === localDate && Number.isInteger(status.openCount) ? status.openCount : 0;
+
+let payload = null;
+if (nudgeDue && openCount > 0) {
+  payload = JSON.stringify({
+    title: 'Health',
+    body: `Du hast heute noch etwas offen: ${openCount} ${openCount === 1 ? 'Eintrag' : 'Einträge'}.`,
+    url: './#/heute',
+    tag: `nachhaken-${localDate}`,
+  });
+} else if (due.length) {
+  payload = JSON.stringify({
+    title: 'Health',
+    body: 'Zeit für deine Medis. Schau kurz in die App.',
+    url: './#/medis',
+    tag: `medis-${localDate}-${due.at(-1)}`,
+  });
 }
 
-const payload = JSON.stringify({
-  title: 'Health',
-  body: 'Zeit für deine Medis. Schau kurz in die App.',
-  url: './#/medis',
-  tag: `medis-${localDate}-${due.at(-1)}`,
-});
+if (!payload) {
+  // Nachhaken ist für heute erledigt, auch wenn nichts offen war
+  if (nudgeDue) {
+    state.lastSent = { ...(state.lastSent ?? {}), nachhaken: localDate };
+    await writeFile('reminders-state.json', `${JSON.stringify(state, null, 2)}\n`);
+  }
+  console.log(`Nichts zu senden (${localDate}, ${get('hour')}:${get('minute')} ${timezone}).`);
+  process.exit(0);
+}
 
 const keep = [];
 let sent = 0;
@@ -84,8 +107,9 @@ for (const subscription of subscriptions.subscriptions ?? []) {
 
 state.lastSent = { ...(state.lastSent ?? {}) };
 for (const time of due) state.lastSent[time] = localDate;
+if (nudgeDue) state.lastSent.nachhaken = localDate;
 await writeFile('reminders-state.json', `${JSON.stringify(state, null, 2)}\n`);
 if (keep.length !== (subscriptions.subscriptions ?? []).length) {
   await writeFile('subscriptions.json', `${JSON.stringify({ ...subscriptions, subscriptions: keep }, null, 2)}\n`);
 }
-console.log(`${sent} Mitteilung(en) für ${due.join(', ')} verschickt.`);
+console.log(`${sent} Mitteilung(en) verschickt (${nudgeDue && openCount > 0 ? 'Nachhaken' : due.join(', ')}).`);

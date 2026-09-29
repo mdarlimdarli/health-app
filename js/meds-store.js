@@ -9,6 +9,11 @@ import { logKey, openNow } from './meds-schedule.js';
 import { getProfile } from './profile.js';
 import { todayISO } from './ui.js';
 
+// status.json für das Nachhaken aktualisieren (nur mit aktivem Push, sonst passiert nichts)
+function statusChanged() {
+  import('./push.js').then(({ scheduleStatusUpdate }) => scheduleStatusUpdate()).catch(() => {});
+}
+
 const TIME_ZONE = 'Europe/Berlin';
 
 export function nowMinutes(date = new Date()) {
@@ -41,6 +46,7 @@ export async function loadLogs() {
 
 export async function setTaken(med, slot, date, taken) {
   const id = logKey(date, med.id, slot);
+  statusChanged();
   if (!taken) {
     await db.remove('medLog', id);
     return null;
@@ -50,14 +56,17 @@ export async function setTaken(med, slot, date, taken) {
 
 export async function saveMeasurement(med, slot, date, values) {
   const id = logKey(date, med.id, slot);
+  statusChanged();
   return db.put('medLog', { id, date, medId: med.id, slot, taken: true, takenAt: new Date().toISOString(), values });
 }
 
 export async function saveMed(med) {
+  statusChanged();
   return db.put('meds', med);
 }
 
 export async function removeMed(id) {
+  statusChanged();
   return db.remove('meds', id);
 }
 

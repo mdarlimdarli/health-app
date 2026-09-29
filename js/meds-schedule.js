@@ -210,6 +210,17 @@ export function openNow(meds, logs, date, nowMinutes, { firstLogDates = new Map(
     .sort((a, b) => (b.med.critical ? 1 : 0) - (a.med.critical ? 1 : 0) || SLOTS.findIndex((s) => s.id === a.slot) - SLOTS.findIndex((s) => s.id === b.slot));
 }
 
+// Heute noch offene Einträge (alle Slots des Tages, egal ob schon fällig), für Nachhaken und status.json
+export function openToday(meds, logs, date, firstLogDates = new Map()) {
+  return dayPlan(meds, logs, date, firstLogDates).flatMap((slot) => slot.items).filter((item) => item.state === 'offen');
+}
+
+// Nachhaken: ab dieser Uhrzeit bis Mitternacht, Standard 22:00
+export const NUDGE_DEFAULT = '22:00';
+export function nudgeDue(nowMinutes, nudgeTime = NUDGE_DEFAULT) {
+  return /^\d{2}:\d{2}$/.test(nudgeTime ?? '') && nowMinutes >= minutesOf(nudgeTime);
+}
+
 // Kurze Beschreibung des Plans für die Verwaltung
 export function describeSchedule(med) {
   const s = med.schedule ?? {};

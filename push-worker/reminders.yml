@@ -5,11 +5,14 @@ name: Erinnerungen senden
 on:
   schedule:
     # Diese Zeilen erzeugt die App unter Einstellungen > Erinnerungen > Zeitplan (Zeiten in UTC).
-    # Beispiel für 08:00 und 20:00 in Europe/Berlin, je Winter- und Sommerzeit:
+    # Beispiel für 08:00 und 20:00 in Europe/Berlin, je Winter- und Sommerzeit,
+    # dazu das Nachhaken um 22:00 (nur wenn laut status.json heute noch etwas offen ist):
     - cron: '0 6 * * *'
     - cron: '0 7 * * *'
     - cron: '0 18 * * *'
     - cron: '0 19 * * *'
+    - cron: '0 20 * * *'
+    - cron: '0 21 * * *'
   workflow_dispatch:
 
 permissions:

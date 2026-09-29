@@ -5,7 +5,7 @@
 */
 
 import assert from 'node:assert/strict';
-import { isScheduledOn, dueSlots, dayPlan, openNow, streak, adherence, logKey, nextScheduledDate, weekdayOf, addDays, slotsOf } from '../js/meds-schedule.js';
+import { isScheduledOn, dueSlots, dayPlan, openNow, openToday, nudgeDue, streak, adherence, logKey, nextScheduledDate, weekdayOf, addDays, slotsOf } from '../js/meds-schedule.js';
 
 let passed = 0;
 function test(name, fn) {
@@ -119,6 +119,27 @@ test('Adhärenz 30 Tage, heute nur fällige Slots', () => {
 test('dueSlots für Messung wie für Medikament', () => {
   const m = med('bp', { type: 'weekly', weekday: 1, slots: ['morgen'] }, { type: 'measurement' });
   assert.deepEqual(dueSlots(m, '2026-09-28'), ['morgen']);
+});
+
+test('Ohne Enddatum läuft ein Eintrag weiter, bis er pausiert oder gelöscht wird', () => {
+  const m = med('a', { type: 'daily', slots: ['morgen'], startDate: '2026-01-01', endDate: null });
+  assert.equal(isScheduledOn(m, '2031-06-15'), true);
+  assert.equal(isScheduledOn({ ...m, active: false }, '2026-10-01'), false);
+  const noDates = med('b', { type: 'weekly', weekday: 3, slots: ['abend'] });
+  assert.equal(isScheduledOn(noDates, '2030-01-02'), true);
+  // Nur ein ausdrückliches Enddatum beendet ihn
+  assert.equal(isScheduledOn({ ...m, schedule: { ...m.schedule, endDate: '2026-12-31' } }, '2027-01-01'), false);
+});
+
+test('Nachhaken: offen heute zählt alle Slots des Tages, ab 22 Uhr fällig', () => {
+  const a = med('a', { type: 'daily', slots: ['morgen', 'abend'] });
+  const b = med('b', { type: 'daily', slots: ['nach-abend'] }, { active: false });
+  const logs = logsFrom([['2026-09-29', 'a', 'morgen']]);
+  assert.deepEqual(openToday([a, b], logs, '2026-09-29').map((item) => `${item.med.id}|${item.slot}`), ['a|abend']);
+  assert.equal(nudgeDue(21 * 60 + 59), false);
+  assert.equal(nudgeDue(22 * 60), true);
+  assert.equal(nudgeDue(23 * 60 + 30, '23:00'), true);
+  assert.equal(nudgeDue(22 * 60, 'kaputt'), false);
 });
 
 console.log(`\n${passed} Tests bestanden${process.exitCode ? ', es gab Fehler' : ''}.`);

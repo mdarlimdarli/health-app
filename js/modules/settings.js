@@ -9,6 +9,7 @@ import { confirmDialog, toast, formatDateTime, todayISO } from '../ui.js';
 import { renderReminders } from './reminders.js';
 import { renderReportSection } from './report-section.js';
 import { renderMealsSection } from './meals-section.js';
+import { renderResetSection } from './reset-section.js';
 import { appTitle, hasProfile, getProfile, loadProfile, parseProfileFile, importProfile, exportProfile } from '../profile.js';
 
 const TEMPLATE = `
@@ -96,6 +97,8 @@ const TEMPLATE = `
       </div>
       <input type="file" accept="application/json,.json" data-import-input hidden>
     </div>
+
+    <div data-reset></div>
   </section>
 `;
 
@@ -344,6 +347,7 @@ export async function render(root) {
 
   await updateStatus();
   prepareExport();
+  renderResetSection($('[data-reset]'));
   if (hasProfile()) {
     renderReminders($('[data-reminders]'));
     renderMealsSection($('[data-meals]'));

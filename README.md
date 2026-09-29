@@ -23,6 +23,8 @@ Neue Versionen lädt die App automatisch im Hintergrund, sobald sie online ist. 
 
 ### Wichtig zu wissen
 
+- **Neu anfangen:** Unter **Einstellungen > Zurücksetzen** löschst du alle Daten auf diesem Gerät (Bestätigung mit dem Wort LÖSCHEN). Die verschlüsselte Sicherung auf GitHub bleibt erhalten und lässt sich mit Owner, Repo, Token und Passwort wiederherstellen.
+
 - Die Daten liegen im Speicher dieser Home-Bildschirm-App. Sie sind getrennt von Safari. Wenn du das Symbol löschst, sind auch die lokalen Daten weg. Deshalb die verschlüsselte Sicherung einrichten.
 - iOS kann den Speicher von Web-Apps löschen, die lange nicht geöffnet wurden. Regelmäßig öffnen und sichern hilft.
 
@@ -41,7 +43,9 @@ Im Repo liegen dann `data.json.enc` (verschlüsselt) und `manifest.json` (nur Ze
 
 Die App zeigt fällige Einträge immer auf der Startseite und als Zahl am Tab Medis. Push-Mitteilungen aufs Handy kommen ohne eigenen Server über eine GitHub Action in deinem privaten Daten-Repo. Unten steht dafür `health-data`. Hast du in den Einstellungen einen anderen Namen eingetragen, gilt überall dieser.
 
-**So funktioniert es:** Beim Aktivieren legt die App im Repo `health-data` zwei Dateien ab. `reminders.json` enthält deine Uhrzeiten, `subscriptions.json` die Push-Adresse deines iPhones. Die Action läuft zu diesen Uhrzeiten, liest beide Dateien und verschickt eine allgemeine Mitteilung ohne Medikamentennamen.
+**So funktioniert es:** Beim Aktivieren legt die App im Repo `health-data` drei Dateien ab. `reminders.json` enthält deine Uhrzeiten und die Nachhak-Zeit, `subscriptions.json` die Push-Adresse deines iPhones, `status.json` nur das Datum und die Anzahl der heute noch offenen Einträge (keine Namen). Die App aktualisiert `status.json` beim Abhaken und beim Start. Die Action läuft zu diesen Uhrzeiten und verschickt eine allgemeine Mitteilung ohne Medikamentennamen.
+
+**Nachhaken um 22 Uhr:** Zur Nachhak-Zeit (Standard 22:00, unter Einstellungen > Erinnerungen änderbar) kommt nur dann eine Mitteilung, wenn laut `status.json` heute noch etwas offen ist: „Du hast heute noch etwas offen: 2 Einträge.“ Welche es sind, siehst du erst in der App. Hast du die App an einem Tag gar nicht geöffnet, gibt es keinen Status von heute und damit kein Nachhaken, die normalen Erinnerungen kommen trotzdem.
 
 1. **VAPID-Schlüssel erzeugen** (einmalig, auf dem Mac):
 
@@ -54,7 +58,7 @@ Die App zeigt fällige Einträge immer auf der Startseite und als Zahl am Tab Me
    - `VAPID_PRIVATE_KEY`: der private Schlüssel, er gehört nur hierher
    - `VAPID_SUBJECT`: eine Kontaktadresse, z. B. `mailto:du@example.com`
 3. **Dateien kopieren:** Aus diesem Repo `push-worker/send-reminders.mjs` nach `health-data/push/send-reminders.mjs` und `push-worker/reminders.yml` nach `health-data/.github/workflows/reminders.yml`.
-4. **Zeitplan eintragen:** In der App unter **Einstellungen > Erinnerungen** die Uhrzeiten festlegen und unter „Zeitplan für die GitHub Action“ die cron-Zeilen kopieren. Diese ersetzen die Beispielzeilen in `reminders.yml`. GitHub kann Zeiten nur aus der Workflow-Datei lesen. Deshalb musst du sie nach jeder Änderung der Uhrzeiten neu einfügen.
+4. **Zeitplan eintragen:** In der App unter **Einstellungen > Erinnerungen** die Uhrzeiten und die Nachhak-Zeit festlegen und unter „Zeitplan für die GitHub Action“ die cron-Zeilen kopieren (die Nachhak-Zeit ist dabei). Diese ersetzen die Beispielzeilen in `reminders.yml`. GitHub kann Zeiten nur aus der Workflow-Datei lesen. Deshalb musst du sie nach jeder Änderung der Uhrzeiten neu einfügen.
 5. **Push aktivieren:** In der App den öffentlichen Schlüssel eintragen und „Push aktivieren“ tippen. iOS fragt dann nach der Erlaubnis für Mitteilungen.
 6. **Testen:** Im Repo `health-data` unter **Actions > Erinnerungen senden > Run workflow** starten. Eine Mitteilung kommt nur, wenn eine Uhrzeit in den letzten zwei Stunden lag und heute noch nicht verschickt wurde.
 

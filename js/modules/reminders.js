@@ -7,7 +7,7 @@
 import * as db from '../db.js';
 import { getProfile, saveProfile } from '../profile.js';
 import { loadMeds } from '../meds-store.js';
-import { pushSupport, currentSubscription, enablePush, disablePush, writeReminders, reminderTimes, workflowSnippet } from '../push.js';
+import { pushSupport, currentSubscription, enablePush, disablePush, writeReminders, writeStatus, reminderTimes, nudgeTime, workflowSnippet } from '../push.js';
 import { toast, el } from '../ui.js';
 import { DEFAULT_REPO } from '../sync.js';
 
@@ -51,6 +51,14 @@ export async function renderReminders(container) {
     times.append(row);
   };
   reminderTimes().forEach(addRow);
+  // Nachhaken: nur wenn heute noch etwas offen ist, ohne Namen
+  const nudgeField = el('label', 'field');
+  const nudgeInput = el('input', 'input');
+  nudgeInput.type = 'time';
+  nudgeInput.value = nudgeTime();
+  nudgeField.append(el('span', 'label', 'Nachhaken'), nudgeInput);
+  const nudgeHint = el('p', 'hint', 'Um diese Uhrzeit kommt nur eine Mitteilung, wenn heute noch etwas offen ist. Sie nennt nur die Anzahl, die Namen siehst du in der App. Ab dann ist der Abschnitt Medikamente auf der Startseite in Koralle markiert.');
+
   const timeActions = el('div', 'button-row');
   const addTime = el('button', 'button', 'Zeit hinzufügen');
   addTime.type = 'button';
@@ -60,9 +68,13 @@ export async function renderReminders(container) {
   saveTimes.addEventListener('click', () => busy(saveTimes, async () => {
     const values = [...times.querySelectorAll('input')].map((input) => input.value).filter((value) => /^\d{2}:\d{2}$/.test(value));
     const profile = getProfile();
-    await saveProfile({ ...profile, reminders: { ...profile.reminders, times: [...new Set(values)].sort() } });
+    const nudge = /^\d{2}:\d{2}$/.test(nudgeInput.value) ? nudgeInput.value : profile.reminders.nudgeTime;
+    await saveProfile({ ...profile, reminders: { ...profile.reminders, times: [...new Set(values)].sort(), nudgeTime: nudge } });
     try {
-      if (active) await writeReminders();
+      if (active) {
+        await writeReminders();
+        await writeStatus();
+      }
       toast(active ? 'Zeiten gespeichert und an GitHub übertragen' : 'Zeiten gespeichert');
     } catch (error) {
       toast(`Gespeichert, aber nicht übertragen: ${errorText(error)}`, { error: true });
@@ -70,7 +82,7 @@ export async function renderReminders(container) {
     renderReminders(container);
   }));
   timeActions.append(addTime, saveTimes);
-  container.append(el('span', 'label', 'Uhrzeiten'), times, timeActions);
+  container.append(el('span', 'label', 'Uhrzeiten'), times, nudgeField, nudgeHint, timeActions);
 
   // Push
   const status = !support.supported
@@ -113,7 +125,7 @@ export async function renderReminders(container) {
   // Zeitplan für die Action
   const details = el('details', 'details');
   details.append(el('summary', null, 'Zeitplan für die GitHub Action'));
-  const explain = el('p', 'hint', `GitHub liest den Zeitplan nur aus der Workflow-Datei. Ersetze die cron-Zeilen in .github/workflows/reminders.yml im Repo ${repo} durch diese. Die Zeiten sind in UTC, je eine Zeile für Winter- und Sommerzeit. Das Script schickt trotzdem nur einmal pro Uhrzeit und Tag.`);
+  const explain = el('p', 'hint', `GitHub liest den Zeitplan nur aus der Workflow-Datei. Ersetze die cron-Zeilen in .github/workflows/reminders.yml im Repo ${repo} durch diese, sie enthalten auch die Nachhak-Zeit. Die Zeiten sind in UTC, je eine Zeile für Winter- und Sommerzeit. Das Script schickt trotzdem nur einmal pro Uhrzeit und Tag.`);
   const pre = el('pre', 'code', workflowSnippet() || '    # Noch keine Uhrzeiten');
   const copy = el('button', 'button button--small', 'Kopieren');
   copy.type = 'button';

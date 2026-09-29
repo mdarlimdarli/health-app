@@ -30,7 +30,7 @@ export const DATA_STORES = Object.keys(SCHEMA).filter((name) => name !== 'syncQu
 
 // Einstellungen, die das Gerät nie verlassen: weder Sicherung noch Export.
 // Das Profil (key "profile") gehört bewusst nicht dazu, es wandert mit der Sicherung.
-export const LOCAL_SETTINGS = new Set(['syncOwner', 'syncToken', 'syncRepo', 'syncShas', 'lastSync', 'cryptoCheck', 'pushEndpoint', 'vapidPublicKey']);
+export const LOCAL_SETTINGS = new Set(['syncOwner', 'syncToken', 'syncRepo', 'syncShas', 'lastSync', 'cryptoCheck', 'pushEndpoint', 'vapidPublicKey', 'pushStatus']);
 
 const changeListeners = new Set();
 let dbPromise = null;
@@ -53,6 +53,25 @@ function open() {
     });
   }
   return dbPromise;
+}
+
+/*
+  Löscht die ganze Datenbank auf diesem Gerät (Zurücksetzen in den Einstellungen).
+  Die eigene Verbindung wird vorher geschlossen, sonst blockiert sie das Löschen.
+*/
+export async function deleteEverything() {
+  if (dbPromise) {
+    const database = await dbPromise.catch(() => null);
+    database?.close();
+    dbPromise = null;
+  }
+  await new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(DB_NAME);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    // Andere offene Tabs: die Löschung läuft, sobald sie schließen
+    request.onblocked = () => resolve();
+  });
 }
 
 export function newId() {

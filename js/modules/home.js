@@ -11,7 +11,7 @@
 
 import { getProfile } from '../profile.js';
 import { loadMeds, loadLogs, setTaken } from '../meds-store.js';
-import { dayPlan, streak, isMeasurement, slotLabel, SLOTS } from '../meds-schedule.js';
+import { dayPlan, streak, isMeasurement, slotLabel, SLOTS, nudgeDue } from '../meds-schedule.js';
 import { SLIDER_META, activeSliders, getCheckin, hasValues, cycleDayFor, periodStarts, auraBlobs } from '../checkin-core.js';
 import { averageCycleLength, cyclePhaseName, periodLength } from '../cycle.js';
 import { setAura, AURAS } from '../aura.js';
@@ -22,6 +22,7 @@ import { expiredRegions, regionLabel } from '../training-options.js';
 /* Kopf: Wochentag, Begrüßung, Tageszahl, Monat und Uhrzeit, jede Minute aktualisiert */
 
 let clock = null;
+let refreshMeds = null;
 
 function renderHead() {
   const head = el('div', 'hero');
@@ -36,6 +37,10 @@ function renderHead() {
 
   const update = () => {
     const now = new Date();
+    // Zum Nachhak-Zeitpunkt die Medikamente neu zeichnen, damit die Markierung ohne Neuladen erscheint
+    const nudge = nudgeDue(now.getHours() * 60 + now.getMinutes(), getProfile().reminders?.nudgeTime);
+    if (head.dataset.nudge !== undefined && head.dataset.nudge !== String(nudge)) refreshMeds?.();
+    head.dataset.nudge = String(nudge);
     const parts = dayParts(now);
     weekday.textContent = parts.weekday;
     hello.textContent = greeting(now, getProfile().displayName);
@@ -117,6 +122,12 @@ async function renderMeds(container) {
     .sort((a, b) => (b.med.critical ? 1 : 0) - (a.med.critical ? 1 : 0) || slotIndex(a.slot) - slotIndex(b.slot));
 
   const card = sectionCard('Medikamente', 'butter');
+  // Ab der Nachhak-Zeit (Standard 22 Uhr) Koralle-Markierung, solange etwas offen ist
+  const now = new Date();
+  if (open.length && nudgeDue(now.getHours() * 60 + now.getMinutes(), getProfile().reminders?.nudgeTime)) {
+    card.classList.add('dash-card--nudge');
+    card.append(el('p', 'nudge-text', `Heute noch ${open.length} ${open.length === 1 ? 'Eintrag' : 'Einträge'} offen`));
+  }
   if (!open.length) {
     const days = overallStreak(meds, logs, today, firstLogDates);
     const row = el('div', 'dash-done');
@@ -351,6 +362,7 @@ export async function render(root) {
   const training = el('div');
   const meal = el('div');
   section.append(head, meds, checkin, cycle, training, meal);
+  refreshMeds = () => renderMeds(meds);
   root.replaceChildren(section);
   await Promise.all([renderMeds(meds), renderCheckin(checkin), renderCycle(cycle), renderTraining(training), renderMeal(meal)]);
 }

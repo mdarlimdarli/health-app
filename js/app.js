@@ -10,7 +10,7 @@ import { initSync } from './sync.js';
 import { loadProfile, hasProfile, appTitle, onProfileChange } from './profile.js';
 import { onChange } from './db.js';
 import { openItems } from './meds-store.js';
-import { setAppBadge } from './push.js';
+import { setAppBadge, scheduleStatusUpdate } from './push.js';
 import { setAura, auraForRoute } from './aura.js';
 
 // Linien-Icons, 24er Raster, Strichstärke kommt aus CSS (Tab-Bar 1.75 px, sonst 1.5 px)
@@ -222,7 +222,13 @@ async function start() {
   onChange((store) => { if (store === 'medLog' || store === 'meds' || store === 'import') updateBadge(); });
   onProfileChange(updateBadge);
   setInterval(updateBadge, BADGE_INTERVAL_MS);
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updateBadge(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    updateBadge();
+    scheduleStatusUpdate();
+  });
+  // Status für das Nachhaken um 22 Uhr einmal je Start aktuell halten (nur mit aktivem Push)
+  scheduleStatusUpdate();
 }
 
 start();

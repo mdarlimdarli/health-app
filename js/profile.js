@@ -41,7 +41,8 @@ const DEFAULTS = {
   },
   meds: [],
   diet: { intolerances: [], cuisines: [], dislikes: [] },
-  reminders: { times: [], timezone: 'Europe/Berlin' },
+  // nudgeTime: Nachhaken, nur wenn heute noch etwas offen ist
+  reminders: { times: [], timezone: 'Europe/Berlin', nudgeTime: '22:00' },
 };
 
 const events = new EventTarget();
@@ -69,6 +70,7 @@ function normalize(raw) {
   result.birthYear = Number.isInteger(result.birthYear) ? result.birthYear : null;
   result.cycleTracking = result.cycleTracking === true;
   result.sex = SEX_OPTIONS.includes(result.sex) ? result.sex : null;
+  if (!/^\d{2}:\d{2}$/.test(result.reminders.nudgeTime ?? '')) result.reminders.nudgeTime = DEFAULTS.reminders.nudgeTime;
   const symptoms = stringList(source.cycleSymptomsDefault).filter((key) => SYMPTOM_KEYS.includes(key));
   result.cycleSymptomsDefault = symptoms.length ? [...new Set(symptoms)] : [...DEFAULT_SYMPTOMS];
   // Migriert alte Schonungs-Tags (Version 1) auf Regionen und Bewegungen
