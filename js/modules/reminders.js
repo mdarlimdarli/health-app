@@ -7,7 +7,7 @@
 import * as db from '../db.js';
 import { getProfile, saveProfile } from '../profile.js';
 import { loadMeds } from '../meds-store.js';
-import { pushSupport, currentSubscription, enablePush, disablePush, writeReminders, writeStatus, reminderTimes, nudgeTime, workflowSnippet } from '../push.js';
+import { pushSupport, currentSubscription, enablePush, disablePush, writeReminders, writeStatus, reminderTimes, nudgeTime, workflowSnippet, vapidKey, sendTestNotification } from '../push.js';
 import { toast, el } from '../ui.js';
 import { DEFAULT_REPO } from '../sync.js';
 
@@ -34,7 +34,7 @@ export async function renderReminders(container) {
 
   container.replaceChildren();
   container.className = 'stack-tight';
-  container.append(el('h2', null, 'Erinnerungen'), el('p', 'secondary', 'In der App siehst du fällige Einträge auf der Startseite und als Zahl am Tab Medis. Push-Mitteilungen kommen zusätzlich zu diesen Uhrzeiten.'));
+  container.append(el('h2', null, 'Erinnerungen'), el('p', 'secondary', 'In der App siehst du fällige Einträge auf der Startseite und als Zahl am Tab Medis. Mitteilungen kommen zusätzlich zu diesen Uhrzeiten.'));
 
   // Uhrzeiten
   const times = el('div', 'time-list');
@@ -84,35 +84,41 @@ export async function renderReminders(container) {
   timeActions.append(addTime, saveTimes);
   container.append(el('span', 'label', 'Uhrzeiten'), times, nudgeField, nudgeHint, timeActions);
 
-  // Push
-  const status = !support.supported
-    ? 'Dieses Gerät unterstützt Web Push nicht.'
-    : support.ios && !support.standalone
-      ? 'Auf dem iPhone funktioniert Push nur in der App vom Home-Bildschirm.'
-      : active ? 'Push ist auf diesem Gerät aktiv.' : 'Push ist auf diesem Gerät aus.';
-  container.append(el('span', 'label', 'Push-Mitteilungen'), el('p', 'secondary', status));
+  // Mitteilungen: Status aktiv, nicht erlaubt, nicht unterstützt oder aus
+  const key = await vapidKey();
+  const permission = support.permission;
+  let statusText;
+  if (!support.supported) statusText = 'Nicht unterstützt: Dieses Gerät oder dieser Browser kann keine Web-Push-Mitteilungen empfangen.';
+  else if (active) statusText = 'Aktiv: Mitteilungen kommen auf dieses Gerät.';
+  else if (permission === 'denied') statusText = 'Nicht erlaubt: Mitteilungen sind für diese App gesperrt. Du kannst sie in den iOS-Einstellungen unter Mitteilungen wieder erlauben.';
+  else statusText = 'Aus: Auf diesem Gerät sind Mitteilungen noch nicht aktiviert.';
+  const statusLine = el('p', `push-status push-status--${!support.supported ? 'unsupported' : active ? 'active' : permission === 'denied' ? 'denied' : 'off'}`, statusText);
+  container.append(el('span', 'label', 'Mitteilungen'), statusLine);
+  if (!support.standalone) container.append(el('p', 'hint', 'Dafür muss die App auf dem Home-Bildschirm liegen: in Safari Teilen, dann Zum Home-Bildschirm, und die App von dort öffnen. Auf dem iPhone ab iOS 16.4.'));
 
-  const keyField = el('label', 'field');
+  // Nur ohne Schlüssel in js/config.js (z. B. in einem Fork) ein Eingabefeld
   const keyInput = el('input', 'input');
-  keyInput.type = 'text';
-  keyInput.autocapitalize = 'off';
-  keyInput.spellcheck = false;
-  keyInput.placeholder = 'Öffentlicher VAPID-Schlüssel';
-  keyInput.value = (await db.getSetting('vapidPublicKey')) ?? '';
-  keyField.append(el('span', 'label', 'VAPID public key'), keyInput);
-  if (!active) container.append(keyField, el('p', 'hint', `Den Schlüssel erzeugst du einmal, die Anleitung steht in der README. Der private Schlüssel gehört nur in die Secrets von ${repo}.`));
+  if (!key) {
+    const keyField = el('label', 'field');
+    keyInput.type = 'text';
+    keyInput.autocapitalize = 'off';
+    keyInput.spellcheck = false;
+    keyInput.placeholder = 'Öffentlicher VAPID-Schlüssel';
+    keyField.append(el('span', 'label', 'VAPID public key'), keyInput);
+    if (!active) container.append(keyField, el('p', 'hint', `Den Schlüssel erzeugst du einmal, die Anleitung steht in ONBOARDING.md. Der private Schlüssel gehört nur in die Secrets von ${repo}.`));
+  }
 
-  const pushButton = el('button', active ? 'button' : 'button button--primary', active ? 'Push abschalten' : 'Push aktivieren');
+  const pushButton = el('button', active ? 'button' : 'button button--primary', active ? 'Mitteilungen abschalten' : 'Mitteilungen aktivieren');
   pushButton.type = 'button';
-  pushButton.disabled = !support.supported || !configured;
+  pushButton.disabled = !support.supported || !configured || permission === 'denied' && !active;
   pushButton.addEventListener('click', () => busy(pushButton, async () => {
     try {
       if (active) {
         await disablePush();
-        toast('Push abgeschaltet');
+        toast('Mitteilungen abgeschaltet');
       } else {
-        await enablePush(keyInput.value);
-        toast('Push aktiv');
+        await enablePush(key || keyInput.value);
+        toast('Mitteilungen aktiv');
       }
     } catch (error) {
       toast(errorText(error), { error: true });
@@ -120,7 +126,22 @@ export async function renderReminders(container) {
     renderReminders(container);
   }));
   container.append(pushButton);
-  if (!configured) container.append(el('p', 'hint', 'Für Push brauchst du zuerst GitHub-Owner und Token weiter unten.'));
+
+  // Test: stößt die Action im Daten-Repo an, sie schickt sofort eine Mitteilung an alle Abos
+  if (active) {
+    const testButton = el('button', 'button', 'Test-Mitteilung senden');
+    testButton.type = 'button';
+    testButton.addEventListener('click', () => busy(testButton, async () => {
+      try {
+        await sendTestNotification();
+        toast('Angestoßen. Die Mitteilung kommt in etwa einer Minute.');
+      } catch (error) {
+        toast(errorText(error), { error: true });
+      }
+    }));
+    container.append(testButton, el('p', 'hint', `Dafür braucht der Token zusätzlich die Berechtigung Actions: Read and write für ${repo}.`));
+  }
+  if (!configured) container.append(el('p', 'hint', 'Für Mitteilungen brauchst du zuerst GitHub-Owner und Token weiter unten.'));
 
   // Zeitplan für die Action
   const details = el('details', 'details');

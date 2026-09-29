@@ -1,19 +1,28 @@
-# Vorlage für das private Repo health-data: nach .github/workflows/reminders.yml kopieren.
-# Verschickt Push-Erinnerungen an die in subscriptions.json hinterlegten Geräte.
+# Vorlage für das private Daten-Repo (Standard health-data): nach .github/workflows/reminders.yml kopieren,
+# das Script nach push/send-reminders.mjs. Verschickt Push-Mitteilungen an die in subscriptions.json
+# hinterlegten Geräte. Secrets: VAPID_PUBLIC_KEY und VAPID_PRIVATE_KEY, optional VAPID_SUBJECT.
 name: Erinnerungen senden
 
 on:
   schedule:
-    # Diese Zeilen erzeugt die App unter Einstellungen > Erinnerungen > Zeitplan (Zeiten in UTC).
-    # Beispiel für 08:00 und 20:00 in Europe/Berlin, je Winter- und Sommerzeit,
-    # dazu das Nachhaken um 22:00 (nur wenn laut status.json heute noch etwas offen ist):
-    - cron: '0 6 * * *'
-    - cron: '0 7 * * *'
-    - cron: '0 18 * * *'
-    - cron: '0 19 * * *'
-    - cron: '0 20 * * *'
-    - cron: '0 21 * * *'
+    # Zeiten in UTC, je Uhrzeit eine Zeile für Sommer- (UTC+2) und eine für Winterzeit (UTC+1).
+    # Das Script prüft die Uhrzeit in Europe/Berlin und schickt je Uhrzeit nur einmal am Tag.
+    # Die passenden Zeilen für eigene Uhrzeiten zeigt die App unter Einstellungen > Erinnerungen.
+    - cron: '30 5 * * *'   # 07:30 Sommerzeit
+    - cron: '30 6 * * *'   # 07:30 Winterzeit
+    - cron: '30 10 * * *'  # 12:30 Sommerzeit
+    - cron: '30 11 * * *'  # 12:30 Winterzeit
+    - cron: '30 18 * * *'  # 20:30 Sommerzeit
+    - cron: '30 19 * * *'  # 20:30 Winterzeit
+    - cron: '0 20 * * *'   # 22:00 Nachhaken, Sommerzeit
+    - cron: '0 21 * * *'   # 22:00 Nachhaken, Winterzeit
+  # Manuell oder aus der App ("Test-Mitteilung senden") starten
   workflow_dispatch:
+    inputs:
+      test:
+        description: 'Sofort eine Test-Mitteilung schicken'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -38,19 +47,22 @@ jobs:
       - name: web-push installieren
         run: npm install --no-save --no-package-lock web-push@3.6.7
 
-      - name: Erinnerungen senden
+      - name: Mitteilungen senden
         run: node push/send-reminders.mjs
         env:
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          TEST_MESSAGE: ${{ github.event.inputs.test }}
 
       # Merken, was heute schon verschickt wurde, und abgelaufene Abos entfernen
       - name: Zustand sichern
         run: |
           git config user.name "health-reminders"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reminders-state.json subscriptions.json
+          for file in reminders-state.json subscriptions.json; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
           if ! git diff --cached --quiet; then
             git commit -m "Erinnerungen verschickt"
             git pull --rebase

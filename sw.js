@@ -4,7 +4,7 @@
   Bei jeder Änderung an Shell-Dateien VERSION erhöhen.
 */
 
-const VERSION = 'v20';
+const VERSION = 'v21';
 const CACHE = `shell-${VERSION}`;
 
 // Pfade relativ zum Scope, damit die App auch unter /health-app/ läuft
@@ -16,6 +16,7 @@ const SHELL = [
   './css/base.css',
   './css/components.css',
   './js/app.js',
+  './js/config.js',
   './js/db.js',
   './js/crypto.js',
   './js/sync.js',

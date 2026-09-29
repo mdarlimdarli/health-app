@@ -366,6 +366,34 @@ export async function restore() {
 }
 
 /*
+  Startet einen Workflow im Daten-Repo per workflow_dispatch, z. B. die Test-Mitteilung.
+  Braucht im Token zusätzlich die Berechtigung Actions: Read and write für das Daten-Repo.
+*/
+export async function dispatchWorkflow(workflow, inputs = {}) {
+  const creds = await requireCredentials();
+  const base = `${API}/repos/${encodeURIComponent(creds.owner)}/${encodeURIComponent(creds.repo)}`;
+  const headers = { Authorization: `Bearer ${creds.token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  const request = async (url, options = {}) => {
+    try {
+      return await fetch(url, { ...options, headers: { ...headers, ...(options.body ? { 'Content-Type': 'application/json' } : {}) }, cache: 'no-store', referrerPolicy: 'no-referrer' });
+    } catch {
+      throw new SyncError('Keine Verbindung zu GitHub.', 'offline');
+    }
+  };
+  // Standard-Branch des Daten-Repos, meist main
+  const repoResponse = await request(base);
+  if (!repoResponse.ok) throw new SyncError(httpErrorMessage(repoResponse.status, creds.repo), repoResponse.status);
+  const { default_branch: ref = 'main' } = await repoResponse.json();
+  const response = await request(`${base}/actions/workflows/${encodeURIComponent(workflow)}/dispatches`, { method: 'POST', body: JSON.stringify({ ref, inputs }) });
+  if (response.status === 204) return true;
+  if (response.status === 401) throw new SyncError('Token ungültig oder abgelaufen.', 401);
+  if (response.status === 403) throw new SyncError(`Dem Token fehlt die Berechtigung Actions: Read and write für ${creds.repo}.`, 403);
+  if (response.status === 404) throw new SyncError(`Workflow ${workflow} im Repo ${creds.repo} nicht gefunden.`, 404);
+  if (response.status === 422) throw new SyncError(`Der Workflow ${workflow} lässt sich nicht manuell starten.`, 422);
+  throw new SyncError(httpErrorMessage(response.status, creds.repo), response.status);
+}
+
+/*
   Unverschlüsselte Hilfsdateien für Push-Erinnerungen (reminders.json, subscriptions.json).
   Sie enthalten nur Uhrzeiten und Push-Adressen, keine Gesundheitsdaten,
   denn die GitHub Action muss sie ohne Passwort lesen können.

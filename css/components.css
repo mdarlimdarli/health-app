@@ -2400,3 +2400,24 @@ a.strip-day::before {
   background: var(--koralle-deep);
   transform: translateY(1px);
 }
+
+/* Status der Mitteilungen: Punkt in der passenden Farbe, Text bleibt Ink */
+.push-status {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.push-status::before {
+  content: "";
+  flex: none;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  background: var(--color-line);
+  transform: translateY(1px);
+}
+
+.push-status--active::before { background: var(--salbei-deep); }
+.push-status--denied::before,
+.push-status--unsupported::before { background: var(--koralle-deep); }

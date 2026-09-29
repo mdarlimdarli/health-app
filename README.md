@@ -47,20 +47,7 @@ Die App zeigt fällige Einträge immer auf der Startseite und als Zahl am Tab Me
 
 **Nachhaken um 22 Uhr:** Zur Nachhak-Zeit (Standard 22:00, unter Einstellungen > Erinnerungen änderbar) kommt nur dann eine Mitteilung, wenn laut `status.json` heute noch etwas offen ist: „Du hast heute noch etwas offen: 2 Einträge.“ Welche es sind, siehst du erst in der App. Hast du die App an einem Tag gar nicht geöffnet, gibt es keinen Status von heute und damit kein Nachhaken, die normalen Erinnerungen kommen trotzdem.
 
-1. **VAPID-Schlüssel erzeugen** (einmalig, auf dem Mac):
-
-   ```bash
-   npx web-push generate-vapid-keys
-   ```
-
-2. **Secrets anlegen:** Im Repo `health-data` unter **Settings > Secrets and variables > Actions** drei Repository-Secrets anlegen:
-   - `VAPID_PUBLIC_KEY`: der öffentliche Schlüssel
-   - `VAPID_PRIVATE_KEY`: der private Schlüssel, er gehört nur hierher
-   - `VAPID_SUBJECT`: eine Kontaktadresse, z. B. `mailto:du@example.com`
-3. **Dateien kopieren:** Aus diesem Repo `push-worker/send-reminders.mjs` nach `health-data/push/send-reminders.mjs` und `push-worker/reminders.yml` nach `health-data/.github/workflows/reminders.yml`.
-4. **Zeitplan eintragen:** In der App unter **Einstellungen > Erinnerungen** die Uhrzeiten und die Nachhak-Zeit festlegen und unter „Zeitplan für die GitHub Action“ die cron-Zeilen kopieren (die Nachhak-Zeit ist dabei). Diese ersetzen die Beispielzeilen in `reminders.yml`. GitHub kann Zeiten nur aus der Workflow-Datei lesen. Deshalb musst du sie nach jeder Änderung der Uhrzeiten neu einfügen.
-5. **Push aktivieren:** In der App den öffentlichen Schlüssel eintragen und „Push aktivieren“ tippen. iOS fragt dann nach der Erlaubnis für Mitteilungen.
-6. **Testen:** Im Repo `health-data` unter **Actions > Erinnerungen senden > Run workflow** starten. Eine Mitteilung kommt nur, wenn eine Uhrzeit in den letzten zwei Stunden lag und heute noch nicht verschickt wurde.
+**Einrichtung:** Schritt für Schritt in [ONBOARDING.md](ONBOARDING.md) unter „Push-Mitteilungen einrichten“: Secrets `VAPID_PRIVATE_KEY` und `VAPID_PUBLIC_KEY` im Daten-Repo, die Vorlagen aus `push-worker/` kopieren, den Token um **Actions: Read and write** erweitern, in der App **Mitteilungen aktivieren** und **Test-Mitteilung senden**. Der öffentliche Schlüssel steht in `js/config.js`, der private nur lokal in `.vapid-private` (ignoriert).
 
 **Einschränkungen auf dem iPhone:**
 - Web-Push gibt es erst ab iOS 16.4, und nur für die App vom Home-Bildschirm, nicht in Safari.

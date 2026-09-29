@@ -7,7 +7,8 @@
 */
 
 import * as db from './db.js';
-import { readPlainJSON, writePlainJSON } from './sync.js';
+import { readPlainJSON, writePlainJSON, dispatchWorkflow } from './sync.js';
+import { VAPID_PUBLIC_KEY } from './config.js';
 import { getProfile } from './profile.js';
 
 const REMINDERS_FILE = 'reminders.json';
@@ -15,6 +16,18 @@ const SUBSCRIPTIONS_FILE = 'subscriptions.json';
 const STATUS_FILE = 'status.json';
 // Mehrere Haken kurz hintereinander ergeben nur einen Schreibvorgang
 const STATUS_DELAY_MS = 8000;
+
+export const WORKFLOW_FILE = 'reminders.yml';
+
+// Öffentlicher Schlüssel aus js/config.js, sonst der zuletzt eingetragene
+export async function vapidKey() {
+  return VAPID_PUBLIC_KEY || (await db.getSetting('vapidPublicKey')) || '';
+}
+
+// Stößt die Action an und lässt sie sofort eine Test-Mitteilung schicken
+export async function sendTestNotification() {
+  return dispatchWorkflow(WORKFLOW_FILE, { test: 'true' });
+}
 
 export function pushSupport() {
   const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;

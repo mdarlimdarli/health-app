@@ -14,12 +14,15 @@ import webpush from 'web-push';
 // Wie spät eine Erinnerung noch verschickt wird, falls GitHub die Action verzögert startet
 const LATE_LIMIT_MINUTES = 120;
 
-const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT } = process.env;
-if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY || !VAPID_SUBJECT) {
-  console.error('VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY und VAPID_SUBJECT müssen als Secrets gesetzt sein.');
+const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, TEST_MESSAGE, GITHUB_REPOSITORY_OWNER } = process.env;
+if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+  console.error('VAPID_PUBLIC_KEY und VAPID_PRIVATE_KEY müssen als Secrets gesetzt sein.');
   process.exit(1);
 }
+// Kontakt für den Push-Dienst: Secret VAPID_SUBJECT (mailto: oder https:), sonst das GitHub-Profil
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || `https://github.com/${GITHUB_REPOSITORY_OWNER || 'health-app'}`;
 webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+const isTest = TEST_MESSAGE === 'true';
 
 async function readJSON(file, fallback) {
   try {
@@ -31,7 +34,7 @@ async function readJSON(file, fallback) {
 
 const reminders = await readJSON('reminders.json', null);
 const nudgeTime = /^\d{2}:\d{2}$/.test(reminders?.nudgeTime ?? '') ? reminders.nudgeTime : null;
-if (!reminders || ((!Array.isArray(reminders.times) || !reminders.times.length) && !nudgeTime)) {
+if (!isTest && (!reminders || ((!Array.isArray(reminders.times) || !reminders.times.length) && !nudgeTime))) {
   console.log('Keine Erinnerungszeiten in reminders.json.');
   process.exit(0);
 }
@@ -39,7 +42,7 @@ const subscriptions = await readJSON('subscriptions.json', { version: 1, subscri
 const state = await readJSON('reminders-state.json', { lastSent: {} });
 
 // Lokales Datum und Uhrzeit in der Zeitzone der Erinnerungen
-const timezone = reminders.timezone || 'Europe/Berlin';
+const timezone = reminders?.timezone || 'Europe/Berlin';
 const parts = new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
 const get = (type) => parts.find((part) => part.type === type).value;
 const localDate = `${get('year')}-${get('month')}-${get('day')}`;
@@ -53,15 +56,18 @@ const isDue = (time, key) => {
   const diff = nowMinutes - minutesOf(time);
   return diff >= 0 && diff <= LATE_LIMIT_MINUTES && state.lastSent?.[key] !== localDate;
 };
-const due = (reminders.times ?? []).filter((time) => time !== nudgeTime && isDue(time, time));
+const due = isTest ? [] : (reminders?.times ?? []).filter((time) => time !== nudgeTime && isDue(time, time));
 
 // Nachhaken: nur mit Status von heute und mindestens einem offenen Eintrag
-const nudgeDue = nudgeTime && isDue(nudgeTime, 'nachhaken');
+const nudgeDue = !isTest && nudgeTime && isDue(nudgeTime, 'nachhaken');
 const status = nudgeDue ? await readJSON('status.json', null) : null;
 const openCount = status?.date === localDate && Number.isInteger(status.openCount) ? status.openCount : 0;
 
 let payload = null;
-if (nudgeDue && openCount > 0) {
+if (isTest) {
+  // Manueller Start mit test=true: sofort an alle Abos, ohne den Tageszustand zu ändern
+  payload = JSON.stringify({ title: 'Health', body: 'Test: Mitteilungen funktionieren.', url: './#/einstellungen', tag: `test-${Date.now()}` });
+} else if (nudgeDue && openCount > 0) {
   payload = JSON.stringify({
     title: 'Health',
     body: `Du hast heute noch etwas offen: ${openCount} ${openCount === 1 ? 'Eintrag' : 'Einträge'}.`,
@@ -105,11 +111,13 @@ for (const subscription of subscriptions.subscriptions ?? []) {
   }
 }
 
-state.lastSent = { ...(state.lastSent ?? {}) };
-for (const time of due) state.lastSent[time] = localDate;
-if (nudgeDue) state.lastSent.nachhaken = localDate;
-await writeFile('reminders-state.json', `${JSON.stringify(state, null, 2)}\n`);
+if (!isTest) {
+  state.lastSent = { ...(state.lastSent ?? {}) };
+  for (const time of due) state.lastSent[time] = localDate;
+  if (nudgeDue) state.lastSent.nachhaken = localDate;
+  await writeFile('reminders-state.json', `${JSON.stringify(state, null, 2)}\n`);
+}
 if (keep.length !== (subscriptions.subscriptions ?? []).length) {
   await writeFile('subscriptions.json', `${JSON.stringify({ ...subscriptions, subscriptions: keep }, null, 2)}\n`);
 }
-console.log(`${sent} Mitteilung(en) verschickt (${nudgeDue && openCount > 0 ? 'Nachhaken' : due.join(', ')}).`);
+console.log(`${sent} Mitteilung(en) verschickt (${isTest ? 'Test' : nudgeDue && openCount > 0 ? 'Nachhaken' : due.join(', ')}).`);

@@ -12,7 +12,7 @@ Jede Person hat ihr eigenes iPhone und ihr eigenes privates Daten-Repo für die 
 2. **Daten-Repo anlegen.** Ein neues, **privates** Repo `health-data` anlegen. Es darf leer bleiben.
 3. **Token erstellen.** Unter GitHub **Settings > Developer settings > Personal access tokens > Fine-grained tokens** einen Token anlegen:
    - Repository access: **Only select repositories**, nur `health-data`
-   - Permissions: **Contents: Read and write**
+   - Permissions: **Contents: Read and write**, für Push-Mitteilungen zusätzlich **Actions: Read and write** (siehe „Push-Mitteilungen einrichten“)
    - Ablaufdatum nach Wunsch. Läuft er ab, meldet die App „Token ungültig oder abgelaufen.“, dann einen neuen eintragen.
 
    Den Token nie ins Repo, in Notizen oder in Chats schreiben. Er gehört nur in die App.
@@ -36,10 +36,66 @@ Jede Person hat ihr eigenes iPhone und ihr eigenes privates Daten-Repo für die 
    Unter dem Feld zeigt die App das Ziel als Vorschau, zum Beispiel `beispiel/health-data`. Prüfen, **Speichern**.
 7. **Passwort setzen und erste Sicherung.** Unter **Passwort** ein Passwort festlegen und gut aufbewahren, ohne es lässt sich die Sicherung nie mehr lesen. Dann **Jetzt sichern**. Im Daten-Repo liegen danach `data.json.enc` (verschlüsselt, mit Profil, Essensplan und allen Einträgen) und `manifest.json` (nur Zeitpunkt und Anzahl). Ab jetzt sichert die App automatisch, 30 Sekunden nach jeder Änderung, sobald sie online ist.
 8. **Essensplan importieren (optional).** Ohne eigenen Plan zeigt der Tab Essen den neutralen Beispielplan mit dem Hinweis „Eigenen Plan importieren“. Einen eigenen Plan im Format von `data/meals.example.json` vorbereiten, aufs iPhone legen und unter **Einstellungen > Essensplan aus Datei importieren** einspielen. Die App prüft das Schema und zeigt die Version. Eine lokale `data/meals.json` ist per `.gitignore` ausgeschlossen, nie committen.
-9. **Medikamente anlegen (optional).** Im Tab **Medis > Verwalten > Neu**. Push-Erinnerungen richtest du wie in der [README](README.md) beschrieben im Daten-Repo ein.
+9. **Medikamente anlegen (optional).** Im Tab **Medis > Verwalten > Neu**. Push-Mitteilungen richtest du wie unten unter „Push-Mitteilungen einrichten“ beschrieben ein.
 10. **Training anpassen (optional).** Die Pläne entstehen aus `training` im Profil. Im Trainings-Tab öffnet **Anpassen** (neben dem Plan) Regionen, Bewegungen, Fokus, Tage pro Woche und Phase. Jede Änderung baut Plan A/B sofort neu, danach zeigt die App „Was sich geändert hat“ mit Grund. Übungen, für die es schon ein Trainingslog gibt, bleiben möglichst erhalten, damit die Fortschrittskurve weiterläuft. Während einer laufenden Einheit ist Anpassen gesperrt. Läuft eine befristete Schonung ab, fragt die Startseite, ob du weiter schonen oder aufheben willst, entfernt wird nichts automatisch. Persönliche Einschränkungen gehören nie in `data/exercises.json`. Einzelne Übungen tauschst du in der Einheit per „Alternative“ oder schließt sie per „Mag ich nicht“ aus.
 
 **Neues iPhone:** App installieren, in der Einrichtung auf **Sicherung laden** tippen, Owner, Daten-Repo, Token und Passwort eintragen und **Wiederherstellen**. Profil, Essensplan und alle Einträge kommen mit.
+
+## Push-Mitteilungen einrichten
+
+Mitteilungen aufs iPhone kommen ohne eigenen Server über eine GitHub Action im privaten Daten-Repo. Sie erinnern um 07:30, 12:30 und 20:30 an die Medis und haken um 22:00 nach, falls heute noch etwas offen ist. Keine Mitteilung nennt ein Medikament, beim Nachhaken steht nur die Anzahl.
+
+### 1. Schlüssel (einmal pro App)
+
+Das Schlüsselpaar für Web Push (VAPID) ist schon erzeugt:
+
+- **Öffentlicher Schlüssel:** steht in `js/config.js` und darf öffentlich sein.
+- **Privater Schlüssel:** liegt nur lokal in `.vapid-private` im Projektordner. Die Datei ist per `.gitignore` ausgeschlossen und nur für dich lesbar. Nie committen, nie in Chats oder Notizen kopieren.
+
+Wer die App forkt, erzeugt ein eigenes Paar, zum Beispiel mit `npx web-push generate-vapid-keys`, trägt den öffentlichen Schlüssel in `js/config.js` ein und legt den privaten in `.vapid-private` ab.
+
+### 2. Secrets im Daten-Repo
+
+Im Repo `health-data` auf GitHub: **Settings > Secrets and variables > Actions > New repository secret**.
+
+- **`VAPID_PRIVATE_KEY`:** der Inhalt von `.vapid-private`. Am Mac im Projektordner diesen Befehl ausführen, dann steht der Schlüssel in der Zwischenablage und du fügst ihn direkt in das Feld „Secret“ ein:
+
+  ```bash
+  tr -d '\n' < .vapid-private | pbcopy
+  ```
+
+  Danach die Zwischenablage mit etwas anderem überschreiben.
+- **`VAPID_PUBLIC_KEY`:** der Wert von `VAPID_PUBLIC_KEY` aus `js/config.js`, ohne Anführungszeichen.
+- **`VAPID_SUBJECT`** (optional): eine Kontaktadresse wie `mailto:du@example.com`. Ohne dieses Secret nutzt die Action dein GitHub-Profil als Kontakt.
+
+### 3. Dateien ins Daten-Repo
+
+Zwei Dateien aus diesem Repo kommen ins Daten-Repo. Am einfachsten im Browser: im Repo `health-data` auf **Add file > Create new file**, den Pfad eintippen, den Inhalt aus der Raw-Ansicht der Vorlage einfügen und committen.
+
+| Vorlage in `health-app` | Pfad im Daten-Repo |
+|---|---|
+| `push-worker/reminders.yml` | `.github/workflows/reminders.yml` |
+| `push-worker/send-reminders.mjs` | `push/send-reminders.mjs` |
+
+Die Vorlage enthält die Zeiten 07:30, 12:30, 20:30 und 22:00, je mit einer Zeile für Sommer- und Winterzeit. Bei eigenen Uhrzeiten zeigt die App unter **Einstellungen > Erinnerungen > Zeitplan für die GitHub Action** die passenden Zeilen.
+
+### 4. Token erweitern
+
+Der Fine-grained Token für das Daten-Repo braucht jetzt zwei Berechtigungen:
+
+- **Contents: Read and write** (Sicherung und die Dateien für Mitteilungen)
+- **Actions: Read and write** (nur für den Button „Test-Mitteilung senden“)
+
+Unter GitHub **Settings > Developer settings > Fine-grained tokens** den Token bearbeiten, oder einen neuen erstellen und in der App eintragen.
+
+### 5. In der App
+
+1. App vom Home-Bildschirm öffnen, nicht in Safari. Web Push geht auf dem iPhone ab iOS 16.4 und nur so.
+2. **Einstellungen > Erinnerungen:** Uhrzeiten 07:30, 12:30 und 20:30 eintragen, Nachhaken 22:00, **Zeiten speichern**.
+3. **Mitteilungen aktivieren** tippen und die Frage von iOS erlauben. Die App legt dann `reminders.json`, `subscriptions.json` und `status.json` im Daten-Repo ab. Der Status zeigt „Aktiv“, „Nicht erlaubt“ oder „Nicht unterstützt“.
+4. **Test-Mitteilung senden** tippen. Nach etwa einer Minute kommt „Test: Mitteilungen funktionieren.“ Alternativ im Daten-Repo unter **Actions > Erinnerungen senden > Run workflow** mit `test` auf `true` starten.
+
+Kommt nichts: Unter **Actions** im Daten-Repo den letzten Lauf öffnen. Dort steht, ob Secrets fehlen, und abgelaufene Abos werden automatisch entfernt. Für wichtige Einträge trotzdem zusätzlich eine Erinnerung in der iOS-App Erinnerungen stellen, iOS stellt Web Push nicht immer pünktlich zu.
 
 ## Zweite Person einrichten
 
@@ -52,7 +108,7 @@ Die zweite Person braucht keinen eigenen GitHub-Account und keinen eigenen Fork.
 3. **App installieren.** Auf dem iPhone der zweiten Person dieselbe Adresse `https://<github-name>.github.io/health-app/` in Safari öffnen und zum Home-Bildschirm hinzufügen.
 4. **Einrichtung.** Die zweite Person füllt die Einrichtung selbst aus, mit ihren eigenen Regionen, Bewegungen, Fokus und Vorgaben, oder importiert ein eigenes `profile.json` (aus `data/profile.example.json` erstellt, nie committen). Profile im alten Schema mit `avoidTags` werden beim Import automatisch umgestellt. Den eigenen Essensplan ebenso per Import.
 5. **Sicherung verbinden.** In den Einstellungen unter GitHub: **Owner** wie bei der ersten Person, **Daten-Repo** `health-data-2`, **Token** aus Schritt 2. Die Vorschau muss `<github-name>/health-data-2` zeigen. Speichern, ein **eigenes Passwort** setzen (die zweite Person kennt es allein) und **Jetzt sichern**.
-6. **Push-Erinnerungen (optional).** Wie in der README beschrieben, nur im Repo `health-data-2`: Secrets anlegen, `push-worker/`-Dateien kopieren, in der App Push aktivieren. Die Action läuft pro Daten-Repo und liest nur dessen Dateien.
+6. **Push-Mitteilungen (optional).** Wie oben unter „Push-Mitteilungen einrichten“, nur im Repo `health-data-2`: dieselben Secrets `VAPID_PRIVATE_KEY` und `VAPID_PUBLIC_KEY` (gleiche App, gleiche Schlüssel), die zwei Dateien kopieren, der eigene Token mit Contents und Actions, in der App **Mitteilungen aktivieren**. Die Action läuft pro Daten-Repo und liest nur dessen Dateien.
 
 Ein Account, zwei Daten-Repos: Wer den Account verwaltet, kann beide Repos sehen, aber nur verschlüsselte Sicherungen. Lesen kann eine Sicherung nur, wer ihr Passwort kennt.
 
@@ -69,5 +125,5 @@ Updates aus dem Original holen: im Fork **Sync fork**. Da nie ein Profil oder Es
 ## Was nie ins Repo gehört
 
 - `data/profile.json`, `data/meals.json`, `data/plans.local.json` (per `.gitignore` ausgeschlossen, werden auch nicht deployt)
-- Tokens, Passwörter, VAPID-Privatschlüssel
+- Tokens, Passwörter, der VAPID-Privatschlüssel (`.vapid-private`, per `.gitignore` ausgeschlossen)
 - Namen, Medikamente oder Ernährungsdetails in Commits, Tests oder Beispielen
