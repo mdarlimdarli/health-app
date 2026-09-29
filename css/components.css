@@ -2044,3 +2044,23 @@ a.week-day::before {
 .guidance-text {
   white-space: pre-line;
 }
+
+/* Startseite: Uhrzeit rechts auf der Grundlinie von Tageszahl und Monat */
+.clock {
+  margin-left: auto;
+  font-size: var(--font-size-month);
+  font-weight: var(--font-weight-month);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+/* Aufforderung zum Check-in: keine Fläche, sie liegt direkt auf der Aura */
+.checkin-prompt .button {
+  justify-self: start;
+}
+
+/* Leere Abschnitte der Startseite nehmen keinen Abstand ein */
+.home > div:empty {
+  display: none;
+}

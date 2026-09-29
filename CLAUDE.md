@@ -18,11 +18,11 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), aura.js (Aura je Screen), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne und Änderungsübersicht, rein funktional), training-options.js (Vokabular Regionen, Bewegungen, Fokus, Migration, rein funktional), training-data.js (gespeicherte Pläne, Neuaufbau), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
+/js/app.js (Router, Shell), aura.js (Aura je Screen), clock.js (Begrüßung, Datum, Uhrzeit, rein funktional), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne und Änderungsübersicht, rein funktional), training-options.js (Vokabular Regionen, Bewegungen, Fokus, Migration, rein funktional), training-data.js (gespeicherte Pläne, Neuaufbau), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
 /js/modules/home.js, training.js, training-adjust.js (Anpassen), training-fields.js (Felder der drei Ebenen), meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.example.json (neutraler Beispiel-Essensplan), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
-/scripts/generate-plans.mjs, generate-icons.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
+/scripts/generate-plans.mjs, generate-icons.mjs, test-home.mjs, test-planner.mjs, test-meds.mjs, test-food.mjs (Node, nur Entwicklung)
 /push-worker/ (Vorlagen für die Push-Action im Repo health-data, wird nicht deployt)
 /assets/exercises/*.svg, /assets/fonts/, /assets/icons/
 
@@ -49,13 +49,14 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 ### Typografie (Inter Variable, Gewichte 100 bis 900, opsz)
 - Große Zahlen: 72 px, Gewicht 900, line-height 0.9, letter-spacing -0.05em, tabular-nums, font-variation-settings "opsz" 32.
 - Überschriften und Begrüßung: 28 px, Gewicht 900, letter-spacing -0.03em. Titel in Karten, Dialogen und Kopfzeile: 20 px, Gewicht 800.
-- Begrüßung steht direkt über der Tageszahl. Monat 20 px, Gewicht 700, auf derselben Grundlinie neben der Zahl.
+- Begrüßung steht direkt über der Tageszahl. Monat 20 px, Gewicht 700, auf derselben Grundlinie neben der Zahl, rechts daneben die Uhrzeit HH:MM im gleichen Stil, live jede Minute und sofort nach Rückkehr in die App.
+- Begrüßung nach der lokalen Stunde des Geräts (getHours): 5 bis 10 Uhr Guten Morgen, 10 bis 17 Hallo, 17 bis 22 Guten Abend, 22 bis 5 Gute Nacht.
 - Kartenzahlen und Chips: 32 px, Gewicht 800.
 - Labels und Tab-Beschriftungen: 12 px, Gewicht 700, Uppercase, letter-spacing 0.08em.
 - Fließtext und Hinweise: Gewicht 500, mindestens 16 px, line-height 1.45.
 
 ### Formen
-- Karten: Sand auf Creme, Rechteck mit Radius 24 px, keine Kontur, keine Schatten, Abstand 12 px. Aktions-Karten Ink mit Creme-Text.
+- Karten: Sand auf Creme, Rechteck mit Radius 24 px, keine Kontur, keine Schatten, Abstand 12 px. Keine Ink-Flächen auf der Startseite, sie liegt ganz auf Creme mit der Aura.
 - Alles Interaktive ist vollrund (--radius-pill): Buttons als Pille (Höhe 52 px, Padding 0 24 px, primär Ink mit Creme-Text, sekundär Sand mit Ink-Text), Chips und Tags als Pille (Höhe 32 px, gewählt in deep der Modulfarbe mit weißer Schrift), Eingabefelder als Pille, Schalter als Pille mit Kreis-Knopf, Stepper als Pille mit runden Knöpfen.
 - Check-in-Stufen als fünf Kreise (52 px, Zahl zentriert, gewählt im base-Ton, satter mit höherem Wert). Haken und Gesamtgefühl ebenfalls als Kreise.
 - Wochentags-Leiste (Training, Medis, Essen, js/week-bar.js): Reihe von Kreisen 40 px, aktiver Tag gefüllt in deep der Modulfarbe mit weißer Zahl, heute mit Ring, erledigte Tage mit Punkt.

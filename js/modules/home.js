@@ -1,5 +1,6 @@
 /*
-  Startseite (Tab Heute): Begrüßung, Datum, Zyklustag (nur mit cycleTracking),
+  Startseite (Tab Heute): Begrüßung, Datum und Live-Uhrzeit (lokale Zeit des Geräts),
+  Zyklustag (nur mit cycleTracking),
   Aura aus den Check-in-Werten (ohne Check-in ruhig in Butter, Rosé, Periwinkle),
   fällige Medikamente (wichtige zuerst, direkt abhakbar),
   abgelaufene Schonungen (nie automatisch entfernt, die Person entscheidet),
@@ -12,22 +13,65 @@ import { isMeasurement, slotLabel } from '../meds-schedule.js';
 import { SLIDER_META, activeSliders, getCheckin, hasValues, cycleDayFor, auraBlobs } from '../checkin-core.js';
 import { setAura, AURAS } from '../aura.js';
 import { todayISO, toast, el } from '../ui.js';
+import { greeting, timeText, dayParts, msToNextMinute } from '../clock.js';
 import { expiredRegions, regionLabel } from '../training-options.js';
 
-const TIME_ZONE = 'Europe/Berlin';
+/* Kopf: Wochentag, Begrüßung, Tageszahl, Monat und Uhrzeit, jede Minute aktualisiert */
 
-function todayParts() {
-  const now = new Date();
-  const fmt = (options) => new Intl.DateTimeFormat('de-DE', { timeZone: TIME_ZONE, ...options }).format(now);
-  return { day: fmt({ day: 'numeric' }), weekday: fmt({ weekday: 'long' }), month: fmt({ month: 'long' }), hour: Number(fmt({ hour: 'numeric', hourCycle: 'h23' })) };
+let clock = null;
+
+function renderHead() {
+  const head = el('div', 'hero');
+  const weekday = el('p', 'label on-aura');
+  const hello = el('h2');
+  const line = el('div', 'day-line');
+  const day = el('span', 'number');
+  const month = el('span', 'month');
+  const time = el('time', 'clock');
+  line.append(day, month, time);
+  head.append(weekday, hello, line);
+
+  const update = () => {
+    const now = new Date();
+    const parts = dayParts(now);
+    weekday.textContent = parts.weekday;
+    hello.textContent = greeting(now, getProfile().displayName);
+    day.textContent = parts.day;
+    month.textContent = parts.month;
+    time.textContent = timeText(now);
+    time.dateTime = timeText(now);
+  };
+  update();
+  startClock(head, update);
+  return head;
 }
 
-// Begrüßung nach Tageszeit, mit Namen aus dem Profil, falls vorhanden
-function greeting(hour) {
-  const phrase = hour >= 5 && hour < 11 ? 'Guten Morgen' : hour >= 11 && hour < 17 ? 'Hallo' : hour >= 17 && hour < 23 ? 'Guten Abend' : 'Gute Nacht';
-  const name = getProfile().displayName;
-  return name ? `${phrase}, ${name}` : phrase;
+// Ein Zeitgeber für die sichtbare Startseite, er endet, sobald der Kopf nicht mehr im DOM ist
+function startClock(head, update) {
+  stopClock();
+  clock = { head, update, timer: null };
+  const schedule = () => {
+    clock.timer = setTimeout(() => {
+      if (!head.isConnected) return stopClock();
+      update();
+      schedule();
+    }, msToNextMinute(new Date()));
+  };
+  schedule();
 }
+
+function stopClock() {
+  if (clock) clearTimeout(clock.timer);
+  clock = null;
+}
+
+// Zurück in der App: sofort aktualisieren, ohne auf den nächsten Minutenwechsel zu warten
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !clock) return;
+  if (!clock.head.isConnected) return stopClock();
+  clock.update();
+  startClock(clock.head, clock.update);
+});
 
 function checkIcon() {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -69,12 +113,12 @@ async function renderDay(container) {
     edit.href = '#/checkin';
     content.append(values, edit);
   } else {
-    // Aktions-Karte: Ink mit Creme-Text
-    const card = el('div', 'card card--action stack-tight');
-    const start = el('a', 'button', 'Check-in starten');
+    // Ohne Check-in keine Fläche, nur Aufforderung und Button auf der Aura
+    const prompt = el('div', 'stack-tight checkin-prompt');
+    const start = el('a', 'button button--primary', 'Check-in starten');
     start.href = '#/checkin';
-    card.append(el('p', 'label', 'Check-in'), el('h2', null, 'Wie geht es dir heute?'), el('p', 'secondary', 'Mit deinem Check-in füllt sich die Farbfläche oben.'), start);
-    content.append(card);
+    prompt.append(el('p', null, 'Wie geht es dir heute? Mit deinem Check-in füllt sich die Farbfläche oben.'), start);
+    content.append(prompt);
   }
   container.replaceChildren(content);
 }
@@ -192,13 +236,9 @@ async function renderMeal(container) {
 }
 
 export async function render(root) {
-  const { day, weekday, month, hour } = todayParts();
   const section = el('section', 'stack home');
-  // Begrüßung direkt über der Tageszahl, Monat auf derselben Grundlinie
-  const intro = el('div', 'hero');
-  const line = el('div', 'day-line');
-  line.append(el('span', 'number', day), el('span', 'month', month));
-  intro.append(el('p', 'label on-aura', weekday), el('h2', null, greeting(hour)), line);
+  // Begrüßung direkt über der Tageszahl, Monat und Uhrzeit auf derselben Grundlinie
+  const intro = renderHead();
 
   const dayArea = el('div');
   const protection = el('div', 'stack-tight');
