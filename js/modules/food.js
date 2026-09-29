@@ -142,6 +142,7 @@ async function renderWeek(root, date) {
   for (const slot of MEAL_SLOTS) {
     const resolved = resolveMeal(data, weekdayOf(date), slot.id, profileDiet, swaps[`${date}|${slot.id}`]);
     const section = el('section', 'slot');
+    section.dataset.slot = slot.id;
     section.append(el('h2', 'slot-title', slot.label));
     section.append(await mealCard({ data, date, slot, resolved, profileDiet, foodsById, rerender: () => renderWeek(root, date) }));
     root.append(section);
@@ -380,10 +381,17 @@ async function renderFoods(root) {
 /* Einstieg aus dem Router */
 
 export async function render(root) {
-  const [, sub = ''] = location.hash.replace(/^#\/?/, '').split('/');
+  const [, sub = '', slot = ''] = location.hash.replace(/^#\/?/, '').split('/');
   const view = el('section', 'stack food');
   root.replaceChildren(view);
   if (sub === 'lebensmittel') return renderFoods(view);
   const date = /^\d{4}-\d{2}-\d{2}$/.test(sub) ? sub : todayISO();
-  return renderWeek(view, date);
+  await renderWeek(view, date);
+  // #/essen/<Datum>/<Slot> öffnet die Rezeptkarte dieses Gerichts, z. B. von der Startseite
+  const recipe = slot ? view.querySelector(`.slot[data-slot="${CSS.escape(slot)}"] details`) : null;
+  if (recipe) {
+    recipe.open = true;
+    recipe.closest('.slot').scrollIntoView({ block: 'start' });
+    window.scrollBy(0, -64);
+  }
 }

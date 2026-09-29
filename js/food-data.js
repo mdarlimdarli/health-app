@@ -85,6 +85,13 @@ export async function setSwap(date, slot, mealId) {
   await db.setSetting('mealSwaps', swaps);
 }
 
+// Notiz des Wochentags aus dem Wochenplan, z. B. "Mittag ist der Rest vom Sonntag"
+export async function dayNote(date) {
+  const data = await loadMeals();
+  const entry = (data?.weekPlan ?? []).find((day) => day.weekday === weekdayOf(date));
+  return typeof entry?.note === 'string' && entry.note.trim() ? entry.note.trim() : '';
+}
+
 // Gerichte eines Tages je Slot
 export async function mealsForDate(date) {
   const data = await loadMeals();

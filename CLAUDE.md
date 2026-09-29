@@ -18,7 +18,7 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 /manifest.webmanifest
 /sw.js
 /css/tokens.css, base.css, components.css
-/js/app.js (Router, Shell), aura.js (Aura je Screen), clock.js (Begrüßung, Datum, Uhrzeit, rein funktional), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne und Änderungsübersicht, rein funktional), training-options.js (Vokabular Regionen, Bewegungen, Fokus, Migration, rein funktional), training-data.js (gespeicherte Pläne, Neuaufbau), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
+/js/app.js (Router, Shell), aura.js (Aura je Screen), clock.js (Begrüßung, Datum, Uhrzeit, rein funktional), week-bar.js (Wochentags-Leiste), db.js (IndexedDB), crypto.js, sync.js, notify.js, profile.js (Profil), ui.js (Dialoge, Datum), planner.js (Trainingspläne und Änderungsübersicht, rein funktional), training-options.js (Vokabular Regionen, Bewegungen, Fokus, Migration, rein funktional), training-data.js (gespeicherte Pläne, Neuaufbau), meds-schedule.js (Zeitplan-Regeln, rein funktional), meds-store.js, push.js, checkin-core.js (Slider, Zyklustag, Tagesfläche), cycle.js (Zykluslänge und Phase in Worten, rein funktional), food-rules.js (Ampel, Ausschlüsse, rein funktional), food-data.js, report.js (Auszug für Beratung)
 /js/modules/home.js, training.js, training-adjust.js (Anpassen), training-fields.js (Felder der drei Ebenen), meds.js, checkin.js, food.js, settings.js, profile-form.js (Onboarding, Profil bearbeiten), reminders.js (Einstellungen Erinnerungen), report-section.js (Einstellungen Auszug)
 /js/vendor/idb.js
 /data/exercises.json, plans.json (optionale Überschreibung), meals.example.json (neutraler Beispiel-Essensplan), profile.example.json (neutrale Profilvorlage), plans.generated.json (Beispielpläne aus profile.example.json)
@@ -113,6 +113,14 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 
 ## Check-in und Startseite
 - Ein Check-in pro Tag (Store checkins, Index date), nachträglich editierbar, jede Auswahl wird sofort gespeichert.
+- Startseite als Dashboard, von oben: Kopf (Wochentag, Begrüßung, Tageszahl, Monat, Live-Uhrzeit, Aura), dann je ein Abschnitt als Kontur-Karte mit Label in Uppercase und 12 px Abstand:
+  1. Medikamente: heute offene Einträge als kompakte Zeilen mit Haken, critical zuerst. Alles erledigt: "Alles genommen" mit Streak (Tage in Folge, über die wichtigen Einträge) in Butter deep.
+  2. Check-in: ohne Werte ein Outline-Button "Wie geht es dir?" in Koralle, sonst die Werte als kleine Kreise im base-Ton ihres Sliders, die Karte öffnet den Check-in.
+  3. Zyklus (nur bei cycleTracking): Zyklustag groß in Rosé deep, daneben die Phase in Worten.
+  4. Training: nächster Plan, letzte Einheit mit Datum, Wochenziel als kleiner Ring in Mandarine, "Einheit starten" startet direkt, abgelaufene Schonungen als Zeilen darin.
+  5. Essen (nur mit eigenem Essensplan): Mittag und Abend mit Tagesnotiz, Tippen öffnet die Rezeptkarte (#/essen/<Datum>/<Slot>).
+  Abschnitte ohne Inhalt fallen komplett weg, kein leerer Rahmen.
+- Phase in Worten (js/cycle.js, nur Schätzung, keine Interpretation): Menstruation bis zum Ende der ersten Phase aus profile.checkin.cyclePhases, Ovulation ca. um Zykluslänge minus 14 (plus minus ein Tag), dazwischen Follikelphase, danach Lutealphase. Zykluslänge ist der Durchschnitt der letzten bis zu sechs eigenen Zyklen aus den Periodenbeginnen (18 bis 45 Tage), ohne Daten 28.
 - Slider nur aus profile.checkin.sliders (energy Mandarine, digestion Salbei, pain Koralle, sleep Periwinkle, mood Rosé). Schmerzseite nur bei painSideToggle.enabled, Zyklus nur bei cycleTracking, sonst komplett ausgeblendet.
 - Zyklusphasen für die Auswertung kommen aus profile.checkin.cyclePhases, nie fest im Code.
 - Auswertung zeigt nur Zahlen und Verläufe, keine Interpretation.

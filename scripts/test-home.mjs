@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /*
-  Tests für den Kopf der Startseite: Begrüßung, Uhrzeit, Datum.
+  Tests für die Startseite: Begrüßung, Uhrzeit, Datum und Zyklusphase.
   Aufruf: node scripts/test-home.mjs
 */
 
 import assert from 'node:assert/strict';
 import { greetingPhrase, greeting, timeText, dayParts, msToNextMinute } from '../js/clock.js';
+import { averageCycleLength, cyclePhaseName, periodLength, DEFAULT_CYCLE_LENGTH } from '../js/cycle.js';
 
 let passed = 0;
 function test(name, fn) {
@@ -53,6 +54,40 @@ test('Datum in lokaler Zeit', () => {
 test('Nächster Minutenwechsel', () => {
   assert.equal(msToNextMinute(new Date(2026, 8, 29, 8, 5, 30, 250)), 29750);
   assert.equal(msToNextMinute(at(8, 5)), 60000);
+});
+
+test('Zykluslänge: Durchschnitt der eigenen Zyklen, sonst 28', () => {
+  assert.equal(averageCycleLength([]), DEFAULT_CYCLE_LENGTH);
+  assert.equal(averageCycleLength(['2026-09-01']), 28);
+  assert.equal(averageCycleLength(['2026-07-01', '2026-07-31', '2026-08-30']), 30);
+  // Unplausible Abstände (vergessener Eintrag) zählen nicht
+  assert.equal(averageCycleLength(['2026-05-01', '2026-06-26', '2026-07-22', '2026-08-17']), 26);
+  // Doppelte Einträge stören nicht
+  assert.equal(averageCycleLength(['2026-08-01', '2026-08-01', '2026-08-29']), 28);
+});
+test('Periodendauer aus dem Profil', () => {
+  assert.equal(periodLength([{ name: 'Periode', from: 1, to: 6 }]), 6);
+  assert.equal(periodLength([]), 5);
+});
+test('Phase in Worten bei 28 Tagen', () => {
+  const at = (day) => cyclePhaseName(day, 28, 5);
+  assert.equal(at(1), 'Menstruation');
+  assert.equal(at(5), 'Menstruation');
+  assert.equal(at(6), 'Follikelphase');
+  assert.equal(at(12), 'Follikelphase');
+  assert.equal(at(13), 'Ovulation ca.');
+  assert.equal(at(15), 'Ovulation ca.');
+  assert.equal(at(16), 'Lutealphase');
+  assert.equal(at(28), 'Lutealphase');
+  assert.equal(at(35), 'Lutealphase');
+  assert.equal(cyclePhaseName(null, 28), null);
+});
+test('Phase verschiebt sich mit der eigenen Zykluslänge', () => {
+  // 32 Tage: Eisprung geschätzt an Tag 18, Fenster 17 bis 19
+  assert.equal(cyclePhaseName(16, 32, 5), 'Follikelphase');
+  assert.equal(cyclePhaseName(17, 32, 5), 'Ovulation ca.');
+  assert.equal(cyclePhaseName(19, 32, 5), 'Ovulation ca.');
+  assert.equal(cyclePhaseName(20, 32, 5), 'Lutealphase');
 });
 
 console.log(`\n${passed} Tests bestanden${process.exitCode ? ', es gab Fehler' : ''}.`);

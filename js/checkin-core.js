@@ -70,6 +70,15 @@ export async function cycleDayFor(date, checkins = null) {
   return daysBetween(last, date) + 1;
 }
 
+// Alle bekannten Periodenbeginne, Grundlage für die durchschnittliche Zykluslänge
+export async function periodStarts(checkins = null) {
+  const list = checkins ?? await allCheckins();
+  const starts = list.filter((c) => c.periodStart).map((c) => c.date);
+  const setting = await db.getSetting('cycleStartDate');
+  if (setting) starts.push(setting);
+  return [...new Set(starts)].sort();
+}
+
 export function phaseFor(cycleDay, phases) {
   if (!Number.isInteger(cycleDay)) return null;
   return phases.find((phase) => cycleDay >= phase.from && (phase.to == null || cycleDay <= phase.to)) ?? null;

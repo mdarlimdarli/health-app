@@ -1415,18 +1415,7 @@ body:has(.rest-timer) .view {
   min-width: 0;
 }
 
-/* Startseite: fällige Einträge */
-.due-card {
-  display: grid;
-  padding-top: var(--space-2);
-  padding-bottom: 4px;
-}
 
-.due-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
 
 /* Badge am Tab */
 .tab {
@@ -1474,16 +1463,7 @@ body:has(.rest-timer) .view {
   border-radius: 16px;
 }
 
-.day-values {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-}
 
-.day-value {
-  display: grid;
-  gap: 2px;
-}
 
 /* Kopfbereich im Aura-Bereich: Begrüßung, Tageszahl, Werte */
 .hero {
@@ -1698,14 +1678,7 @@ body:has(.rest-timer) .view {
   border-top: var(--line-width) solid var(--color-line);
 }
 
-.training-card {
-  display: grid;
-  gap: var(--space-1);
-}
 
-.training-card .button {
-  margin-top: var(--space-1);
-}
 
 /* Essen */
 .food-head {
@@ -1938,19 +1911,8 @@ a.week-day::before {
   text-align: right;
 }
 
-.meal-today {
-  display: grid;
-  gap: var(--space-1);
-}
 
-.meal-today-row {
-  display: grid;
-  gap: 2px;
-}
 
-.meal-today .button {
-  margin-top: var(--space-1);
-}
 
 .report-preview {
   max-height: 320px;
@@ -2044,11 +2006,6 @@ a.week-day::before {
   color: var(--color-text);
 }
 
-/* Aufforderung zum Check-in: keine Fläche, sie liegt direkt auf der Aura */
-.checkin-prompt .button {
-  justify-self: start;
-}
-
 /* Leere Abschnitte der Startseite nehmen keinen Abstand ein */
 .home > div:empty {
   display: none;
@@ -2080,4 +2037,162 @@ a.week-day::before {
 .ring-stop-from,
 .ring-stop-to {
   stop-color: var(--mandarine-deep);
+}
+
+/*
+  Startseite als Dashboard: Kopf, dann Abschnitte als Kontur-Karten mit 12 px Abstand.
+*/
+.home {
+  gap: var(--card-gap);
+}
+
+.home > .hero {
+  padding-bottom: var(--space-2);
+}
+
+.dash-card {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Karte als Link: öffnet den Bereich, ohne Unterstreichung */
+.dash-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dash-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dash-head svg,
+.dash-row svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: var(--color-text-secondary);
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Kompakte Zeilen: Haken 44 px, Tap-Ziel bleibt erfüllt */
+.dash-card .med-row {
+  min-height: 52px;
+  padding: 4px 0;
+}
+
+.dash-card .med-row + .med-row {
+  padding-top: var(--space-1);
+}
+
+.dash-card .med-check {
+  width: var(--tap-min);
+  height: var(--tap-min);
+}
+
+.dash-card .med-check svg {
+  width: 22px;
+  height: 22px;
+}
+
+.dash-done {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* Check-in-Werte als kleine Kreise im base-Ton ihres Sliders */
+.value-circles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  row-gap: var(--space-2);
+}
+
+.value-item {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.value-circle {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  background: var(--tone);
+  border-radius: 50%;
+}
+
+.value-label {
+  /* Normale Schreibweise statt Versalien, damit vier Werte in eine Reihe passen */
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+}
+
+.dash-training {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.mini-ring {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  transform: rotate(-90deg);
+}
+
+.mini-ring circle {
+  fill: none;
+  stroke-width: 5;
+}
+
+.mini-ring-track {
+  stroke: var(--color-line);
+}
+
+.mini-ring-value {
+  stroke: var(--mandarine-deep);
+  stroke-linecap: round;
+}
+
+.mini-ring text {
+  font-size: 14px;
+  font-weight: 800;
+  fill: var(--color-text);
+  transform: rotate(90deg);
+  transform-origin: 28px 28px;
+}
+
+.dash-protection {
+  padding-top: var(--space-2);
+  border-top: var(--line-width) solid var(--color-line);
+}
+
+/* Zeile als Link, z. B. ein Gericht, das die Rezeptkarte öffnet */
+.dash-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  color: inherit;
+  text-decoration: none;
+}
+
+.dash-row + .dash-row {
+  padding-top: var(--space-1);
+  border-top: var(--line-width) solid var(--color-line);
 }

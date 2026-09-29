@@ -932,9 +932,28 @@ async function renderProgress(root, lib) {
 export async function nextTraining() {
   const lib = await loadLibrary();
   const [plansData, workouts] = await Promise.all([loadPlans(lib), loadWorkouts()]);
-  const plan = nextPlan(plansData.plans, finishedOf(workouts));
-  return { plan, active: activeOf(workouts), names: plan.exercises.map((entry) => lib.get(entry.exerciseId)?.name).filter(Boolean) };
+  const finished = finishedOf(workouts);
+  const plan = nextPlan(plansData.plans, finished);
+  const monday = mondayOf(todayISO());
+  return {
+    plan,
+    active: activeOf(workouts),
+    names: plan.exercises.map((entry) => lib.get(entry.exerciseId)?.name).filter(Boolean),
+    last: finished.at(-1) ?? null,
+    doneThisWeek: finished.filter((workout) => workout.date >= monday).length,
+    goal: Math.max(1, Number(getProfile().training.daysPerWeek) || 2),
+  };
 }
+
+// Startet den nächsten Plan direkt, etwa von der Startseite. Läuft schon eine Einheit, bleibt sie.
+export async function startNextWorkout() {
+  const lib = await loadLibrary();
+  const [plansData, workouts] = await Promise.all([loadPlans(lib), loadWorkouts()]);
+  if (activeOf(workouts)) return;
+  await startWorkout(nextPlan(plansData.plans, finishedOf(workouts)), lib);
+}
+
+export { formatDate as formatTrainingDate };
 
 /* Einstieg aus dem Router */
 
