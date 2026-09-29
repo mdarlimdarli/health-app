@@ -3,7 +3,7 @@
   0. Kopf: Wochentag, Begrüßung, Tageszahl, Monat, Live-Uhrzeit, Aura aus dem Check-in
   1. Medikamente: heute offene Einträge als kompakte Zeilen, wichtige zuerst, sonst "Alles genommen" mit Streak
   2. Check-in: Aufforderung oder die Werte als farbige Kreise
-  3. Zyklus (nur mit cycleTracking): Zyklustag, Phase in Worten
+  3. Zyklus (nur mit cycleTracking): Zyklustag, Phase in Worten, Symptome des Tages als Chips
   4. Training: nächster Plan, letzte Einheit, Wochenziel als Ring, abgelaufene Schonungen
   5. Essen (nur mit eigenem Plan): Mittag und Abend mit Tagesnotiz, Tippen öffnet die Rezeptkarte
   Jeder Abschnitt ist eine Kontur-Karte, Abschnitte ohne Inhalt fallen ganz weg.
@@ -203,7 +203,7 @@ async function renderCycle(container) {
   const [cycleDay, starts] = await Promise.all([cycleDayFor(today), periodStarts()]);
 
   const card = el('a', 'card dash-card dash-link tone-rose');
-  card.href = '#/checkin';
+  card.href = '#/zyklus';
   const head = el('div', 'dash-head');
   head.append(el('p', 'label', 'Zyklus'), svgIcon(ICON_NEXT));
   card.append(head);
@@ -216,8 +216,19 @@ async function renderCycle(container) {
   const phase = cyclePhaseName(cycleDay, length, periodLength(profile.checkin.cyclePhases));
   const line = el('div', 'day-line');
   line.append(el('span', 'number', String(cycleDay)), el('span', 'month', phase));
-  card.setAttribute('aria-label', `Zyklustag ${cycleDay}, ${phase}`);
   card.append(line, el('p', 'secondary', `Zyklustag, dein Zyklus dauert im Schnitt ${length} Tage`));
+
+  // Heute eingetragene Symptome als Chips
+  const { getEntry } = await import('../cycle-store.js');
+  const { symptomLabel } = await import('../cycle-symptoms.js');
+  const entry = await getEntry(today);
+  const labels = entry.symptoms.map((item) => symptomLabel(item.key));
+  if (labels.length) {
+    const tags = el('div', 'symptom-tags');
+    labels.forEach((label) => tags.append(el('span', 'symptom-tag', label)));
+    card.append(tags);
+  }
+  card.setAttribute('aria-label', `Zyklus: Tag ${cycleDay}, ${phase}${labels.length ? `, heute ${labels.join(', ')}` : ''}`);
   container.append(card);
 }
 

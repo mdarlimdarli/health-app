@@ -6,6 +6,10 @@
 */
 
 import { getProfile, saveProfile, parseProfileFile, importProfile } from '../profile.js';
+
+const SEX_LABELS = [['weiblich', 'Weiblich'], ['maennlich', 'Männlich'], ['divers', 'Divers']];
+// Vorauswahl für "Zyklus tracken?": bei divers entscheidet die Person selbst
+const CYCLE_DEFAULT = { weiblich: true, maennlich: false };
 import { toast, el } from '../ui.js';
 import { trainingFields } from './training-fields.js';
 
@@ -81,13 +85,17 @@ const TEMPLATE = `
         <span class="label">Name</span>
         <input class="input" name="displayName" type="text" autocomplete="given-name" required>
       </label>
+      <fieldset class="fieldset">
+        <legend class="label">Geschlecht</legend>
+        <div class="chips" data-group="sex"></div>
+      </fieldset>
+      <label class="switch-row">
+        <span>Zyklus tracken?</span>
+        <input class="switch" name="cycleTracking" type="checkbox">
+      </label>
       <label class="field">
         <span class="label">Geburtsjahr, optional</span>
         <input class="input" name="birthYear" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="bday-year">
-      </label>
-      <label class="switch-row">
-        <span>Zyklus mitverfolgen</span>
-        <input class="switch" name="cycleTracking" type="checkbox">
       </label>
     </section>
 
@@ -155,6 +163,20 @@ export async function render(root, { route } = {}) {
   form.displayName.value = profile.displayName;
   form.birthYear.value = profile.birthYear ?? '';
   form.cycleTracking.checked = profile.cycleTracking;
+  // Geschlecht als Pillen-Auswahl, eine Wahl
+  for (const [value, label] of SEX_LABELS) {
+    const chip = el('label', 'chip chip--rose');
+    const input = el('input');
+    input.type = 'radio';
+    input.name = 'sex';
+    input.value = value;
+    input.checked = profile.sex === value;
+    input.addEventListener('change', () => {
+      if (value in CYCLE_DEFAULT) form.cycleTracking.checked = CYCLE_DEFAULT[value];
+    });
+    chip.append(input, el('span', null, label));
+    $('[data-group="sex"]').append(chip);
+  }
   form.daysPerWeek.value = String(profile.training.daysPerWeek);
   form.level.value = String(profile.training.level);
   form.dislikes.value = profile.diet.dislikes.map(tagLabel).join(', ');
@@ -199,6 +221,7 @@ export async function render(root, { route } = {}) {
     next.displayName = displayName;
     next.birthYear = birthYear;
     next.cycleTracking = form.cycleTracking.checked;
+    next.sex = form.querySelector('input[name="sex"]:checked')?.value ?? null;
     next.training.daysPerWeek = Number(form.daysPerWeek.value);
     next.training.level = Number(form.level.value);
     Object.assign(next.training, fields.value());

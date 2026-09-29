@@ -3,6 +3,7 @@
   "displayName": "Beispiel",
   "language": "de",
   "birthYear": null,
+  "sex": null,
   "cycleTracking": false,
   "training": {
     "daysPerWeek": 2,

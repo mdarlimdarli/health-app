@@ -9,6 +9,9 @@
 import * as db from './db.js';
 import { todayISO } from './ui.js';
 import { normalizeTraining } from './training-options.js';
+import { DEFAULT_SYMPTOMS, SYMPTOM_KEYS } from './cycle-symptoms.js';
+
+export const SEX_OPTIONS = ['weiblich', 'maennlich', 'divers'];
 
 // Version 2: training.avoidTags ersetzt durch protectRegions, avoidMovements, focus und guidance
 export const PROFILE_VERSION = 2;
@@ -19,7 +22,10 @@ const DEFAULTS = {
   displayName: '',
   language: 'de',
   birthYear: null,
+  sex: null,
   cycleTracking: false,
+  // Symptome, die der Zyklus-Screen immer zeigt, der Rest steht unter "Mehr"
+  cycleSymptomsDefault: [...DEFAULT_SYMPTOMS],
   training: { daysPerWeek: 2, level: 1, goal: '', protectRegions: [], avoidMovements: [], focus: [], guidance: '', pullPushRatio: '1:1', startPhase: 1 },
   checkin: {
     sliders: ['energy', 'digestion', 'pain', 'sleep'],
@@ -61,6 +67,9 @@ function normalize(raw) {
   result.displayName = typeof result.displayName === 'string' ? result.displayName.trim() : '';
   result.birthYear = Number.isInteger(result.birthYear) ? result.birthYear : null;
   result.cycleTracking = result.cycleTracking === true;
+  result.sex = SEX_OPTIONS.includes(result.sex) ? result.sex : null;
+  const symptoms = stringList(source.cycleSymptomsDefault).filter((key) => SYMPTOM_KEYS.includes(key));
+  result.cycleSymptomsDefault = symptoms.length ? [...new Set(symptoms)] : [...DEFAULT_SYMPTOMS];
   // Migriert alte Schonungs-Tags (Version 1) auf Regionen und Bewegungen
   result.training = normalizeTraining(isObject(source.training) ? { ...DEFAULTS.training, ...source.training } : DEFAULTS.training);
   result.diet.intolerances = stringList(result.diet.intolerances);

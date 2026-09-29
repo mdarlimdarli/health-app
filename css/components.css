@@ -603,6 +603,7 @@
 .chip--butter:has(input:checked) { color: #FFFFFF; background: var(--butter-deep); }
 .chip--mandarine:has(input:checked) { color: #FFFFFF; background: var(--mandarine-deep); }
 .chip--koralle:has(input:checked) { color: #FFFFFF; background: var(--koralle-deep); }
+.chip--rose:has(input:checked) { color: #FFFFFF; background: var(--rose-deep); }
 
 .chip:has(input:focus-visible) {
   outline: 2px solid var(--color-text);
@@ -2195,4 +2196,184 @@ a.week-day::before {
 .dash-row + .dash-row {
   padding-top: var(--space-1);
   border-top: var(--line-width) solid var(--color-line);
+}
+
+/* Zyklus: Kalenderstreifen, je Tag ein Kreis, Blutung als Füllung in Rosé, Symptome als Punkt */
+.cycle-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  row-gap: 4px;
+}
+
+.strip-day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: var(--tap-min);
+  padding-bottom: 8px;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* Tap-Fläche seitlich auf 44 px erweitern, die Spalten sind auf 375 px nur gut 41 px breit */
+a.strip-day::before {
+  content: "";
+  position: absolute;
+  inset: 0 -2px;
+}
+
+.strip-circle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
+}
+
+.strip-circle--1 { background: color-mix(in srgb, var(--rose) 45%, var(--color-bg)); box-shadow: none; }
+.strip-circle--2 { background: var(--rose); box-shadow: none; }
+.strip-circle--3 { background: color-mix(in srgb, var(--rose-deep) 55%, var(--rose)); box-shadow: none; }
+.strip-circle--4 { color: #FFFFFF; background: var(--rose-deep); box-shadow: none; }
+
+.strip-day--today .strip-circle {
+  box-shadow: inset 0 0 0 1.5px var(--color-text);
+}
+
+.strip-day--selected .strip-circle {
+  outline: 2px solid var(--rose-deep);
+  outline-offset: 2px;
+}
+
+.strip-day--symptoms::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rose-deep);
+}
+
+.strip-day--future {
+  opacity: 0.45;
+}
+
+.cycle-day-line {
+  margin-top: calc(var(--space-2) * -1);
+}
+
+/* Symptome: Zeile mit drei Kreisen für Stärke 1 bis 3 (leer, base, deep) */
+.symptom-list,
+.symptom-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.symptom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  min-height: 52px;
+}
+
+.symptom-row + .symptom-row {
+  border-top: var(--line-width) solid var(--color-line);
+}
+
+.symptom-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  /* Lange Wörter wie Stimmungsschwankungen dürfen trennen */
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
+.intensity {
+  display: flex;
+  flex: none;
+  /* Die Tap-Fläche des letzten Kreises darf ins Kartenpolster ragen, der Kreis bleibt bündig */
+  margin-right: -9px;
+}
+
+.intensity-dot {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+}
+
+.intensity-dot::before {
+  content: "";
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--rose-deep);
+  transition: background-color var(--duration) var(--easing);
+}
+
+.intensity-dot--1.intensity-dot--on::before { background: var(--rose); }
+.intensity-dot--2.intensity-dot--on::before { background: color-mix(in srgb, var(--rose-deep) 55%, var(--rose)); }
+.intensity-dot--3.intensity-dot--on::before { background: var(--rose-deep); }
+
+/* Muster: Punktreihe je Symptom über die Zyklustage, Beschriftung darüber */
+.pattern-row {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-1) 0;
+}
+
+.pattern-row + .pattern-row {
+  border-top: var(--line-width) solid var(--color-line);
+}
+
+.pattern-row .symptom-label {
+  font-size: 14px;
+}
+
+.pattern-dots {
+  display: grid;
+  grid-template-columns: repeat(var(--days), minmax(0, 1fr));
+  align-items: center;
+  height: 12px;
+  background: linear-gradient(var(--color-line), var(--color-line)) center / 100% 1px no-repeat;
+}
+
+.pattern-dot {
+  justify-self: center;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rose-deep) calc(var(--share) * 100%), transparent);
+}
+
+.pattern-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* Symptome des Tages als ruhige Tags auf der Startseite */
+.symptom-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.symptom-tag {
+  display: inline-flex;
+  align-items: center;
+  height: var(--chip-height);
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--rose-deep);
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--rose-deep);
 }

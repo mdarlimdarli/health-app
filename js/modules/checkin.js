@@ -186,7 +186,9 @@ async function renderDay(root, date) {
       if (!current || current < date) await db.setSetting('cycleStartDate', date);
     });
 
-    card.append(el('p', 'label', 'Zyklustag'), line, stepper, period);
+    const symptoms = el('a', 'button', 'Zyklus-Symptome');
+    symptoms.href = date === today ? '#/zyklus' : `#/zyklus/${date}`;
+    card.append(el('p', 'label', 'Zyklustag'), line, stepper, period, symptoms);
     if (checkin.periodStart) card.append(el('p', 'hint', 'An diesem Tag hat die Periode begonnen.'));
     root.append(card);
   }

@@ -8,7 +8,8 @@
 import { openDB } from './vendor/idb.js';
 
 const DB_NAME = 'healthapp';
-const DB_VERSION = 1;
+// Version 2: Store cycleSymptoms. Das Upgrade legt nur fehlende Stores an, Daten bleiben.
+const DB_VERSION = 2;
 export const EXPORT_VERSION = 1;
 
 // Schema: Primärschlüssel und Indizes je Store
@@ -19,6 +20,7 @@ const SCHEMA = {
   workouts: { keyPath: 'id', indexes: ['date'] },
   exercisePrefs: { keyPath: 'exerciseId', indexes: [] },
   mealFeedback: { keyPath: 'id', indexes: ['date'] },
+  cycleSymptoms: { keyPath: 'id', indexes: ['date'] },
   settings: { keyPath: 'key', indexes: [] },
   syncQueue: { keyPath: 'id', indexes: ['status'] },
 };

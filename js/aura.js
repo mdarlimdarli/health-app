@@ -45,6 +45,11 @@ export const AURAS = {
     { tone: 'periwinkle', x: 40, y: -14, intensity: 0.9 },
     { tone: 'rose', x: 70, y: 24, intensity: 0.7 },
   ],
+  // Zyklus: Rosé großzügig, Butter dezent
+  zyklus: [
+    { tone: 'rose', x: 18, y: 4, intensity: 0.85 },
+    { tone: 'butter', x: 86, y: 10, intensity: 0.45 },
+  ],
   einstellungen: [],
   profil: [],
 };

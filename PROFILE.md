@@ -31,6 +31,8 @@ Beim Export landen die aktuellen Medikamente wieder in der Datei.
 | `displayName` | Text | Name der Person. Erscheint in der App als Titel („Beispiel“ ergibt „Beispiel Health“) und in der Begrüßung. Das Manifest heißt immer „Health“. |
 | `language` | Text | Sprache der Oberfläche, aktuell nur `de`. |
 | `birthYear` | Zahl oder `null` | Geburtsjahr, optional. Für altersabhängige Hinweise, z. B. im Training. |
+| `sex` | Text oder `null` | Geschlecht: `weiblich`, `maennlich` oder `divers`. Setzt im Onboarding nur die Vorauswahl für `cycleTracking` (an bei weiblich, aus bei männlich, bei divers unverändert). |
+| `cycleSymptomsDefault` | Liste | Symptome, die der Zyklus-Screen immer zeigt. Start: `gliederschmerzen`, `hautempfindlich`, `blaehbauch`, `kraempfe`, `muedigkeit`, `stimmungsschwankungen`. Ein Symptom aus der übrigen Liste rückt automatisch nach, wenn es an drei Tagen in 60 Tagen gewählt wurde. Mögliche Werte stehen in `js/cycle-symptoms.js`. |
 | `cycleTracking` | ja/nein | `true` blendet Zyklustag und Zyklusauswertungen ein. Bei `false` fragt die App nie nach dem Zyklus. |
 
 ### `training`

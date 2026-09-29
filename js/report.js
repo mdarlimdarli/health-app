@@ -12,6 +12,7 @@ import { SLIDER_META, activeSliders, cycleDayFor } from './checkin-core.js';
 import { adherence, isMeasurement, describeSchedule } from './meds-schedule.js';
 import { estimate1RM } from './planner.js';
 import { regionLabel, movementLabel, focusLabel } from './training-options.js';
+import { bleedingLabel, symptomsText } from './cycle-symptoms.js';
 import { INTOLERANCE_LABELS } from './food-rules.js';
 
 function addDays(iso, days) {
@@ -31,8 +32,8 @@ export async function buildReport({ weeks = 4, anonymize = true } = {}) {
   const from = addDays(today, -(weeks * 7 - 1));
   const inRange = (date) => date >= from && date <= today;
 
-  const [checkins, workouts, meds, medLog, feedback] = await Promise.all([
-    db.getAll('checkins'), db.getAll('workouts'), db.getAll('meds'), db.getAll('medLog'), db.getAll('mealFeedback'),
+  const [checkins, workouts, meds, medLog, feedback, symptoms] = await Promise.all([
+    db.getAll('checkins'), db.getAll('workouts'), db.getAll('meds'), db.getAll('medLog'), db.getAll('mealFeedback'), db.getAll('cycleSymptoms'),
   ]);
   let library = new Map();
   let foods = { meals: [] };
@@ -57,6 +58,7 @@ export async function buildReport({ weeks = 4, anonymize = true } = {}) {
   lines.push('## Profil');
   const profileLines = [
     profile.birthYear ? `Geburtsjahr: ${profile.birthYear}` : null,
+    profile.sex ? `Geschlecht: ${{ weiblich: 'weiblich', maennlich: 'männlich', divers: 'divers' }[profile.sex]}` : null,
     `Zyklus-Tracking: ${profile.cycleTracking ? 'ja' : 'nein'}`,
     `Training: ${t.daysPerWeek} Tage pro Woche, Level ${t.level}, Phase ${(await db.getSetting('trainingPhase')) ?? t.startPhase}`,
     t.protectRegions.length ? `Regionen schonen: ${t.protectRegions.map((entry) => `${regionLabel(entry.region)}${entry.until ? ` (bis ${german(entry.until)})` : ''}`).join(', ')}` : null,
@@ -122,6 +124,16 @@ export async function buildReport({ weeks = 4, anonymize = true } = {}) {
   });
   lines.push('## Einnahme und Messungen, erledigt', '');
   lines.push(adherenceRows.length ? table(['Eintrag', 'Anteil', 'Erledigt'], adherenceRows) : 'Keine Einträge.', '');
+
+  // Zyklus-Symptome: Blutung und Symptome je Tag mit Zyklustag, nur mit cycleTracking
+  if (profile.cycleTracking) {
+    const symptomRows = [];
+    for (const entry of symptoms.filter((e) => inRange(e.date)).sort((a, b) => (a.date < b.date ? -1 : 1))) {
+      symptomRows.push([german(entry.date), (await cycleDayFor(entry.date, checkins)) ?? '', bleedingLabel(entry.bleeding), symptomsText(entry), entry.note ?? '']);
+    }
+    lines.push('## Zyklus-Symptome', '', 'Stärke der Symptome 1 bis 3.', '');
+    lines.push(symptomRows.length ? table(['Datum', 'Zyklustag', 'Blutung', 'Symptome', 'Notiz'], symptomRows) : 'Keine Symptome im Zeitraum.', '');
+  }
 
   // Mahlzeiten-Feedback
   const mealNames = new Map((foods.meals ?? []).map((m) => [m.id, m.name]));

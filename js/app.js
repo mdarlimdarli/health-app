@@ -31,6 +31,7 @@ const ROUTES = {
   medis: { title: 'Medis', tone: 'butter', tab: true, load: () => import('./modules/meds.js') },
   checkin: { title: 'Check-in', tone: 'periwinkle', tab: true, load: () => import('./modules/checkin.js') },
   essen: { title: 'Essen', tone: 'salbei', tab: true, load: () => import('./modules/food.js') },
+  zyklus: { title: 'Zyklus', tone: 'rose', tab: false, load: () => import('./modules/cycle.js') },
   einstellungen: { title: 'Einstellungen', tone: 'rose', tab: false, load: () => import('./modules/settings.js') },
   profil: { title: 'Profil', tone: 'rose', tab: false, load: () => import('./modules/profile-form.js') },
   willkommen: { title: 'Willkommen', tone: 'mandarine', tab: false, load: () => import('./modules/profile-form.js') },
@@ -39,7 +40,7 @@ const ROUTES = {
 const DEFAULT_ROUTE = 'heute';
 
 // Modulfarbe für Buttons, Zahlen und aktive Elemente, neutral ist Periwinkle
-const MODULE_TONES = { training: 'mandarine', medis: 'butter', checkin: 'koralle', essen: 'salbei' };
+const MODULE_TONES = { training: 'mandarine', medis: 'butter', checkin: 'koralle', essen: 'salbei', zyklus: 'rose' };
 const BADGE_INTERVAL_MS = 60000;
 
 function icon(name) {
@@ -87,6 +88,8 @@ const isDay = (part) => /^\d{4}-\d{2}-\d{2}$/.test(part);
 
 function parentOf(id, sub) {
   if (id === 'einstellungen') return hasProfile() ? returnTo : null;
+  // Zyklus erreicht man von der Startseite oder aus dem Check-in, zurück geht es dorthin
+  if (id === 'zyklus') return isDay(sub) ? '#/zyklus' : returnTo;
   if (id === 'profil') return '#/einstellungen';
   if (id === 'training' && (sub === 'einheit' || sub === 'fortschritt' || sub === 'anpassen')) return '#/training';
   if (id === 'medis' && (sub === 'neu' || sub === 'bearbeiten')) return '#/medis/verwalten';
@@ -101,7 +104,7 @@ function updateBack(id, sub) {
   back.hidden = !target;
   if (target) back.href = target;
   // Rücksprung aus den Einstellungen: zuletzt besuchte Ansicht außerhalb von Einstellungen und Profil
-  if (id !== 'einstellungen' && id !== 'profil' && id !== 'willkommen') returnTo = location.hash || `#/${id}`;
+  if (!['einstellungen', 'profil', 'willkommen', 'zyklus'].includes(id)) returnTo = location.hash || `#/${id}`;
 }
 
 function currentRoute() {
