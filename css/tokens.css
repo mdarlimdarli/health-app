@@ -27,25 +27,44 @@
   --color-text-secondary: var(--ink-2);
   --color-line: var(--line);
   --color-tabline: rgba(22, 22, 22, 0.12);
+  /* Karten sind transparent mit feiner Kontur, die Aura scheint durch */
+  --color-outline: rgba(22, 22, 22, 0.14);
+  /* Leichte Creme-Füllung nur für Eingabefelder und aktive Zustände */
+  --color-fill: rgba(244, 239, 230, 0.72);
 
   /*
     Modulfarben in zwei Stufen.
     base: Pastellton für Verläufe und Flächen.
-    deep: Kontrastakzent für Linien, aktive Elemente und Flächen mit weißer Schrift.
-    Die deep-Werte sind so abgedunkelt, dass weiße Schrift mindestens 4,5:1 erreicht.
+    deep: Buttons, große Zahlen, Linien, aktive Elemente, Text in Modulfarbe.
+    Die deep-Werte sind so abgedunkelt, dass Creme-Schrift auf deep und deep-Text auf Creme
+    mindestens 4,6:1 erreichen (WCAG AA mit Reserve).
+    Butter ist die Ausnahme: Primärbuttons tragen Ink-Schrift, dafür braucht es eine hellere
+    Füllung (butter-strong, Ink 4,66:1). Ink auf Butter deep käme nur auf 3,5:1.
   */
   --butter: #F5D96B;
-  --butter-deep: #8C7221;
+  --butter-deep: #81691E;
+  --butter-strong: #9B7E25;
   --mandarine: #F49A5A;
-  --mandarine-deep: #C0561E;
+  --mandarine-deep: #B04F1C;
   --koralle: #F27A6B;
-  --koralle-deep: #C7392B;
+  --koralle-deep: #C4382A;
   --rose: #F3B8CB;
-  --rose-deep: #C54B7A;
+  --rose-deep: #BB3C6D;
   --periwinkle: #A9B8F0;
   --periwinkle-deep: #4A5FCC;
   --salbei: #B9CFA6;
-  --salbei-deep: #598141;
+  --salbei-deep: #51753B;
+
+  /*
+    Modul-Ton: jede Ansicht setzt ihn über data-tone am body (js/app.js),
+    einzelne Elemente über die Klasse .tone-<farbe>.
+    tone-fill und tone-on: Primärbutton, tone-deep: Sekundärbutton, Zahlen, aktive Elemente.
+    Neutral (Startseite, Einstellungen, Profil) ist Periwinkle.
+  */
+  --tone: var(--periwinkle);
+  --tone-deep: var(--periwinkle-deep);
+  --tone-fill: var(--periwinkle-deep);
+  --tone-on: var(--creme);
 
   /* Aura: weiche Verläufe von base zu transparent */
   --aura-blur: 56px;
@@ -120,7 +139,9 @@
 
   /* Layout */
   --header-height: 56px;
-  --tabbar-height: 64px;
+  --tabbar-height: 60px;
+  --tab-icon: 26px;
+  --tab-stroke: 1.75;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);

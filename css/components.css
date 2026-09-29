@@ -116,7 +116,8 @@
 
 .icon-button:active,
 .icon-button[aria-current="page"] {
-  background: var(--color-card);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
 }
 
 /* Hauptbereich über der Aura, Platz für die Tab-Bar lassen */
@@ -134,7 +135,7 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Tab-Bar: Creme mit feiner Linie, aktiver Tab mit Kreis in seiner Modulfarbe */
+/* Tab-Bar: Creme mit feiner Linie, nur Icons, aktiver Tab mit weichem Blob in der Modulfarbe */
 .tabbar {
   position: fixed;
   left: 0;
@@ -151,18 +152,10 @@
 .tab {
   --tab-tone: var(--butter);
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  display: grid;
+  place-items: center;
   min-height: var(--tabbar-height);
-  padding-top: 4px;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-label);
-  letter-spacing: var(--letter-spacing-label);
-  text-transform: uppercase;
   text-decoration: none;
   transition: color var(--duration) var(--easing);
 }
@@ -170,35 +163,38 @@
 .tab[data-route="heute"] { --tab-tone: var(--rose); }
 .tab[data-route="training"] { --tab-tone: var(--mandarine); }
 .tab[data-route="medis"] { --tab-tone: var(--butter); }
-.tab[data-route="checkin"] { --tab-tone: var(--periwinkle); }
+.tab[data-route="checkin"] { --tab-tone: var(--koralle); }
 .tab[data-route="essen"] { --tab-tone: var(--salbei); }
 
 .tab svg {
   position: relative;
   z-index: 1;
+  width: var(--tab-icon);
+  height: var(--tab-icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--tab-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .tab[aria-current="page"] {
   color: var(--color-text);
 }
 
-.tab[aria-current="page"] svg {
-  stroke-width: 2;
-}
-
+/* Blob: weicher Verlauf von base zu transparent, wie die Aura */
 .tab[aria-current="page"]::before {
   content: "";
   position: absolute;
-  top: 4px;
+  top: 50%;
   left: 50%;
-  width: 36px;
-  height: 36px;
-  margin-left: -18px;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
   border-radius: 50%;
-  background: var(--tab-tone);
+  background: radial-gradient(circle, var(--tab-tone) 0%, var(--tab-tone) 38%, transparent 70%);
 }
 
-.tab svg,
 .icon-button svg {
   width: 24px;
   height: 24px;
@@ -209,11 +205,12 @@
   stroke-linejoin: round;
 }
 
-/* Karte: Sand auf Creme, Radius 24, keine Kontur, keine Schatten */
+/* Karte: transparent mit 1 px Kontur in Ink 14 Prozent, Radius 24, die Aura scheint durch */
 .card {
   position: relative;
   padding: var(--space-3);
-  background: var(--color-card);
+  background: transparent;
+  border: var(--line-width) solid var(--color-outline);
   border-radius: var(--radius-card);
   overflow: hidden;
   isolation: isolate;
@@ -227,16 +224,7 @@
   z-index: -1;
 }
 
-/* Aktions-Karte: Ink mit Creme-Text */
-.card--action {
-  color: var(--color-bg);
-  background: var(--color-text);
-}
-
-.card--action .label,
-.card--action .secondary {
-  color: rgba(244, 239, 230, 0.78);
-}
+/* Aktions-Karte: früher Ink, jetzt wie jede Karte, keine dunklen Flächen mehr */
 
 /* Platzhalter-Ansicht der leeren Module */
 .placeholder {
@@ -270,21 +258,17 @@
   font: inherit;
   font-size: 16px;
   color: var(--color-text);
-  background: var(--color-card);
-  border: 1.5px solid transparent;
+  background: var(--color-fill);
+  border: 1.5px solid var(--color-outline);
   border-radius: var(--radius-pill);
   transition: border-color var(--duration) var(--easing);
   -webkit-appearance: none;
   appearance: none;
 }
 
-.card .input {
-  background: var(--color-bg);
-}
-
 .input:focus {
   outline: none;
-  border-color: var(--color-text);
+  border-color: var(--tone-deep);
 }
 
 .hint {
@@ -309,7 +293,7 @@
   transform: translateY(1px);
 }
 
-/* Buttons als Pille: primär Ink, sekundär Sand */
+/* Buttons als Pille: primär gefüllt in der Modulfarbe, sekundär Kontur und Text in deep */
 .button {
   display: inline-flex;
   align-items: center;
@@ -319,15 +303,11 @@
   padding: 0 var(--space-3);
   font-weight: 800;
   white-space: nowrap;
-  color: var(--color-text);
-  background: var(--color-card);
-  border: 0;
+  color: var(--tone-deep);
+  background: transparent;
+  border: 1.5px solid var(--tone-deep);
   border-radius: var(--radius-pill);
   transition: background-color var(--duration) var(--easing), opacity var(--duration) var(--easing), transform var(--duration) var(--easing);
-}
-
-.card .button:not(.button--primary):not(.button--danger) {
-  background: var(--color-bg);
 }
 
 .button:active {
@@ -339,8 +319,9 @@
 }
 
 .button--primary {
-  color: var(--color-bg);
-  background: var(--color-text);
+  color: var(--tone-on);
+  background: var(--tone-fill);
+  border-color: var(--tone-fill);
 }
 
 .button--primary:active {
@@ -348,8 +329,9 @@
 }
 
 .button--danger {
-  color: #FFFFFF;
+  color: var(--creme);
   background: var(--koralle-deep);
+  border-color: var(--koralle-deep);
 }
 
 .button-row {
@@ -491,7 +473,7 @@
 }
 
 .switch:checked {
-  background: var(--color-text);
+  background: var(--tone-deep);
 }
 
 .switch:checked::after {
@@ -525,7 +507,7 @@
   height: 32px;
   margin-top: -14px;
   border-radius: 50%;
-  background: var(--color-text);
+  background: var(--tone-deep);
   border: 0;
 }
 
@@ -539,7 +521,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--color-text);
+  background: var(--tone-deep);
   border: 0;
 }
 
@@ -573,8 +555,8 @@
 }
 
 .check-row input:checked {
-  border-color: var(--color-text);
-  background: var(--color-text) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F4EFE6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 18px no-repeat;
+  border-color: var(--tone-deep);
+  background: var(--tone-deep) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F4EFE6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 18px no-repeat;
 }
 
 /* Chips und Tags: Pille, 32 px hoch, Tap-Fläche nach oben und unten erweitert */
@@ -593,14 +575,15 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--color-text);
-  background: var(--color-card);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background-color var(--duration) var(--easing), color var(--duration) var(--easing);
 }
 
-.card .chip {
-  background: var(--color-bg);
+.chip:has(input:checked) {
+  box-shadow: none;
 }
 
 .chip::before {
@@ -917,13 +900,15 @@ a.button {
   display: grid;
   gap: var(--space-1);
   padding: 12px var(--space-2);
-  background: var(--color-bg);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
   border-radius: 20px;
   transition: background-color var(--duration) var(--easing);
 }
 
 .set-row--done {
   background: color-mix(in srgb, var(--mandarine) 30%, var(--color-bg));
+  box-shadow: none;
 }
 
 .set-top {
@@ -943,8 +928,8 @@ a.button {
   font-size: 14px;
   font-weight: 700;
   color: var(--color-text);
-  background: var(--color-card);
-  border: 0;
+  background: var(--color-fill);
+  border: var(--line-width) solid var(--color-outline);
   border-radius: var(--radius-pill);
   -webkit-appearance: none;
   appearance: none;
@@ -994,7 +979,8 @@ a.button {
   align-items: center;
   padding: 4px;
   border-radius: var(--radius-pill);
-  background: var(--color-card);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
 }
 
 .stepper-button {
@@ -1003,7 +989,9 @@ a.button {
   width: var(--tap-min);
   height: var(--tap-min);
   border-radius: 50%;
-  background: var(--color-bg);
+  background: transparent;
+  color: var(--tone-deep);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
 }
 
 .stepper-button:active {
@@ -1034,7 +1022,9 @@ a.button {
   padding: var(--space-3) var(--space-2) var(--space-2);
   overflow: hidden;
   isolation: isolate;
-  background: var(--color-card);
+  /* Liegt über dem Inhalt, deshalb deckend in Creme mit Kontur */
+  background: var(--color-bg);
+  border: var(--line-width) solid var(--color-outline);
   border-radius: var(--radius-card);
   animation: view-in var(--duration) var(--easing);
 }
@@ -1092,7 +1082,8 @@ body:has(.rest-timer) .view {
   height: var(--tap-circle);
   font-size: 20px;
   font-weight: 800;
-  background: var(--color-card);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
   border-radius: 50%;
   cursor: pointer;
   transition: background-color var(--duration) var(--easing);
@@ -1106,6 +1097,7 @@ body:has(.rest-timer) .view {
 
 .feel-option:has(input:checked) {
   background: var(--mandarine);
+  box-shadow: none;
 }
 
 .feel-scale {
@@ -1129,12 +1121,9 @@ body:has(.rest-timer) .view {
   grid-auto-flow: column;
   gap: 4px;
   padding: 4px;
-  background: var(--color-card);
+  background: transparent;
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
   border-radius: var(--radius-pill);
-}
-
-.card .segmented {
-  background: var(--color-bg);
 }
 
 .segment {
@@ -1155,8 +1144,8 @@ body:has(.rest-timer) .view {
 }
 
 .segment:has(input:checked) {
-  color: var(--color-bg);
-  background: var(--color-text);
+  color: var(--tone-on);
+  background: var(--tone-fill);
 }
 
 .chart-card {
@@ -1198,8 +1187,8 @@ body:has(.rest-timer) .view {
 }
 
 .segmented--links .segment[aria-current="page"] {
-  color: var(--color-bg);
-  background: var(--color-text);
+  color: var(--tone-on);
+  background: var(--tone-fill);
 }
 
 /* Medis */
@@ -1446,7 +1435,7 @@ body:has(.rest-timer) .view {
 
 .tab-badge {
   position: absolute;
-  top: 6px;
+  top: calc(50% - 22px);
   left: calc(50% + 6px);
   min-width: 18px;
   height: 18px;
@@ -1560,7 +1549,8 @@ body:has(.rest-timer) .view {
   height: var(--tap-circle);
   font-size: 18px;
   font-weight: 800;
-  background: var(--color-bg);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
   border-radius: 50%;
   transition: background-color var(--duration) var(--easing), transform var(--duration) var(--easing);
 }
@@ -1571,6 +1561,7 @@ body:has(.rest-timer) .view {
 
 .tap--on {
   background: color-mix(in srgb, var(--tone) calc(30% + var(--level) * 70%), var(--color-bg));
+  box-shadow: none;
 }
 
 .tap-ends {
@@ -1768,7 +1759,8 @@ a.week-day::before {
   font-size: 15px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  background: var(--color-card);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
   border-radius: 50%;
   transition: background-color var(--duration) var(--easing);
 }
@@ -1897,7 +1889,8 @@ a.week-day::before {
   gap: var(--space-1);
   min-height: var(--button-height);
   font-weight: 700;
-  background: var(--color-card);
+  background: var(--color-fill);
+  box-shadow: inset 0 0 0 var(--line-width) var(--color-outline);
   border-radius: var(--radius-pill);
   transition: background-color var(--duration) var(--easing);
 }
@@ -1919,6 +1912,7 @@ a.week-day::before {
 .thumb[aria-pressed="true"] {
   color: #FFFFFF;
   background: var(--salbei-deep);
+  box-shadow: none;
 }
 
 .food-list {
@@ -1964,11 +1958,6 @@ a.week-day::before {
   white-space: pre-wrap;
 }
 
-/* Buttons auf Aktions-Karten: Creme auf Ink */
-.card--action .button {
-  color: var(--color-text);
-  background: var(--color-bg);
-}
 
 /* In Karten kleinere Verläufe, sie zeigen dort nur einen Wert */
 .card .blob {
@@ -2063,4 +2052,32 @@ a.week-day::before {
 /* Leere Abschnitte der Startseite nehmen keinen Abstand ein */
 .home > div:empty {
   display: none;
+}
+
+/*
+  Modul-Ton: body[data-tone] setzt ihn je Ansicht (auch für Dialoge und Pausentimer),
+  .tone-<farbe> an einzelnen Elementen, z. B. für Buttons in ein anderes Modul.
+  Primärbutton: Füllung tone-fill, Schrift tone-on. Butter trägt Ink-Schrift.
+*/
+[data-tone="butter"], .tone-butter { --tone: var(--butter); --tone-deep: var(--butter-deep); --tone-fill: var(--butter-strong); --tone-on: var(--ink); }
+[data-tone="mandarine"], .tone-mandarine { --tone: var(--mandarine); --tone-deep: var(--mandarine-deep); --tone-fill: var(--mandarine-deep); --tone-on: var(--creme); }
+[data-tone="koralle"], .tone-koralle { --tone: var(--koralle); --tone-deep: var(--koralle-deep); --tone-fill: var(--koralle-deep); --tone-on: var(--creme); }
+[data-tone="rose"], .tone-rose { --tone: var(--rose); --tone-deep: var(--rose-deep); --tone-fill: var(--rose-deep); --tone-on: var(--creme); }
+[data-tone="periwinkle"], .tone-periwinkle { --tone: var(--periwinkle); --tone-deep: var(--periwinkle-deep); --tone-fill: var(--periwinkle-deep); --tone-on: var(--creme); }
+[data-tone="salbei"], .tone-salbei { --tone: var(--salbei); --tone-deep: var(--salbei-deep); --tone-fill: var(--salbei-deep); --tone-on: var(--creme); }
+
+/* Große Zahlen in der deep-Farbe ihres Moduls, die Tageszahl der Startseite bleibt Ink */
+.number,
+.card-number {
+  color: var(--tone-deep);
+}
+
+.number--ink {
+  color: var(--color-text);
+}
+
+/* Fortschrittsring in Mandarine deep */
+.ring-stop-from,
+.ring-stop-to {
+  stop-color: var(--mandarine-deep);
 }

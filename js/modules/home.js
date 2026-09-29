@@ -25,7 +25,7 @@ function renderHead() {
   const weekday = el('p', 'label on-aura');
   const hello = el('h2');
   const line = el('div', 'day-line');
-  const day = el('span', 'number');
+  const day = el('span', 'number number--ink');
   const month = el('span', 'month');
   const time = el('time', 'clock');
   line.append(day, month, time);
@@ -95,7 +95,7 @@ async function renderDay(container) {
   if (profile.cycleTracking) {
     const cycleDay = await cycleDayFor(today);
     if (cycleDay) {
-      const line = el('div', 'day-line');
+      const line = el('div', 'day-line tone-rose');
       line.append(el('span', 'number', String(cycleDay)), el('span', 'month', 'Zyklustag'));
       content.append(line);
     }
@@ -105,17 +105,17 @@ async function renderDay(container) {
     const values = el('div', 'day-values');
     for (const key of sliders) {
       if (!Number.isInteger(checkin[key])) continue;
-      const item = el('span', 'day-value');
+      const item = el('span', `day-value tone-${SLIDER_META[key].tone}`);
       item.append(el('span', 'label on-aura', SLIDER_META[key].label), el('span', 'card-number', String(checkin[key])));
       values.append(item);
     }
-    const edit = el('a', 'button button--small', 'Check-in bearbeiten');
+    const edit = el('a', 'button button--small tone-koralle', 'Check-in bearbeiten');
     edit.href = '#/checkin';
     content.append(values, edit);
   } else {
     // Ohne Check-in keine Fläche, nur Aufforderung und Button auf der Aura
     const prompt = el('div', 'stack-tight checkin-prompt');
-    const start = el('a', 'button button--primary', 'Check-in starten');
+    const start = el('a', 'button button--primary tone-koralle', 'Check-in starten');
     start.href = '#/checkin';
     prompt.append(el('p', null, 'Wie geht es dir heute? Mit deinem Check-in füllt sich die Farbfläche oben.'), start);
     content.append(prompt);
@@ -130,7 +130,7 @@ async function renderDue(container) {
   container.replaceChildren();
   if (!items.length) return;
 
-  const card = el('div', 'card due-card');
+  const card = el('div', 'card due-card tone-butter');
   const head = el('div', 'due-head');
   head.append(el('p', 'label', 'Jetzt fällig'), el('span', 'card-number', String(items.length)));
   card.append(head);
@@ -171,7 +171,7 @@ async function renderProtection(container) {
   const expired = expiredRegions(training, todayISO());
   container.replaceChildren();
   for (const entry of expired) {
-    const card = el('div', 'card stack-tight');
+    const card = el('div', 'card stack-tight tone-mandarine');
     const label = regionLabel(entry.region);
     card.append(el('p', 'label', 'Schonung'), el('p', null, `Schonung ${label} ist abgelaufen, weiter schonen oder aufheben?`));
     const keep = el('button', 'button', 'Weiter schonen');
@@ -200,7 +200,7 @@ async function renderTraining(container) {
     const { nextTraining } = await import('./training.js');
     const { plan, active, names } = await nextTraining();
     if (!plan) return;
-    const card = el('div', 'card training-card');
+    const card = el('div', 'card training-card tone-mandarine');
     card.append(el('p', 'label', active ? 'Einheit läuft' : 'Nächstes Training'), el('h2', null, active?.planName ?? plan.name));
     card.append(el('p', 'secondary', active ? 'Mach dort weiter, wo du aufgehört hast.' : `${names.slice(0, 3).join(', ')}${names.length > 3 ? ` und ${names.length - 3} weitere` : ''}`));
     const go = el('a', 'button button--primary', active ? 'Fortsetzen' : 'Zum Training');
@@ -219,7 +219,7 @@ async function renderMeal(container) {
     const day = await mealsForDate(todayISO());
     const planned = (day ?? []).filter((entry) => entry.meal);
     if (!planned.length) return;
-    const card = el('div', 'card meal-today');
+    const card = el('div', 'card meal-today tone-salbei');
     card.append(el('p', 'label', 'Heute auf dem Plan'));
     for (const entry of planned) {
       const row = el('div', 'meal-today-row');

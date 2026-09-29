@@ -30,16 +30,18 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 Ästhetik: Swiss Design, clean, minimalistisch. Jeder Screen liegt auf Creme und trägt eine Aura aus weichen Farbverläufen. Große Zahlen tragen die Information, Text ist sekundär. Alle Werte stehen als Tokens in css/tokens.css.
 
 ### Farben
-- Neutral: Creme #F4EFE6 (Grund überall), Sand #EEE7DB (Karten), Ink #161616 (Text), Ink-2 #6C6761 (Sekundärtext, 4,5:1 auch auf Sand), Linie #E1DACF.
-- Modulfarben in zwei Stufen, base für Verläufe und Flächen, deep für Linien, aktive Elemente und Flächen mit weißer Schrift. Die deep-Werte sind abgedunkelt, damit weiße Schrift mindestens 4,5:1 erreicht:
-  - Butter: base #F5D96B, deep #8C7221 (Medis)
-  - Mandarine: base #F49A5A, deep #C0561E (Training, Energie)
-  - Koralle: base #F27A6B, deep #C7392B (Schmerz, Warnung, Markierungen)
-  - Rosé: base #F3B8CB, deep #C54B7A (Zyklus, Stimmung)
-  - Periwinkle: base #A9B8F0, deep #4A5FCC (Schlaf, Check-in)
-  - Salbei: base #B9CFA6, deep #598141 (Verdauung, Ernährung)
-- Text immer Ink. Sekundärtext Ink-2 auf Creme und Sand. Im oberen Aura-Bereich Ink mit 78 Prozent Deckkraft (Klasse .on-aura), das hält 4,5:1.
-- Jede Text-Farbe-Kombination mindestens 4,5:1 (WCAG AA). Große Zahlen in Ink, nie in einem deep-Ton.
+- Neutral: Creme #F4EFE6 (Grund überall), Sand #EEE7DB (nur noch als Token, keine Kartenflächen), Ink #161616 (Text), Ink-2 #6C6761 (Sekundärtext), Linie #E1DACF, Kontur Ink 14 Prozent (--color-outline), Füllung Creme 72 Prozent (--color-fill, nur Eingabefelder und aktive Zustände).
+- Modulfarben in zwei Stufen, base für Verläufe, Blobs und Flächen, deep für Buttons, große Zahlen, Linien, aktive Elemente und Text in Modulfarbe. Die deep-Werte sind so abgedunkelt, dass Creme-Schrift auf deep und deep-Text auf Creme mindestens 4,6:1 erreichen:
+  - Butter: base #F5D96B, deep #81691E, strong #9B7E25 (Füllung für Primärbuttons mit Ink-Schrift, 4,66:1) (Medis, Streak)
+  - Mandarine: base #F49A5A, deep #B04F1C (Training, Energie)
+  - Koralle: base #F27A6B, deep #C4382A (Check-in, Schmerz, Warnung, Markierungen)
+  - Rosé: base #F3B8CB, deep #BB3C6D (Zyklus, Stimmung)
+  - Periwinkle: base #A9B8F0, deep #4A5FCC (Schlaf, Einstellungen, neutrale Aktionen)
+  - Salbei: base #B9CFA6, deep #51753B (Verdauung, Ernährung)
+- Modul-Ton: js/app.js setzt body[data-tone] je Ansicht (Training Mandarine, Medis Butter, Check-in Koralle, Essen Salbei, sonst Periwinkle). Einzelne Elemente bekommen .tone-<farbe>, z. B. ein Button auf der Startseite, der ins Training führt. Die Tokens --tone, --tone-deep, --tone-fill und --tone-on stehen in tokens.css.
+- Text immer Ink, außer Sekundärbuttons und Text in Modulfarbe (deep). Sekundärtext Ink-2. Im oberen Aura-Bereich Ink mit 78 Prozent Deckkraft (Klasse .on-aura), das hält 4,5:1.
+- Jede Text-Farbe-Kombination mindestens 4,5:1 (WCAG AA).
+- Große Zahlen in der deep-Farbe ihres Moduls: Zyklustag Rosé, Streak Butter, Gewichte, Fortschritt und Fortschrittsring Mandarine, Check-in-Werte in ihrer Slider-Farbe. Die Tageszahl der Startseite bleibt Ink (.number--ink). Überschriften bleiben Ink.
 
 ### Aura
 - Kein Screen hat eine farbige Vollfläche. Die Aura (js/aura.js, #aura in der Shell) besteht aus zwei bis drei, höchstens vier Verläufen von base zu transparent, blur 56 px, mix-blend-mode multiply, Größe 240 bis 420 px. Sie liegt hinter dem oberen Bereich, läuft nach unten in Creme aus, pointer-events none, 400 ms Einblenden beim Routing, sonst keine Animation. Die Kopfzeile ist darüber transparent und wird beim Scrollen Creme.
@@ -56,8 +58,8 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 - Fließtext und Hinweise: Gewicht 500, mindestens 16 px, line-height 1.45.
 
 ### Formen
-- Karten: Sand auf Creme, Rechteck mit Radius 24 px, keine Kontur, keine Schatten, Abstand 12 px. Keine Ink-Flächen auf der Startseite, sie liegt ganz auf Creme mit der Aura.
-- Alles Interaktive ist vollrund (--radius-pill): Buttons als Pille (Höhe 52 px, Padding 0 24 px, primär Ink mit Creme-Text, sekundär Sand mit Ink-Text), Chips und Tags als Pille (Höhe 32 px, gewählt in deep der Modulfarbe mit weißer Schrift), Eingabefelder als Pille, Schalter als Pille mit Kreis-Knopf, Stepper als Pille mit runden Knöpfen.
+- Karten: transparent mit 1 px Kontur in Ink 14 Prozent, Radius 24 px, keine Schatten, Abstand 12 px. Auf der Aura liegen sie durchsichtig, die Verläufe scheinen durch. Keine gefüllten Sand- oder Ink-Flächen. Einzige deckende Fläche ist der Pausentimer, weil er über dem Inhalt liegt (Creme mit Kontur).
+- Alles Interaktive ist vollrund (--radius-pill): Buttons als Pille (Höhe 52 px, Padding 0 24 px). Primär gefüllt in deep der Modulfarbe mit Creme-Schrift, bei Butter strong mit Ink-Schrift. Sekundär transparent mit 1,5 px Kontur und Text in deep der Modulfarbe. Chips und Tags als Pille (Höhe 32 px, ungewählt mit Kontur und leichter Creme-Füllung, gewählt in deep der Modulfarbe mit weißer Schrift), Eingabefelder als Pille mit Kontur und leichter Creme-Füllung, Schalter als Pille mit Kreis-Knopf (an in deep), Stepper als Pille mit runden Knöpfen, Umschalter aktiv in der Modulfarbe.
 - Check-in-Stufen als fünf Kreise (52 px, Zahl zentriert, gewählt im base-Ton, satter mit höherem Wert). Haken und Gesamtgefühl ebenfalls als Kreise.
 - Wochentags-Leiste (Training, Medis, Essen, js/week-bar.js): Reihe von Kreisen 40 px, aktiver Tag gefüllt in deep der Modulfarbe mit weißer Zahl, heute mit Ring, erledigte Tage mit Punkt.
 - Kalenderpunkte in Auswertungen als Kreise 12 px. Fortschrittsring bleibt ein Kreis.
@@ -66,12 +68,12 @@ Persönliche Health- und Fitness-App für eine einzelne Person pro Fork (persön
 ### Elemente
 - Kopfzeile: Titel links, Einstellungen oben rechts. Auf Unterseiten steht links ein Zurück-Pfeil zur übergeordneten Ansicht (im Standalone-Modus gibt es keine Browserleiste). Externe Links öffnen immer außerhalb der App in Safari (target _blank, rel noopener).
 - App-Icons 180 und 512 px: Creme mit einem Sonnenkreis im Verlauf, kein Text (scripts/generate-icons.mjs).
-- Tab-Bar: Creme mit 1 px Linie in Ink 12 Prozent, 5 Einträge (Heute, Training, Medis, Check-in, Essen). Aktives Icon mit 2 px Linie und Ink-Label, dahinter ein Kreis 36 px im base-Ton der Modulfarbe (Heute Rosé, Training Mandarine, Medis Butter, Check-in Periwinkle, Essen Salbei). Inaktiv Ink-2. Einstellungen über Icon oben rechts. Safe Areas (env(safe-area-inset-*)) beachten.
+- Tab-Bar: Creme mit 1 px Linie in Ink 12 Prozent, 5 Einträge nur als Icons ohne Beschriftung, jedes mit aria-label: Heute Sonne, Training Hantel, Medis Kapsel, Check-in Herz, Essen Messer und Gabel. Icons 26 px, Linie 1,75 px. Aktiver Tab in Ink mit weichem Blob im base-Ton der Modulfarbe dahinter (Heute Rosé, Training Mandarine, Medis Butter, Check-in Koralle, Essen Salbei). Inaktiv Ink-2. Einstellungen über Icon oben rechts. Safe Areas (env(safe-area-inset-*)) beachten.
 - Diagramme: Linien im deep-Ton der Modulfarbe, keine Gitterlinien, Punkte und Markierungen in Koralle deep.
 - Raster: 8 px. Seitenrand 20 px.
 - Interaktion: Tap-Ziele mind. 44 px (Chips mit erweiterter Tap-Fläche). Keine Hover-Zustände nötig. Übergänge 180 ms ease-out. Haptik nicht verfügbar, dafür klare visuelle Bestätigung.
-- Icons: dünne Linien-Icons (1.5 px), selbst als SVG, keine Icon-Bibliothek.
-- Verbotene Muster: farbige Vollflächen, Balkendiagramme mit vielen Farben, Schlagschatten, Konturen um Karten, Bootstrap-Look, Emojis im UI.
+- Icons: dünne Linien-Icons (1.5 px, in der Tab-Bar 1.75 px), selbst als SVG, keine Icon-Bibliothek.
+- Verbotene Muster: farbige Vollflächen, gefüllte Kartenflächen, Balkendiagramme mit vielen Farben, Schlagschatten, Bootstrap-Look, Emojis im UI.
 
 ## Regeln für Code
 - Alles muss offline funktionieren, außer Sync und YouTube-Links.

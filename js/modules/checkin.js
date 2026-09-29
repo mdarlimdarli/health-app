@@ -102,7 +102,7 @@ async function renderDay(root, date) {
   // Slider als fünf Tap-Felder
   for (const key of sliders) {
     const meta = SLIDER_META[key];
-    const card = el('div', `card slider-card slider-card--${meta.tone}`);
+    const card = el('div', `card slider-card slider-card--${meta.tone} tone-${meta.tone}`);
     const head = el('div', 'slider-head');
     const valueText = el('span', 'card-number');
     head.append(el('h2', null, meta.label), valueText);
@@ -148,7 +148,7 @@ async function renderDay(root, date) {
   if (profile.cycleTracking) {
     const all = await allCheckins();
     let cycleDay = await cycleDayFor(date, all);
-    const card = el('div', 'card cycle-card');
+    const card = el('div', 'card cycle-card tone-rose');
     const line = el('div', 'day-line');
     const number = el('span', 'number');
     const suffix = el('span', 'month');
@@ -327,7 +327,7 @@ async function renderAnalysis(root) {
     if (sliders.includes('pain')) {
       const trained = inRange.filter((c) => c.trainedToday).map((c) => c.pain);
       const rest = inRange.filter((c) => !c.trainedToday).map((c) => c.pain);
-      const card = el('div', 'card stat-card');
+      const card = el('div', 'card stat-card tone-koralle');
       card.append(el('p', 'label', 'Schmerz im Durchschnitt'));
       const grid = el('div', 'stat-grid');
       for (const [label, values] of [['Trainingstage', trained], ['Ohne Training', rest]]) {
@@ -339,7 +339,7 @@ async function renderAnalysis(root) {
       stats.append(card);
     }
     if (profile.cycleTracking && sliders.includes('digestion')) {
-      const card = el('div', 'card stat-card');
+      const card = el('div', 'card stat-card tone-salbei');
       card.append(el('p', 'label', 'Verdauung im Durchschnitt nach Zyklusphase'));
       const list = el('div', 'stat-list');
       for (const phase of profile.checkin.cyclePhases) {

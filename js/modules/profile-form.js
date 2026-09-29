@@ -94,13 +94,13 @@ const TEMPLATE = `
     <section class="stack-tight">
       <h2>Training</h2>
       <p class="secondary">Diese Angaben ersetzen keine Beratung. Trag hier ein, was dir Physio, Osteopath oder Arzt gesagt haben.</p>
-      <div class="range-block card">
+      <div class="range-block card tone-mandarine">
         <div class="blob blob--mandarine" data-blob="daysPerWeek"></div>
         <span class="label">Tage pro Woche</span>
         <output class="number" data-output="daysPerWeek"></output>
         <input class="range" name="daysPerWeek" type="range" min="1" max="6" step="1" aria-label="Trainingstage pro Woche">
       </div>
-      <div class="range-block card">
+      <div class="range-block card tone-mandarine">
         <div class="blob blob--mandarine" data-blob="level"></div>
         <span class="label">Level</span>
         <output class="number" data-output="level"></output>

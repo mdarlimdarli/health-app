@@ -13,13 +13,13 @@ import { openItems } from './meds-store.js';
 import { setAppBadge } from './push.js';
 import { setAura, auraForRoute } from './aura.js';
 
-// Linien-Icons, 24er Raster, Strichstärke kommt aus CSS (1.5 px)
+// Linien-Icons, 24er Raster, Strichstärke kommt aus CSS (Tab-Bar 1.75 px, sonst 1.5 px)
 const ICONS = {
   heute: '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/>',
   training: '<path d="M3 12h18M6 8v8M3.5 10v4M18 8v8M20.5 10v4"/>',
   medis: '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="m9 9 6 6"/>',
-  checkin: '<path d="M3 12h4l2-5 4 10 2-5h6"/>',
-  essen: '<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19 13 11"/>',
+  checkin: '<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/>',
+  essen: '<path d="M6 3v5.5a2 2 0 0 0 4 0V3M8 3v18"/><path d="M17.5 21V3c-2.2 1.4-3.5 4.2-3.5 8.5h3.5"/>',
   einstellungen: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
   zurueck: '<path d="M15 5 8 12l7 7"/>',
 };
@@ -37,6 +37,9 @@ const ROUTES = {
 };
 
 const DEFAULT_ROUTE = 'heute';
+
+// Modulfarbe für Buttons, Zahlen und aktive Elemente, neutral ist Periwinkle
+const MODULE_TONES = { training: 'mandarine', medis: 'butter', checkin: 'koralle', essen: 'salbei' };
 const BADGE_INTERVAL_MS = 60000;
 
 function icon(name) {
@@ -46,7 +49,7 @@ function icon(name) {
 function renderShell(root) {
   const tabs = Object.entries(ROUTES)
     .filter(([, route]) => route.tab)
-    .map(([id, route]) => `<a class="tab" href="#/${id}" data-route="${id}">${icon(id)}<span>${route.title}</span>${id === 'medis' ? '<span class="tab-badge" data-badge hidden></span>' : ''}</a>`)
+    .map(([id, route]) => `<a class="tab" href="#/${id}" data-route="${id}" aria-label="${route.title}">${icon(id)}${id === 'medis' ? '<span class="tab-badge" data-badge hidden></span>' : ''}</a>`)
     .join('');
 
   root.innerHTML = `
@@ -118,6 +121,7 @@ async function navigate() {
   document.getElementById('app').classList.toggle('shell--onboarding', !hasProfile());
 
   document.getElementById('view-title').textContent = route.title;
+  document.body.dataset.tone = MODULE_TONES[id] ?? 'periwinkle';
   updateBack(id, location.hash.replace(/^#\/?/, '').split('/')[1] ?? '');
   // Aura des Moduls, Startseite und Check-in überschreiben sie mit ihren Werten
   setAura(auraForRoute(id, location.hash.replace(/^#\/?/, '').split('/')[1] ?? ''));
@@ -162,6 +166,8 @@ async function updateBadge() {
   badge.hidden = count === 0;
   badge.textContent = String(count);
   badge.setAttribute('aria-label', `${count} fällig`);
+  // Der Tab hat nur ein Icon, die Zahl gehört deshalb in sein Label
+  badge.closest('a')?.setAttribute('aria-label', count ? `Medis, ${count} fällig` : 'Medis');
   setAppBadge(count);
 }
 
